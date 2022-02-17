@@ -11,7 +11,7 @@ permissions.add(Intents.FLAGS.GUILD_MEMBERS) //Get guild memebers
 permissions.add(Intents.FLAGS.DIRECT_MESSAGES) //Get direct messages
 
 //Creating bot
-const client = new Client({ intents: permissions })
+const client = new Client({ intents: permissions, partials: ['MESSAGE', 'CHANNEL'] })
 
 //Enviroment variables
 const env = require('dotenv')
@@ -24,24 +24,99 @@ const config = require('./config.json')
 const fs = require('fs')
 const commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./assets/commands').filter((file) => file.endsWith('.js'))
+const subcommandFiles = fs.readdirSync(`./assets/commands/subcommands`).filter((file) => file.endsWith('.js'))
 
 let loaded_commands = []
-let unloaded_commands = []
+let notloaded_commands = []
+let loaded_subcommands = []
+loaded_subcommands.len = 0
+let notloaded_subcommands = []
 
 for (const file of commandFiles) {
     let command = require(`./assets/commands/${file}`)
     if (!command.name) {
-        loaded_commands.push(file.replace('.js', ''))
-    } else {
+        notloaded_commands.push(file.replace('.js', ''))
+        continue
+    }
+
+    loaded_commands.push(command.name)
+    commands.set(command.name, command)
+    if (!command.subcommands.length) continue
+    commands.get(command.name).subcommandsExec = new Discord.Collection()
+    for (const subcommandFile of subcommandFiles) {
+        if (!command.subcommands.includes(subcommandFile.replace('.js', ''))) continue
+        let subcommand = require(`./assets/commands/subcommands/${subcommandFile}`)
+        if (!subcommand.name) {
+            if (!notloaded_subcommands[command.name]) notloaded_subcommands[command.name] = []
+            notloaded_subcommands[command.name].push(subcommandFile.replace('.js', ''))
+            continue
+        }
+        if (!loaded_subcommands[command.name]) loaded_subcommands[command.name] = []
+        loaded_subcommands[command.name].push(subcommand.name)
+        loaded_subcommands.len++
+        commands.get(command.name).subcommandsExec.set(subcommand.name, subcommand)
     }
 }
 
+if (notloaded_commands.length) {
+    console.log('❌ Failed to load ' + notloaded_commands.length + ' commands:')
+    notloaded_commands.forEach((command) => {
+        console.log(`- ${command}`)
+    })
+    console.log('')
+}
+
+//Sharting variables to global scope
+client.commands = commands
+client.config = config
+
+if (loaded_commands.length) {
+    console.log(
+        '✔️  Sucessfully loaded ' +
+            loaded_commands.length +
+            ' commands with ' +
+            loaded_subcommands.len +
+            ' subcommands:'
+    )
+
+    loaded_commands.forEach((command) => {
+        console.log(`- ${command}`)
+        if (loaded_subcommands[command]?.length) {
+            loaded_subcommands[command].forEach((subcommand) => {
+                console.log(` - ✔️  ${subcommand}`)
+            })
+        }
+        if (notloaded_subcommands[command]?.length) {
+            notloaded_subcommands[command].forEach((subcommand) => {
+                console.log(` - ❌  ${subcommand}`)
+            })
+        }
+    })
+}
+
 client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`)
+    console.log(`✔️  Logged in as ${client.user.tag}!`)
 })
 
 client.on('messageCreate', async (message) => {
-    console.log(message)
+    if (message.author.bot) return
+    if (message.author.id == config.author) message.author = true
+    if (!message.content.startsWith(config.prefix)) return
+    let args = message.content.slice(config.prefix.length).trim().split(' ')
+    let command = args.shift().toLowerCase()
+    if (!command) return
+
+    if (!commands.has(command)) {
+        message.reply(`Command \`${command}\` not found. Use ${config.prefix}help to see all commands.`)
+        return
+    }
+
+    try {
+        commands.get(command).execute(message, args)
+    } catch (e) {
+        console.log(e)
+        message.reply(e.message)
+    }
 })
 
 client.login(process.env.token)
