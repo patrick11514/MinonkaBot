@@ -66,9 +66,10 @@ if (notloaded_commands.length) {
     console.log('')
 }
 
-//Sharting variables to global scope
+//Sharing variables to global scope
 client.commands = commands
 client.config = config
+client.wf = __dirname
 
 if (loaded_commands.length) {
     console.log(
@@ -100,7 +101,7 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
-    if (message.author.id == config.author) message.author = true
+    if (message.author.id == config.author) message.author.owner = true
     if (!message.content.startsWith(config.prefix)) return
     let args = message.content.slice(config.prefix.length).trim().split(' ')
     let command = args.shift().toLowerCase()
@@ -112,9 +113,20 @@ client.on('messageCreate', async (message) => {
     }
 
     try {
-        commands.get(command).execute(message, args)
+        let command_to_execute = commands.get(command)
+
+        if (args.length >= 1 && command_to_execute.subcommands.includes(args[0])) {
+            let subcommand = args.shift()
+            command_to_execute = command_to_execute.subcommandsExec.get(subcommand)
+        }
+
+        if (command_to_execute.admin && !message.author?.owner) {
+            throw new Error('You are not allowed to use this command.')
+        }
+
+        command_to_execute.execute(message, args)
     } catch (e) {
-        console.log(e)
+        //console.log(e)
         message.reply(e.message)
     }
 })
