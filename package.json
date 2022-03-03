@@ -1,4 +1,11 @@
 {
+  "name": "discord_league_of_legends_bot",
+  "description": "Discord bot, that allow you to get informations about your account and your friends",
+  "version": "0.0.1",
+  "author": "Patrik Mintěl",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
