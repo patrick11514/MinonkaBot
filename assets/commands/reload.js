@@ -7,13 +7,11 @@ module.exports = {
     admin: true,
     execute: function (message, args) {
         if (!args.length) {
-            message.reply('Please specify a command to reload')
-            return
+            return message.reply('Please specify a command to reload')
         }
 
         if (args.length > 1) {
-            message.reply('Please specify only one command to reload')
-            return
+            return message.reply('Please specify only one command to reload')
         }
 
         const commands = message.client.commands
@@ -23,17 +21,15 @@ module.exports = {
         if (command.includes('@')) {
             let list = command.split('@')
             if (!commands.get(list[0])) {
-                message.reply(
+                return message.reply(
                     `Command \`${list[0]}\` not found. Use ${message.client.config.prefix}help to see all commands.`
                 )
-                return
             }
 
             if (!commands.get(list[0])?.subcommands.includes(list[1])) {
-                message.reply(
+                return message.reply(
                     `Subcommand \`${list[1]}\` for command \`${list[0]}\` not found. Use ${message.client.config.prefix}help to see all commands.`
                 )
-                return
             }
 
             try {
@@ -45,16 +41,14 @@ module.exports = {
                 message.client.commands.get(list[0]).subcommandsExec.set(list[1], command_to_execute)
                 return message.reply(`Subcommand \`${list[1]}\` for command \`${list[0]}\` reloaded.`)
             } catch (e) {
-                message.reply(e.message)
-                return
+                return message.reply(e.message)
             }
         }
 
         if (!commands.get(command)) {
-            message.reply(
+            return message.reply(
                 `Command \`${command}\` not found. Use ${message.client.config.prefix}help to see all commands.`
             )
-            return
         }
 
         try {
@@ -66,8 +60,7 @@ module.exports = {
             message.client.commands.set(command, command_to_execute)
             return message.reply(`Command \`${command}\` reloaded.`)
         } catch (e) {
-            message.reply(e.message)
-            return
+            return message.reply(e.message)
         }
     },
 }
