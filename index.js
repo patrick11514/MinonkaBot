@@ -33,6 +33,7 @@ loaded_subcommands.len = 0
 let notloaded_subcommands = []
 
 for (const file of commandFiles) {
+    if (file.startsWith('#')) continue
     let command = require(`./assets/commands/${file}`)
     if (!command.name) {
         notloaded_commands.push(file.replace('.js', ''))
@@ -41,10 +42,16 @@ for (const file of commandFiles) {
 
     loaded_commands.push(command.name)
     commands.set(command.name, command)
+
+    if (command.setup) {
+        command.setup(client)
+    }
+
     if (!command.subcommands.length) continue
     commands.get(command.name).subcommandsExec = new Discord.Collection()
     for (const subcommandFile of subcommandFiles) {
-        if (!command.subcommands.includes(subcommandFile.replace('.js', ''))) continue
+        if (subcommandFile.startsWith('#')) continue
+        if (!subcommandFile.includes(command.name + '@')) continue
         let subcommand = require(`./assets/commands/subcommands/${subcommandFile}`)
         if (!subcommand.name) {
             if (!notloaded_subcommands[command.name]) notloaded_subcommands[command.name] = []
@@ -55,6 +62,10 @@ for (const file of commandFiles) {
         loaded_subcommands[command.name].push(subcommand.name)
         loaded_subcommands.len++
         commands.get(command.name).subcommandsExec.set(subcommand.name, subcommand)
+
+        if (subcommand.setup) {
+            subcommand.setup(client)
+        }
     }
 }
 
@@ -70,6 +81,10 @@ if (notloaded_commands.length) {
 client.commands = commands
 client.config = config
 client.wf = __dirname
+client.fc = require('./assets/glob.js')
+
+//set variables in modules
+client.fc.config = client.config
 
 if (loaded_commands.length) {
     console.log(
@@ -101,9 +116,9 @@ client.on('ready', () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
-    if (message.author.id == config.author) message.author.owner = true
-    if (!message.content.startsWith(config.prefix)) return
-    let args = message.content.slice(config.prefix.length).trim().split(' ')
+    if (message.author.id == client.config.author) message.author.owner = true
+    if (!message.content.startsWith(client.config.prefix)) return
+    let args = message.content.slice(client.config.prefix.length).trim().split(' ')
     let command = args.shift().toLowerCase()
     if (!command) return
 
