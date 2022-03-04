@@ -1,6 +1,7 @@
 {
     "author": "620266881227423745",
     "prefix": "?",
+    "default_region": "EUN1",
     "regions": [
         "EUN1",
         "BR1",
@@ -14,6 +15,9 @@
         "TR1",
         "RU"
     ],
+    "endpoints": {
+        "summoner/by-name": "summoner/v4/summoners/by-name"
+    },
     "lanes": {
         "TOP": "Top",
         "MIDDLE": "Mid",
