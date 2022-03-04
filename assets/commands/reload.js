@@ -51,7 +51,7 @@ module.exports = {
                 //and save it to global scope
                 message.client.commands.get(list[0]).subcommandsExec.set(list[1], command_to_execute)
                 //execute setup function for subcommand
-                command_to_execute.setup(message.client)
+                command_to_execute.setup(message.client, true)
                 //reply with success message
                 return message.reply(`Subcommand \`${list[1]}\` for command \`${list[0]}\` reloaded.`)
             } catch (e) {
@@ -99,7 +99,7 @@ module.exports = {
             //and save it to global scope
             message.client.commands.set(command, command_to_execute)
             //execute setup function for command
-            command_to_execute.setup(message.client)
+            command_to_execute.setup(message.client, true)
             //reply with success message
             return message.reply(`Command \`${command}\` reloaded.`)
         } catch (e) {
