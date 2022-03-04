@@ -1,0 +1,3 @@
+[submodule "image_server"]
+	path = image_server
+	url = git@github.com:patrick11514/MinonkaImageServer.git
