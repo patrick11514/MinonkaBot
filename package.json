@@ -3,6 +3,11 @@
   "description": "Discord bot, that allow you to get informations about your account and your friends",
   "version": "0.0.1",
   "author": "Patrik Mintěl",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/patrick11514/MinonkaBot.git"
+  },
   "scripts": {
     "start": "node index.js"
   },
