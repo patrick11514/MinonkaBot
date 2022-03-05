@@ -16,7 +16,8 @@
         "RU"
     ],
     "endpoints": {
-        "summoner/by-name": "summoner/v4/summoners/by-name"
+        "summoner/by-name": "summoner/v4/summoners/by-name",
+        "league/by-id": "league/v4/entries/by-summoner"
     },
     "lanes": {
         "TOP": "Top",
