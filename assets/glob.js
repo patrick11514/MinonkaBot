@@ -1,8 +1,16 @@
+const { Client } = require('discord.js')
 const fetch = require('node-fetch')
 
 module.exports = {
     config: null,
 
+    /**
+     *
+     * @param {string} endpoint
+     * @param {string} region
+     * @param {string} param
+     * @returns {Promise<object>}
+     */
     fetchApi: async function (endpoint, region, param) {
         let url = `https://${region}.api.riotgames.com/lol/${endpoint}/${param}`
 
@@ -17,6 +25,12 @@ module.exports = {
         return json
     },
 
+    /**
+     *
+     * @param {string} name
+     * @param {string} region
+     * @returns {Promise<object>}
+     */
     getSummoner: async function (name, region) {
         let json = await this.fetchApi(this.config.endpoints['summoner/by-name'], region, name)
 
@@ -27,18 +41,29 @@ module.exports = {
         return json
     },
 
-    findSummoner: async function (name) {
+    /**
+     *
+     * @param {string} name
+     * @param {Client} client
+     * @param {string} id
+     * @returns
+     */
+    findSummoner: async function (name, client, id) {
         let regions = this.config.regions
+        client.searchingPlayerStatus[id].total = regions.length
 
         let servers = []
         let info = {}
 
+        let i = 1
         for (let region of regions) {
+            client.searchingPlayerStatus[id].scanned = i
             let summoner = await this.getSummoner(name, region)
             if (summoner) {
                 servers.push(region)
                 info[region] = summoner
             }
+            i++
         }
         if (servers.length > 0) {
             return {
@@ -49,6 +74,12 @@ module.exports = {
         return false
     },
 
+    /**
+     *
+     * @param {string} encryptedSummonerId
+     * @param {string} region
+     * @returns
+     */
     getSummonerRanks: async function (encryptedSummonerId, region) {
         let data = await this.fetchApi(this.config.endpoints['league/by-id'], region, encryptedSummonerId)
 
@@ -71,6 +102,12 @@ module.exports = {
         return ranks
     },
 
+    /**
+     *
+     * @param {string} type
+     * @param {Object} data
+     * @returns
+     */
     getImage: async function (type, data) {
         let types = {
             summoner: 'summonerProfile',
@@ -95,5 +132,19 @@ module.exports = {
                 }
             } while (true)
         }
+    },
+    /**
+     *
+     * @param {Number} length
+     * @returns
+     */
+    generateRandomString: function (length) {
+        let result = ''
+        let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        let charactersLength = characters.length
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength))
+        }
+        return result
     },
 }
