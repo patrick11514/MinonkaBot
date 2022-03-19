@@ -84,6 +84,16 @@ module.exports = {
             body: JSON.stringify(data),
         })
         let json = await response.json()
-        console.log(json)
+        if (json.file) {
+            return json.file
+        }
+        if (json?.loading) {
+            do {
+                let data = await this.getImage(type, data)
+                if (data.file) {
+                    return data.file
+                }
+            } while (true)
+        }
     },
 }
