@@ -1,3 +1,5 @@
+const { Client, Message } = require('discord.js')
+
 module.exports = {
     name: 'nameOfCommand',
     subcommands: ['subcommand1', 'subcommand2', '...'],
@@ -5,14 +7,15 @@ module.exports = {
     arguments: ['arg1', 'arg2', '...'],
     /**
      * Optional function
+     * @param {Client} client
      */
     setup: function (client) {
         //do something
     },
     /**
      * Required function
-     * message - sent message object
-     * args - array of arguments
+     * @param {Message} message
+     * @param {Array} args
      */
     execute: async function (message, args) {
         //do something

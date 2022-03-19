@@ -1,9 +1,16 @@
+const { Message } = require('discord.js')
+
 module.exports = {
     name: 'restart',
     arguments: [],
     subcommands: [],
     description: 'Restart the bot',
     admin: true,
+    /**
+     *
+     * @param {Message} message
+     * @param {Array} args
+     */
     execute: async function (message, args) {
         //send text to console
         console.log('✔️  Restarting...')

@@ -1,3 +1,5 @@
+const { Client, Message } = require('discord.js')
+
 module.exports = {
     mainCommand: 'nameOfMainCommand',
     name: 'nameOfSubcommand',
@@ -5,14 +7,15 @@ module.exports = {
     description: 'Description of subcommand',
     /**
      * Optional function
+     * @param {Client} client
      */
     setup: function (client) {
         //do something
     },
-    /*
-     * Required functionm
-     * message - sent message object
-     * args - array of arguments
+    /**
+     *
+     * @param {Message} message
+     * @param {Array} args
      */
     execute: function (message, args) {
         //do something

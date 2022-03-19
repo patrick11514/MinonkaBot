@@ -1,3 +1,4 @@
+const { Message } = require('discord.js')
 const fs = require('fs')
 module.exports = {
     name: 'reload',
@@ -5,6 +6,12 @@ module.exports = {
     subcommands: [],
     description: 'Reload command commands',
     admin: true,
+    /**
+     *
+     * @param {Message} message
+     * @param {Array} args
+     * @returns
+     */
     execute: function (message, args) {
         // if command don't have arguments, then reply with error message
         if (!args.length) {

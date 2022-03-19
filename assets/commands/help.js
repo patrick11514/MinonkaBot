@@ -1,9 +1,16 @@
+const { Message } = require('discord.js')
+
 module.exports = {
     name: 'help',
     arguments: [],
     subcommands: [],
     description: 'Displays all commands',
 
+    /**
+     *
+     * @param {Message} message
+     * @param {Array} args
+     */
     execute: function (message, args) {
         //Variable with text to send
         let text = '-----===== **COMMANDS** ======-----'

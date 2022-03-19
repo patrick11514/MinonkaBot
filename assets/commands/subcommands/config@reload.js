@@ -1,8 +1,15 @@
+const { Message } = require('discord.js')
+
 module.exports = {
     mainCommand: 'config',
     name: 'reload',
     arguments: [],
     description: 'Reload config',
+    /**
+     *
+     * @param {Message} message
+     * @param {Array} args
+     */
     execute: function (message, args) {
         //try to load config
         try {
