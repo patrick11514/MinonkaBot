@@ -1,4 +1,6 @@
 const { MessageActionRow, MessageButton } = require('discord.js')
+const fs = require('fs')
+const path = require('path')
 
 module.exports = {
     name: 'summoner',
@@ -63,6 +65,7 @@ module.exports = {
         let name = args.join(' ')
         let region
         let summoner = null
+        let msg
 
         if (name.includes('@')) {
             //split name and region
@@ -78,11 +81,11 @@ module.exports = {
             }
         } else {
             //try to search player on some region
-            let msg = await message.reply('Searching player')
+            msg = await message.reply('Searching player')
             let dots = 1
             let loaded = false
             let loop = async (msg) => {
-                await new Promise((resolve) => setTimeout(resolve, 800))
+                await new Promise((resolve) => setTimeout(resolve, 1000))
                 if (loaded) return
                 await msg.edit(`Searching player${'.'.repeat(dots)}`)
                 dots++
@@ -97,7 +100,7 @@ module.exports = {
 
             //if player not found then reply with error message
             if (!find) {
-                return message.reply("Can't find player on any server")
+                return msg.edit("Can't find player on any server")
             }
 
             let regions = find.regions
@@ -137,13 +140,16 @@ module.exports = {
             region = regions[0]
             summoner = info[0]
         }
+        if (!msg) {
+            msg = await message.reply('Loading...')
+        }
 
         if (summoner == null) {
             summoner = await gf.getSummoner(name, region)
         }
 
         if (!summoner) {
-            return message.reply(`Summoner \`${name}\` on region \`${region}\` not found`)
+            return msg.edit(`Summoner \`${name}\` on region \`${region}\` not found`)
         }
 
         let info = {
@@ -157,7 +163,18 @@ module.exports = {
 
         info.solo = ranked_data.solo
         info.flex = ranked_data.flex
-        console.log(info)
-        let getImage = await gf.getImage('summoner', info)
+        let getImage
+        try {
+            getImage = await gf.getImage('summoner', info)
+        } catch (e) {
+            return msg.edit(`Can't get image for summoner \`${name}\` on region \`${region}\` (API Error)`)
+        }
+        let image = path.join('./image_server', getImage)
+
+        if (!fs.existsSync(image)) {
+            return msg.edit(`Can't get image for summoner \`${name}\` on region \`${region}\` (File not found)`)
+        }
+
+        msg.edit({ content: ' ', files: [image] })
     },
 }
