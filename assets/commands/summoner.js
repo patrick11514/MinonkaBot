@@ -1,4 +1,4 @@
-const { MessageActionRow, MessageButton } = require('discord.js')
+const { MessageActionRow, MessageButton, Client, Message } = require('discord.js')
 const fs = require('fs')
 const path = require('path')
 
@@ -7,6 +7,12 @@ module.exports = {
     subcommands: [],
     description: 'Get info about summoner',
     arguments: ['name'],
+    /**
+     *
+     * @param {Client} client
+     * @param {boolean} reload
+     * @returns
+     */
     setup: function (client, reload = false) {
         if (reload) return
 
@@ -49,6 +55,12 @@ module.exports = {
             })
         })
     },
+    /**
+     *
+     * @param {Message} message
+     * @param {Array} args
+     * @returns
+     */
     execute: async function (message, args) {
         //set constant config to config from global scope
         const config = message.client.config
@@ -82,19 +94,28 @@ module.exports = {
         } else {
             //try to search player on some region
             msg = await message.reply('Searching player')
+            let searchId = await gf.generateRandomString(12)
+            message.client.searchingPlayerStatus[searchId] = {
+                scanned: 0,
+                total: 0,
+            }
             let dots = 1
             let loaded = false
             let loop = async (msg) => {
                 await new Promise((resolve) => setTimeout(resolve, 1000))
                 if (loaded) return
-                await msg.edit(`Searching player${'.'.repeat(dots)}`)
+                await msg.edit(
+                    `Searching player${'.'.repeat(dots)} (${message.client.searchingPlayerStatus[searchId].scanned}/${
+                        message.client.searchingPlayerStatus[searchId].total
+                    })`
+                )
                 dots++
                 if (dots > 3) dots = 1
                 await loop(msg)
             }
             loop(msg)
 
-            let find = await gf.findSummoner(name)
+            let find = await gf.findSummoner(name, message.client, searchId)
 
             loaded = true
 

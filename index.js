@@ -82,6 +82,7 @@ client.commands = commands
 client.config = config
 client.wf = __dirname
 client.fc = require('./assets/glob.js')
+client.searchingPlayerStatus = {}
 
 //set variables in modules
 client.fc.config = client.config
