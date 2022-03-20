@@ -85,7 +85,7 @@ client.commands = commands
 client.config = config
 client.wf = __dirname
 client.fc = require('./assets/glob.js')
-client.searchingPlayerStatus = {}
+client.searchingStatus = {}
 client.champions = fetch(`http://${process.env.API}/champions`).then((res) => res.json())
 
 //set variables in modules

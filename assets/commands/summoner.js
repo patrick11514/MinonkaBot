@@ -95,7 +95,7 @@ module.exports = {
             //try to search player on some region
             msg = await message.reply('Searching player')
             let searchId = await gf.generateRandomString(12)
-            message.client.searchingPlayerStatus[searchId] = {
+            message.client.searchingStatus[searchId] = {
                 scanned: 0,
                 total: 0,
             }
@@ -105,8 +105,8 @@ module.exports = {
                 await new Promise((resolve) => setTimeout(resolve, 1000))
                 if (loaded) return
                 await msg.edit(
-                    `Searching player${'.'.repeat(dots)} (${message.client.searchingPlayerStatus[searchId].scanned}/${
-                        message.client.searchingPlayerStatus[searchId].total
+                    `Searching player${'.'.repeat(dots)} (${message.client.searchingStatus[searchId].scanned}/${
+                        message.client.searchingStatus[searchId].total
                     })`
                 )
                 dots++
