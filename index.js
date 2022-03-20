@@ -12,6 +12,7 @@ permissions.add(Intents.FLAGS.DIRECT_MESSAGES) //Get direct messages
 
 //Creating bot
 const client = new Client({ intents: permissions, partials: ['MESSAGE', 'CHANNEL'] })
+client.cache = {}
 
 //Enviroment variables
 const env = require('dotenv')
@@ -86,7 +87,9 @@ client.config = config
 client.wf = __dirname
 client.fc = require('./assets/glob.js')
 client.searchingStatus = {}
-client.champions = fetch(`http://${process.env.API}/champions`).then((res) => res.json())
+;(async function () {
+    client.champions = await fetch(`http://${process.env.API}/champions`).then((res) => res.json())
+})()
 
 //set variables in modules
 client.fc.config = client.config
