@@ -26,6 +26,9 @@ const commands = new Discord.Collection()
 const commandFiles = fs.readdirSync('./assets/commands').filter((file) => file.endsWith('.js'))
 const subcommandFiles = fs.readdirSync(`./assets/commands/subcommands`).filter((file) => file.endsWith('.js'))
 
+//fetch
+const fetch = require('node-fetch')
+
 let loaded_commands = []
 let notloaded_commands = []
 let loaded_subcommands = []
@@ -83,6 +86,7 @@ client.config = config
 client.wf = __dirname
 client.fc = require('./assets/glob.js')
 client.searchingPlayerStatus = {}
+client.champions = fetch(`http://${process.env.API}/champions`).then((res) => res.json())
 
 //set variables in modules
 client.fc.config = client.config
