@@ -1,6 +1,26 @@
 const { Client } = require('discord.js')
 const fetch = require('node-fetch')
 
+Array.prototype.equals = function (array) {
+    // if the other array is a falsy value, return
+    if (!array) return false
+
+    // compare lengths - can save a lot of time
+    if (this.length != array.length) return false
+
+    for (var i = 0, l = this.length; i < l; i++) {
+        // Check if we have nested arrays
+        if (this[i] instanceof Array && array[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!this[i].equals(array[i])) return false
+        } else if (this[i] != array[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false
+        }
+    }
+    return true
+}
+
 module.exports = {
     config: null,
 
@@ -11,8 +31,13 @@ module.exports = {
      * @param {string} param
      * @returns {Promise<object>}
      */
-    fetchApi: async function (endpoint, region, param) {
-        let url = `https://${region}.api.riotgames.com/lol/${endpoint}/${param}`
+    fetchApi: async function (endpoint, region, param = '') {
+        let url
+        if (param != '') {
+            url = `https://${region}.api.riotgames.com/lol/${endpoint}/${param}`
+        } else {
+            url = `https://${region}.api.riotgames.com/lol/${endpoint}`
+        }
 
         let response = await fetch(url, {
             headers: {
@@ -50,14 +75,14 @@ module.exports = {
      */
     findSummoner: async function (name, client, id) {
         let regions = this.config.regions
-        client.searchingPlayerStatus[id].total = regions.length
+        client.searchingStatus[id].total = regions.length
 
         let servers = []
         let info = {}
 
         let i = 1
         for (let region of regions) {
-            client.searchingPlayerStatus[id].scanned = i
+            client.searchingStatus[id].scanned = i
             let summoner = await this.getSummoner(name, region)
             if (summoner) {
                 servers.push(region)
@@ -146,5 +171,40 @@ module.exports = {
             result += characters.charAt(Math.floor(Math.random() * charactersLength))
         }
         return result
+    },
+
+    /**
+     * @param {Client} client
+     * @param {string} id
+     */
+    getRotation: async function (client, id) {
+        let regions = this.config.regions
+        client.searchingStatus[id].total = regions.length
+
+        let rotation = { categories: {}, champions: {} }
+        let categoryId = 0
+
+        let i = 1
+        for (let region of regions) {
+            client.searchingStatus[id].scanned = i
+            let json = await this.fetchApi(this.config.endpoints['rotation'], region)
+            let champions = json.freeChampionIds
+            let found = false
+            for (let [category, champCat] of Object.entries(rotation.champions)) {
+                if (champions.equals(champCat)) {
+                    found = true
+                    rotation.categories[category] = [...rotation.categories[category], region]
+                    break
+                }
+            }
+            if (!found) {
+                rotation.champions[categoryId] = champions
+                rotation.categories[categoryId] = [region]
+                categoryId++
+            }
+            i++
+        }
+
+        return rotation
     },
 }
