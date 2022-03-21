@@ -110,9 +110,19 @@ module.exports = {
 
         let ranks = {}
 
-        console.log(data)
-
         data.forEach((queue) => {
+            let miniSeries = {}
+            if (queue.miniSeries) {
+                let games = queue.miniSeries.progress.split('')
+                miniSeries.games = games
+                miniSeries.images = []
+                miniSeries.games.forEach((gameType, i) => {
+                    miniSeries.images[i] = gameType
+                        .replace('W', 'seriesWin.png')
+                        .replace('L', 'seriesLose.png')
+                        .replace('N', 'seriesEmpty.png')
+                })
+            }
             ranks[this.config.queues[queue.queueType]] = {
                 tier: queue.tier,
                 rank: queue.rank,
@@ -121,6 +131,7 @@ module.exports = {
                 total: queue.wins + queue.losses,
                 wr: ((queue.wins / (queue.wins + queue.losses)) * 100).toFixed(1),
                 lp: queue.leaguePoints,
+                promos: miniSeries,
             }
         })
 

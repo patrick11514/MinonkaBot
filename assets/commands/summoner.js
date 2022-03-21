@@ -184,6 +184,7 @@ module.exports = {
 
         info.solo = ranked_data.solo
         info.flex = ranked_data.flex
+
         let getImage
         try {
             getImage = await gf.getImage('summoner', info)
