@@ -35,18 +35,10 @@ module.exports = {
                 return interaction.reply({ content: "You can't use this interaction!", ephemeral: true })
             }
 
-            let components = interaction.message.components
-
-            components.forEach((row) => {
-                row.components.forEach((button) => {
-                    button.disabled = true
-                })
-            })
-
-            interaction.message.edit({ components: components })
+            interaction.message.edit({ components: [] })
 
             //execute command summoner
-            interaction.client.commands.get('summoner').execute(message, [`${name}@${server}`])
+            interaction.client.commands.get('summoner').execute(message, [`${name}@${server}`], interaction.message)
 
             //reply with client only message
             interaction.reply({
@@ -61,7 +53,7 @@ module.exports = {
      * @param {Array} args
      * @returns
      */
-    execute: async function (message, args) {
+    execute: async function (message, args, editMessage = null) {
         //set constant config to config from global scope
         const config = message.client.config
         //set constant global function to functions from global scope
@@ -71,7 +63,11 @@ module.exports = {
 
         //if no arguments, then reply with error message
         if (args.length < 1) {
-            return message.reply('Please provide a summoner name')
+            let msg = 'Please provide a summoner name'
+            if (editMessage) {
+                return editMessage.edit(msg)
+            }
+            return message.reply(msg)
         }
         //put arguments together with space between them (if somebody have nickname with space)
         let name = args.join(' ')
@@ -89,11 +85,19 @@ module.exports = {
             //if region is invalid then reply with error message
             if (!config.regions.includes(region)) {
                 let regions = config.regions.join(', ')
-                return message.reply(`Invalid region \`${region}\`.\nValid regions ${regions}`)
+                let msg = `Invalid region \`${region}\`.\nValid regions ${regions}`
+                if (editMessage) {
+                    return editMessage.edit(msg)
+                }
+                return message.reply(msg)
             }
         } else {
             //try to search player on some region
-            msg = await message.reply('Searching player')
+            if (editMessage) {
+                msg = await editMessage.edit('Searching player')
+            } else {
+                msg = await message.reply('Searching player')
+            }
             let searchId = await gf.generateRandomString(12)
             message.client.searchingStatus[searchId] = {
                 scanned: 0,
@@ -162,7 +166,11 @@ module.exports = {
             summoner = info[0]
         }
         if (!msg) {
-            msg = await message.reply('Loading...')
+            if (editMessage) {
+                msg = await editMessage.edit('Loading...')
+            } else {
+                msg = await message.reply('Loading...')
+            }
         }
 
         if (summoner == null) {
