@@ -59,8 +59,6 @@ module.exports = {
         //set constant global function to functions from global scope
         const gf = message.client.fc
 
-        let last_message = null
-
         //if no arguments, then reply with error message
         if (args.length < 1) {
             let msg = 'Please provide a summoner name'
