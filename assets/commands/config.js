@@ -11,7 +11,7 @@ module.exports = {
      * @param {Message} message
      * @param {Array} args
      */
-    execute: function (message, args) {
+    execute: function (message) {
         message.reply('Please use argument.')
     },
 }

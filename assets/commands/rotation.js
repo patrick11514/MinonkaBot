@@ -1,4 +1,4 @@
-const { Client, Message } = require('discord.js')
+const { Message } = require('discord.js')
 const fs = require('fs')
 
 module.exports = {
@@ -14,9 +14,7 @@ module.exports = {
      * @param {Message} message
      * @param {Array} args
      */
-    execute: async function (message, args) {
-        //set constant config to config from global scope
-        const config = message.client.config
+    execute: async function (message) {
         //set constant global function to functions from global scope
         const gf = message.client.fc
         //set constant champions to champions list from global scope

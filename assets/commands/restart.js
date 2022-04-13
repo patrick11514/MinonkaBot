@@ -56,7 +56,7 @@ module.exports = {
      * @param {Message} message
      * @param {Array} args
      */
-    execute: async function (message, args) {
+    execute: async function (message) {
         let row = new MessageActionRow()
 
         row.addComponents(
