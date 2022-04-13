@@ -80,6 +80,10 @@ module.exports = {
             name = split[0]
             //and set region to second part
             region = split[1].toUpperCase()
+            //try to convert region
+            if (config.regions_readable[region]) {
+                region = config.regions_readable[region]
+            }
             //if region is invalid then reply with error message
             if (!config.regions.includes(region)) {
                 let regions = config.regions.join(', ')
@@ -181,7 +185,7 @@ module.exports = {
 
         let info = {
             name: summoner.name,
-            region: region,
+            region: Object.keys(config.regions_readable).find((key) => region === config.regions_readable[key]),
             level: summoner.summonerLevel,
             icon: summoner.profileIconId,
         }
