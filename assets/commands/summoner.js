@@ -1,6 +1,7 @@
 const { MessageActionRow, MessageButton, Client, Message } = require('discord.js')
 const fs = require('fs')
 const path = require('path')
+const Loop = require('../functions/loop.js')
 
 module.exports = {
     name: 'summoner',
@@ -100,30 +101,12 @@ module.exports = {
             } else {
                 msg = await message.reply('Searching player')
             }
-            let searchId = await gf.generateRandomString(12)
-            message.client.searchingStatus[searchId] = {
-                scanned: 0,
-                total: 0,
-            }
-            let dots = 1
-            let loaded = false
-            let loop = async (msg) => {
-                await new Promise((resolve) => setTimeout(resolve, 1000))
-                if (loaded) return
-                await msg.edit(
-                    `Searching player${'.'.repeat(dots)} (${message.client.searchingStatus[searchId].scanned}/${
-                        message.client.searchingStatus[searchId].total
-                    })`
-                )
-                dots++
-                if (dots > 3) dots = 1
-                await loop(msg)
-            }
-            loop(msg)
 
-            let find = await gf.findSummoner(name, message.client, searchId)
+            let loop = new Loop(message, msg)
 
-            loaded = true
+            let find = await gf.findSummoner(name, message.client, loop.id)
+
+            loop.stop()
 
             //if player not found then reply with error message
             if (!find) {
