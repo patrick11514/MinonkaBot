@@ -1,4 +1,4 @@
-{
+module.exports = {
     "author": "620266881227423745",
     "prefix": "?",
     "default_region": "EUN1",
@@ -15,6 +15,19 @@
         "TR1",
         "RU"
     ],
+    "regions_readable": {
+        "EUNE": "EUN1",
+        "BR": "BR1",
+        "EUW": "EUW1",
+        "JP": "JP1",
+        "KR": "KR",
+        "LA1": "LA1",
+        "LA2": "LA2",
+        "NA": "NA1",
+        "OC": "OC1",
+        "TR": "TR1",
+        "RU": "RU"
+    },
     "endpoints": {
         "summoner/by-name": "summoner/v4/summoners/by-name",
         "league/by-id": "league/v4/entries/by-summoner",
