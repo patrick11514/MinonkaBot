@@ -14,7 +14,7 @@ module.exports = {
         //try to load config
         try {
             //path to config
-            let path = `${message.client.wf}/config.json`
+            let path = `${message.client.wf}/config.js`
             //delete config from cache
             delete require.cache[require.resolve(path)]
             //require config

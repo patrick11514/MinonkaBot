@@ -19,7 +19,7 @@ const env = require('dotenv')
 env.config()
 
 //Config
-const config = require('./config.json')
+const config = require('./config.js')
 
 //Load commands
 const fs = require('fs')
