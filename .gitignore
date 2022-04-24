@@ -4,3 +4,4 @@ service.sh
 assets/emojis.json
 assets/commands/create.sh
 assets/commands/subcommands/create.sh
+assets/db

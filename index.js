@@ -30,6 +30,13 @@ const subcommandFiles = fs.readdirSync(`./assets/commands/subcommands`).filter((
 //fetch
 const fetch = require('node-fetch')
 
+//db
+const JSONdb = require("simple-json-db")
+const db = new JSONdb("./assets/db/userProfiles.json", {
+    asyncWrite: true,
+    syncOnWrite: true
+})
+
 let loaded_commands = []
 let notloaded_commands = []
 let loaded_subcommands = []
@@ -87,7 +94,9 @@ client.config = config
 client.wf = __dirname
 client.fc = require('./assets/glob.js')
 client.searchingStatus = {}
-;(async function () {
+client.db = db;
+
+(async function () {
     client.champions = await fetch(`http://${process.env.API}/champions`).then((res) => res.json())
 })()
 
@@ -97,10 +106,10 @@ client.fc.config = client.config
 if (loaded_commands.length) {
     console.log(
         '✔️  Sucessfully loaded ' +
-            loaded_commands.length +
-            ' commands with ' +
-            loaded_subcommands.len +
-            ' subcommands:'
+        loaded_commands.length +
+        ' commands with ' +
+        loaded_subcommands.len +
+        ' subcommands:'
     )
 
     loaded_commands.forEach((command) => {
@@ -131,7 +140,6 @@ client.on('messageCreate', async (message) => {
     if (!command) return
 
     if (!commands.has(command)) {
-        message.reply(`Command \`${command}\` not found. Use ${config.prefix}help to see all commands.`)
         return
     }
 
