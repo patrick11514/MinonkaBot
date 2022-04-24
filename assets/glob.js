@@ -218,4 +218,26 @@ module.exports = {
 
         return rotation
     },
+
+    getMasteries: async function (id, region) {
+        let json = await this.fetchApi(this.config.endpoints['mastery/by-id'], region, id)
+
+        return json
+    },
+
+    visualizeMastery: function (masteryData, emotes, client) {
+        let champions = client.champions
+        let championId = masteryData.championId
+        let championName = champions[championId]
+
+        let text = `${emotes[championName]} **${championName}**:\n`
+        let d = new Date(masteryData.lastPlayTime)
+        text += `⌛ Last played: ${d.getHours()}:${d.getMinutes()} ${d.getDate()}.${d.getMonth()}.${d.getFullYear()}\n`
+        text += `${emotes["chestacquired"]} Chest acquired: ${masteryData.chestGranted ? 'Yes' : 'No'}\n`
+
+
+
+
+        console.log(masteryData)
+    }
 }
