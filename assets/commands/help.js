@@ -9,10 +9,16 @@ module.exports = {
     /**
      *
      * @param {Message} message
+     * @param {Array} args
      */
-    execute: function (message) {
+    execute: function (message, args) {
         //Variable with text to send
         let text = '-----===== **COMMANDS** ======-----'
+
+        if (message.author.owner && args[0] == "user") {
+            message.author.owner = false
+            text += "\n**Displaying as user**"
+        }
 
         //foreach all loaded comamnds
         message.client.commands.forEach((command) => {
