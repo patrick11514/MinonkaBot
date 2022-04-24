@@ -1,7 +1,7 @@
 {
   "name": "discord_league_of_legends_bot",
   "description": "Discord bot, that allow you to get informations about your account and your friends",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "author": "Patrik Mintěl",
   "license": "ISC",
   "repository": {
