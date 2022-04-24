@@ -12,7 +12,6 @@ module.exports = {
      *
      * @param {Client} client
      * @param {boolean} reload
-     * @returns
      */
     setup: function (client, reload = false) {
         if (reload) return
