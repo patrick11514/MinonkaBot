@@ -58,14 +58,51 @@ module.exports = {
         const config = message.client.config
         //set constant global function to functions from global scope
         const gf = message.client.fc
+        //db
+        const db = message.client.db
+
+        let discordId = message.author.id
 
         //if no arguments, then reply with error message
         if (args.length < 1) {
-            let msg = 'Please provide a summoner name'
-            if (editMessage) {
-                return editMessage.edit(msg)
+            if (!await db.has(discordId) || await db.get(discordId).length == 0) {
+
+                let msg = 'Please provide a summoner name'
+                if (editMessage) {
+                    return editMessage.edit(msg)
+                }
+                return message.reply(msg)
             }
-            return message.reply(msg)
+
+            let accounts = await db.get(discordId)
+
+            if (accounts.length > 1) {
+                let rows = []
+
+                for (let i = 0, j = accounts.length; i < j; i += 5) {
+                    let temp = accounts.slice(i, i + 5)
+                    let row = new MessageActionRow()
+                    temp.forEach((account) => {
+                        let [name, region] = account.split("@")
+                        row.addComponents(
+                            new MessageButton()
+                                .setCustomId(
+                                    `SUMMONER@${name}@${region.toLowerCase()}@${message.channelId}@${message.id}`
+                                )
+                                .setLabel(`${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`)
+                                .setStyle('DANGER')
+                        )
+                    })
+                    rows.push(row)
+                }
+
+                return message.reply({
+                    content: "Please select one account:",
+                    components: rows,
+                })
+            }
+
+            args[0] = accounts[0]
         }
         //put arguments together with space between them (if somebody have nickname with space)
         let name = args.join(' ')
