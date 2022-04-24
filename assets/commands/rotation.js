@@ -6,13 +6,12 @@ module.exports = {
     subcommands: [],
     description: 'Champion rotation',
     arguments: [],
-    setup(client, reload = false) {
+    setup(client) {
         client.cache.rotation = 0
     },
     /**
      * Required function
      * @param {Message} message
-     * @param {Array} args
      */
     execute: async function (message) {
         //set constant global function to functions from global scope
@@ -35,8 +34,7 @@ module.exports = {
                 await new Promise((resolve) => setTimeout(resolve, 1000))
                 if (loaded) return
                 await msg.edit(
-                    `Scanning servers${'.'.repeat(dots)} (${message.client.searchingStatus[searchId].scanned}/${
-                        message.client.searchingStatus[searchId].total
+                    `Scanning servers${'.'.repeat(dots)} (${message.client.searchingStatus[searchId].scanned}/${message.client.searchingStatus[searchId].total
                     })`
                 )
                 dots++

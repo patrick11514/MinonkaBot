@@ -10,7 +10,6 @@ module.exports = {
      *
      * @param {Message} message
      * @param {Array} args
-     * @returns
      */
     execute: function (message, args) {
         // if command don't have arguments, then reply with error message

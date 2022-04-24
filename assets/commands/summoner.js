@@ -52,7 +52,7 @@ module.exports = {
      *
      * @param {Message} message
      * @param {Array} args
-     * @returns
+     * @param {Message} editMessage 
      */
     execute: async function (message, args, editMessage = null) {
         //set constant config to config from global scope

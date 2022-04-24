@@ -9,7 +9,6 @@ module.exports = {
     /**
      *
      * @param {Message} message
-     * @param {Array} args
      */
     execute: function (message) {
         //Variable with text to send
