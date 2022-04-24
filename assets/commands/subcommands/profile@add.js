@@ -72,6 +72,12 @@ module.exports = {
 
         await find.getSummonerData(message, !editMessage ? false : true)
 
+        let summoner = find.getData()
+
+        if (!summoner) {
+            return
+        }
+
         let msg = find.editMessage
         let name = find.name
         let region = find.region
