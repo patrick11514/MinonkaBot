@@ -1,4 +1,5 @@
 const { MessageActionRow, MessageButton, Message, Client } = require('discord.js')
+const FindUser = require('../../functions/findUser.js')
 const Loop = require('../../functions/loop.js')
 
 module.exports = {
@@ -67,110 +68,13 @@ module.exports = {
             }
         }
 
-        let name, summoner, region, msg
+        let find = new FindUser(args, "PROFILE_ADD", editMessage)
 
-        if (args.length > 1) {
-            let arg = args.join(" ")
-            if (arg.includes("@")) {
-                let split = arg.split("@")
-                name = split[0]
-                region = split[1].toUpperCase()
-            } else {
-                name = args[0]
-                region = args[1].toUpperCase()
-            }
-        } else {
-            let arg = args[0]
-            if (arg.includes("@")) {
-                let split = arg.split("@")
-                name = split[0]
-                region = split[1].toUpperCase()
-            } else {
-                name = args[0]
-            }
-        }
+        await find.getSummonerData(message, !editMessage ? false : true)
 
-        if (!region) {
-            if (editMessage) {
-                msg = await editMessage.edit('Searching player')
-            } else {
-                msg = await message.reply('Searching player')
-            }
-
-            let loop = new Loop(message, msg)
-
-            let data = await gf.findSummoner(name, message.client, loop.id)
-            loop.stop()
-
-            if (!data) {
-                return msg.edit("Can't find player on any server")
-            }
-
-            let regions = data.regions
-            let info = data.info
-
-            if (regions.length > 1) {
-                let rows = []
-                let player_info = '\n**Region: level**\n'
-
-                for (let [id, data] of Object.entries(info)) {
-                    player_info += `${id}: \`${data.summonerLevel}\` `
-                }
-
-                for (let i = 0, j = regions.length; i < j; i += 5) {
-                    let temp = regions.slice(i, i + 5)
-                    let row = new MessageActionRow()
-                    temp.forEach((region) => {
-                        row.addComponents(
-                            new MessageButton()
-                                .setCustomId(
-                                    `PROFILE_ADD@${name}@${region.toLowerCase()}@${message.channelId}@${message.id}`
-                                )
-                                .setLabel(region)
-                                .setStyle('PRIMARY')
-                        )
-                    })
-                    rows.push(row)
-                }
-
-                return msg.edit({
-                    content: `Found ${name} on multiple servers, please select one.\n${player_info}`,
-                    components: rows,
-                })
-            }
-
-            region = regions[0]
-            summoner = info[0]
-        } else {
-            if (config.regions_readable[region]) {
-                region = config.regions_readable[region]
-            }
-
-            if (!config.regions.includes(region)) {
-                let regions = config.regions.join(', ')
-                let msg = `Invalid region \`${region}\`.\nValid regions ${regions}`
-                if (editMessage) {
-                    return editMessage.edit(msg)
-                }
-                return message.reply(msg)
-            }
-        }
-
-        if (!msg) {
-            if (editMessage) {
-                msg = await editMessage.edit('Loading...')
-            } else {
-                msg = await message.reply('Loading...')
-            }
-        }
-
-        if (summoner == null) {
-            summoner = await gf.getSummoner(name, region)
-        }
-
-        if (!summoner) {
-            return msg.edit(`Summoner \`${name}\` on region \`${region}\` not found`)
-        }
+        let msg = find.editMessage
+        let name = find.name
+        let region = find.region
 
         let discordId = message.author.id
         let data
