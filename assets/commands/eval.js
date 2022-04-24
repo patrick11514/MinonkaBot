@@ -4,7 +4,7 @@ module.exports = {
     name: 'eval',
     subcommands: [],
     description: 'Execute code',
-    arguments: ['cide'],
+    arguments: ['code'],
     admin: true,
     /**
      * Required function
