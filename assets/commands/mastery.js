@@ -18,6 +18,6 @@ module.exports = {
      * @param {Array} args
      */
     execute: async function (message, args) {
-        //do something
+
     },
 }
