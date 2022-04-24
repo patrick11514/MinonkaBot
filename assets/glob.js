@@ -234,8 +234,8 @@ module.exports = {
         let d = new Date(masteryData.lastPlayTime)
         text += `⌛ Last played: ${d.getHours()}:${d.getMinutes()} ${d.getDate()}.${d.getMonth()}.${d.getFullYear()}\n`
         text += `${emotes["chestacquired"]} Chest acquired: ${masteryData.chestGranted ? 'Yes' : 'No'}\n`
-
-
+        let maxPoints = masteryData.championPointsSinceLastLevel + masteryData.championPointsUntilNextLevel
+        let points = championPointsSinceLastLevel
 
 
         console.log(masteryData)
