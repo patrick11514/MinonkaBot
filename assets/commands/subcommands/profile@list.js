@@ -15,7 +15,7 @@ module.exports = {
 
         let discordId = message.author.id
 
-        if (!await db.has(discordId)) {
+        if (!await db.has(discordId) || await db.get(discordId).length == 0) {
             return message.reply("You don't have any linked accounts")
         }
 
