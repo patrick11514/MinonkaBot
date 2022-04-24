@@ -2,6 +2,7 @@ const { MessageActionRow, MessageButton, Client, Message } = require('discord.js
 const fs = require('fs')
 const path = require('path')
 const Loop = require('../functions/loop.js')
+const SendComponent = require('../functions/sendComponents.js')
 
 module.exports = {
     name: 'summoner',
@@ -77,6 +78,7 @@ module.exports = {
             let accounts = await db.get(discordId)
 
             if (accounts.length > 1) {
+                let component = new SendComponent("SUMMONER", "PRIMARY", message, function ())
                 let rows = []
 
                 for (let i = 0, j = accounts.length; i < j; i += 5) {
@@ -90,7 +92,7 @@ module.exports = {
                                     `SUMMONER@${name}@${region.toLowerCase()}@${message.channelId}@${message.id}`
                                 )
                                 .setLabel(`${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`)
-                                .setStyle('DANGER')
+                                .setStyle('PRIMARY')
                         )
                     })
                     rows.push(row)
