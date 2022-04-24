@@ -1,4 +1,4 @@
-const { Client, Message } = require('discord.js')
+const { Client, Message, MessageActionRow, MessageSelectMenu, MessageButton } = require('discord.js')
 const FindUser = require('../functions/findUser')
 const fs = require('fs')
 const SendComponent = require('../functions/sendComponents')
@@ -43,6 +43,119 @@ module.exports = {
             interaction.reply({
                 content: `Executing command ${this.name} for player ${name} on server ${server}`,
                 ephemeral: true,
+            })
+        })
+
+        client.on('interactionCreate', async (interaction) => {
+            if (!interaction.isSelectMenu()) return
+            let id = interaction.customId
+            let split = id.split('@')
+            let fromCommand = split[0]
+            if (fromCommand != 'MASTERY') return
+            let summonerId = split[1]
+            let region = split[2]
+            let message = interaction.message
+            let gf = message.client.fc
+            let selected = interaction.values[0]
+            const emotes = JSON.parse(fs.readFileSync("./assets/emojis.json"))
+
+            let masteries = await gf.getMasteries(summonerId, region)
+
+            let mastery = gf.visualizeMastery(masteries[selected], emotes, message.client)
+
+            interaction.update({
+                content: mastery
+            })
+        })
+
+        client.on('interactionCreate', async (interaction) => {
+            if (!interaction.isButton()) return
+            let id = interaction.customId
+            let split = id.split('@')
+            let fromCommand = split[0]
+            if (fromCommand != 'MASTERY_NEXT' && fromCommand != "MASTERY_PREV") return
+            let summonerId = split[1]
+            let region = split[2]
+            let page = parseInt(split[3])
+            let message = interaction.message
+            let gf = message.client.fc
+
+            let masteries = await gf.getMasteries(summonerId, region)
+
+            let components = interaction.message.components
+
+            if (fromCommand == "MASTERY_NEXT") {
+                let options = []
+                for (let i = (page * 25); i < Math.min(masteries.length, (page + 1) * 25); i++) {
+                    console.log(i)
+                    let mastery = masteries[i]
+                    let champion = message.client.champions[mastery.championId]
+                    let level = mastery.championLevel
+                    let points = mastery.championPoints
+
+                    options.push({
+                        label: `${champion} - level ${level} (${points} points)`,
+                        description: "Select to display mastery for " + champion,
+                        value: `${i}`
+                    })
+                }
+                console.log(options)
+                page = page + 1
+
+                if (page >= Math.ceil(masteries.length / 25)) {
+                    components[1].components[1].disabled = true
+                }
+                components[1].components[0].disabled = false
+
+                let label = components[1].components[0].customId
+                label = label.split("@")
+                label[3] = page
+                components[1].components[0].customId = label.join("@")
+
+                label = components[1].components[1].customId
+                label = label.split("@")
+                label[3] = page
+                components[1].components[1].customId = label.join("@")
+
+                components[0].components[0].options = options
+            } else {
+                let options = []
+
+                for (let i = ((page - 2) * 25); i < Math.min(masteries.length, (page - 1) * 25); i++) {
+                    let mastery = masteries[i]
+                    let champion = message.client.champions[mastery.championId]
+                    let level = mastery.championLevel
+                    let points = mastery.championPoints
+
+                    options.push({
+                        label: `${champion} - level ${level} (${points} points)`,
+                        description: "Select to display mastery for " + champion,
+                        value: `${i}`
+                    })
+                }
+
+                page = page - 1
+
+                if (page <= 1) {
+                    components[1].components[0].disabled = true
+                }
+                components[1].components[1].disabled = false
+
+                let label = components[1].components[0].customId
+                label = label.split("@")
+                label[3] = page
+                components[1].components[0].customId = label.join("@")
+
+                label = components[1].components[1].customId
+                label = label.split("@")
+                label[3] = page
+                components[1].components[1].customId = label.join("@")
+
+                components[0].components[0].options = options
+            }
+
+            interaction.update({
+                components: components
             })
         })
     },
@@ -96,9 +209,52 @@ module.exports = {
 
         let masteries = await gf.getMasteries(summoner.id, region)
 
-        let text = gf.visualizeMastery(masteries[0], emotes, message.client)
+        let text = "**First 3 masteries**:\n"
 
-        console.log(text)
+        for (let i = 0; i < 3; i++) {
+            text += gf.visualizeMastery(masteries[i], emotes, message.client) + "\n\n"
+        }
+
+
+        let options = []
+
+        for (let i = 0; i < Math.min(masteries.length, 25); i++) {
+            let mastery = masteries[i]
+            let champion = message.client.champions[mastery.championId]
+            let level = mastery.championLevel
+            let points = mastery.championPoints
+
+            options.push({
+                label: `${champion} - level ${level} (${points} points)`,
+                description: "Select to display mastery for " + champion,
+                value: `${i}`
+            })
+        }
+
+        let row = new MessageActionRow().addComponents(new MessageSelectMenu()
+            .setCustomId("MASTERY@" + summoner.id + "@" + region)
+            .setPlaceholder("Nothing selected")
+            .addOptions(options)
+        )
+
+        let row2 = new MessageActionRow()
+        if (masteries.length > 25) {
+            row2.addComponents(
+                new MessageButton()
+                    .setCustomId("MASTERY_PREV@" + summoner.id + "@" + region + "@" + 1)
+                    .setLabel("⬅️")
+                    .setStyle("PRIMARY")
+                    .setDisabled(true)
+            )
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId("MASTERY_NEXT@" + summoner.id + "@" + region + "@" + 1)
+                        .setLabel("➡️")
+                        .setStyle("PRIMARY")
+                )
+        }
+
+        message.reply({ content: text, components: [row, row2] })
 
     },
 }
