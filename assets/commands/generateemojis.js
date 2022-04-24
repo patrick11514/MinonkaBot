@@ -3,7 +3,7 @@ const fs = require('fs')
 
 module.exports = {
     name: 'generateemojis',
-    subcommands: [],
+    subcommands: ["show"],
     description: 'Generate emojis list',
     arguments: [],
     admin: true,
@@ -12,7 +12,7 @@ module.exports = {
      * @param {Message} message
      */
     execute: async function (message) {
-        let servers = ['955054979192881162', '955053883103780894', '955054220766248970', '955054457098498078']
+        let servers = ['955054979192881162', '955053883103780894', '955054220766248970', '955054457098498078', "967816629557817354"]
         let count = 0
         let emojiList = {}
 
