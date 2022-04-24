@@ -1,5 +1,4 @@
 const { Message } = require('discord.js')
-const fetch = require('node-fetch')
 const Loop = require('./loop')
 const SendComponent = require('./sendComponents')
 
