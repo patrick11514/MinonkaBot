@@ -1,13 +1,14 @@
 const { MessageActionRow, MessageButton, Client, Message } = require('discord.js')
 const fs = require('fs')
 const path = require('path')
-const Loop = require('../functions/loop.js')
+const FindUser = require('../functions/findUser.js')
+const SendComponent = require('../functions/sendComponents.js')
 
 module.exports = {
     name: 'summoner',
     subcommands: [],
     description: 'Get info about summoner',
-    arguments: ['name'],
+    arguments: ['name', "server"],
     /**
      *
      * @param {Client} client
@@ -77,24 +78,11 @@ module.exports = {
             let accounts = await db.get(discordId)
 
             if (accounts.length > 1) {
-                let rows = []
+                let component = new SendComponent("SUMMONER", "PRIMARY", message, function (name, region, config) {
+                    return `${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`
+                })
 
-                for (let i = 0, j = accounts.length; i < j; i += 5) {
-                    let temp = accounts.slice(i, i + 5)
-                    let row = new MessageActionRow()
-                    temp.forEach((account) => {
-                        let [name, region] = account.split("@")
-                        row.addComponents(
-                            new MessageButton()
-                                .setCustomId(
-                                    `SUMMONER@${name}@${region.toLowerCase()}@${message.channelId}@${message.id}`
-                                )
-                                .setLabel(`${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`)
-                                .setStyle('DANGER')
-                        )
-                    })
-                    rows.push(row)
-                }
+                let rows = await component.generate(accounts)
 
                 return message.reply({
                     content: "Please select one account:",
@@ -105,101 +93,17 @@ module.exports = {
             args[0] = accounts[0]
         }
         //put arguments together with space between them (if somebody have nickname with space)
-        let name = args.join(' ')
-        let region
-        let summoner = null
-        let msg
 
-        if (name.includes('@')) {
-            //split name and region
-            let split = name.split('@')
-            //and set name to first part
-            name = split[0]
-            //and set region to second part
-            region = split[1].toUpperCase()
-            //try to convert region
-            if (config.regions_readable[region]) {
-                region = config.regions_readable[region]
-            }
-            //if region is invalid then reply with error message
-            if (!config.regions.includes(region)) {
-                let regions = config.regions.join(', ')
-                let msg = `Invalid region \`${region}\`.\nValid regions ${regions}`
-                if (editMessage) {
-                    return editMessage.edit(msg)
-                }
-                return message.reply(msg)
-            }
-        } else {
-            //try to search player on some region
-            if (editMessage) {
-                msg = await editMessage.edit('Searching player')
-            } else {
-                msg = await message.reply('Searching player')
-            }
+        let find = new FindUser(args, "SUMMONER", editMessage)
 
-            let loop = new Loop(message, msg)
+        await find.getSummonerData(message, !editMessage ? false : true)
 
-            let find = await gf.findSummoner(name, message.client, loop.id)
-
-            loop.stop()
-
-            //if player not found then reply with error message
-            if (!find) {
-                return msg.edit("Can't find player on any server")
-            }
-
-            let regions = find.regions
-            let info = find.info
-
-            //if player found on more than 1 server then reply with message with list of servers
-            if (regions.length > 1) {
-                let rows = []
-                let player_info = '\n**Region: level**\n'
-
-                for (let [id, data] of Object.entries(info)) {
-                    player_info += `${id}: \`${data.summonerLevel}\` `
-                }
-
-                for (let i = 0, j = regions.length; i < j; i += 5) {
-                    let temp = regions.slice(i, i + 5)
-                    let row = new MessageActionRow()
-                    temp.forEach((region) => {
-                        row.addComponents(
-                            new MessageButton()
-                                .setCustomId(
-                                    `SUMMONER@${name}@${region.toLowerCase()}@${message.channelId}@${message.id}`
-                                )
-                                .setLabel(region)
-                                .setStyle('PRIMARY')
-                        )
-                    })
-                    rows.push(row)
-                }
-
-                return msg.edit({
-                    content: `Found ${name} on multiple servers, please select one.\n${player_info}`,
-                    components: rows,
-                })
-            }
-
-            region = regions[0]
-            summoner = info[0]
-        }
-        if (!msg) {
-            if (editMessage) {
-                msg = await editMessage.edit('Loading...')
-            } else {
-                msg = await message.reply('Loading...')
-            }
-        }
-
-        if (summoner == null) {
-            summoner = await gf.getSummoner(name, region)
-        }
+        let summoner = find.getData()
+        let region = find.region
+        let msg = find.editMessage
 
         if (!summoner) {
-            return msg.edit(`Summoner \`${name}\` on region \`${region}\` not found`)
+            return
         }
 
         let info = {

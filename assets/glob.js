@@ -218,4 +218,88 @@ module.exports = {
 
         return rotation
     },
+
+    getMasteries: async function (id, region) {
+        let json = await this.fetchApi(this.config.endpoints['mastery/by-id'], region, id)
+
+        return json
+    },
+
+    visualizeMastery: function (masteryData, emotes, client) {
+        let champions = client.champions
+        let championId = masteryData.championId
+        let championName = champions[championId]
+
+        let text = `${emotes[championName]} **${championName}**:\n`
+        let d = new Date(masteryData.lastPlayTime)
+        let hours = d.getHours() > 9 ? d.getHours() : '0' + d.getHours()
+        let minutes = d.getMinutes() > 9 ? d.getMinutes() : '0' + d.getMinutes()
+
+        text += `⌛ Last played: ${hours}:${minutes} ${d.getDate()}.${d.getMonth()}.${d.getFullYear()}\n`
+        text += `${emotes["chestacquired"]} Chest acquired: ${masteryData.chestGranted ? 'Yes' : 'No'}\n`
+        text += `${emotes["masterypoints"]} Mastery points: ${masteryData.championPoints}\n`
+        let maxPoints = masteryData.championPointsSinceLastLevel + masteryData.championPointsUntilNextLevel
+        let points = masteryData.championPointsSinceLastLevel
+        let percentage = Math.round((points / maxPoints) * 100)
+        if (percentage == 100 && (masteryData.championLevel == 5 || masteryData.championLevel == 6)) {
+            let tokens
+            if (masteryData.championLevel == 5) {
+                tokens = 2
+            } else {
+                tokens = 3
+            }
+
+            percentage = Math.round((masteryData.tokensEarned / tokens) * 100)
+
+            text += emotes["mastery" + masteryData.championLevel] + " "
+
+            let perc = percentage / 10
+            for (let i = 1; i <= 10; i++) {
+                if (perc > 0.75) {
+                    text += emotes["progress" + i + "_full"]
+                } else if (perc > 0.35) {
+                    text += emotes["progress" + i + "_half"]
+                } else {
+                    text += emotes["progress" + i + "_empty"]
+                }
+                perc--
+            }
+            text += " " + emotes["mastery" + (masteryData.championLevel + 1)]
+            text += ` (${masteryData.tokensEarned}/${tokens} ` + emotes["masterytoken" + (masteryData.championLevel + 1)] + ")"
+
+        } else if (masteryData.championLevel != 7) {
+            text += emotes["mastery" + masteryData.championLevel] + " "
+
+            let perc = percentage / 10
+            for (let i = 1; i <= 10; i++) {
+                if (perc > 0.75) {
+                    text += emotes["progress" + i + "_full"]
+                } else if (perc > 0.35) {
+                    text += emotes["progress" + i + "_half"]
+                } else {
+                    text += emotes["progress" + i + "_empty"]
+                }
+                perc--
+            }
+            text += " " + emotes["mastery" + (masteryData.championLevel + 1)]
+            text += ` (${points}/${maxPoints})`
+        } else {
+            text += emotes["mastery" + masteryData.championLevel] + " "
+
+            let perc = percentage / 10
+            for (let i = 1; i <= 10; i++) {
+                if (perc > 0.75) {
+                    text += emotes["progress" + i + "_full"]
+                } else if (perc > 0.35) {
+                    text += emotes["progress" + i + "_half"]
+                } else {
+                    text += emotes["progress" + i + "_empty"]
+                }
+                perc--
+            }
+            text += ` ${points}`
+        }
+
+        return text
+    }
 }

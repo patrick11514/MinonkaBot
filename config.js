@@ -20,6 +20,7 @@ module.exports = {
         'summoner/by-name': 'summoner/v4/summoners/by-name',
         'league/by-id': 'league/v4/entries/by-summoner',
         rotation: 'platform/v3/champion-rotations',
+        "mastery/by-id": "champion-mastery/v4/champion-masteries/by-summoner",
     },
     lanes: {
         TOP: 'Top',
