@@ -54,10 +54,19 @@ module.exports = {
             if (fromCommand != 'MASTERY') return
             let summonerId = split[1]
             let region = split[2]
+            let author = split[3]
             let message = interaction.message
             let gf = message.client.fc
             let selected = interaction.values[0]
             const emotes = JSON.parse(fs.readFileSync("./assets/emojis.json"))
+
+            if (!author) {
+                return interaction.reply({ content: "Please send command again", ephemeral: true })
+            }
+
+            if (author != interaction.user.id) {
+                return interaction.reply({ content: "You can't use this interaction!", ephemeral: true })
+            }
 
             let masteries = await gf.getMasteries(summonerId, region)
 
@@ -77,8 +86,17 @@ module.exports = {
             let summonerId = split[1]
             let region = split[2]
             let page = parseInt(split[3])
+            let author = split[4]
             let message = interaction.message
             let gf = message.client.fc
+
+            if (!author) {
+                return interaction.reply({ content: "Please send command again", ephemeral: true })
+            }
+
+            if (author != interaction.user.id) {
+                return interaction.reply({ content: "You can't use this interaction!", ephemeral: true })
+            }
 
             let masteries = await gf.getMasteries(summonerId, region)
 
@@ -294,7 +312,7 @@ module.exports = {
         }
 
         let row = new MessageActionRow().addComponents(new MessageSelectMenu()
-            .setCustomId("MASTERY@" + summoner.id + "@" + region)
+            .setCustomId("MASTERY@" + summoner.id + "@" + region + "@" + message.author.id)
             .setPlaceholder(`Nothing selected - page 1 (0-25/${masteries.length})`)
             .addOptions(options)
         )
@@ -303,20 +321,20 @@ module.exports = {
         if (masteries.length > 25) {
             row2.addComponents(
                 new MessageButton()
-                    .setCustomId("MASTERY_PREV@" + summoner.id + "@" + region + "@" + 1)
+                    .setCustomId("MASTERY_PREV@" + summoner.id + "@" + region + "@" + 1 + "@" + message.author.id)
                     .setLabel("⬅️")
                     .setStyle("PRIMARY")
                     .setDisabled(true)
             )
                 .addComponents(
                     new MessageButton()
-                        .setCustomId("MASTERY_NEXT@" + summoner.id + "@" + region + "@" + 1)
+                        .setCustomId("MASTERY_NEXT@" + summoner.id + "@" + region + "@" + 1 + "@" + message.author.id)
                         .setLabel("➡️")
                         .setStyle("PRIMARY")
                 )
                 .addComponents(
                     new MessageButton()
-                        .setCustomId("MASTERY_MAIN@" + summoner.id + "@" + region)
+                        .setCustomId("MASTERY_MAIN@" + summoner.id + "@" + region + "@" + 1 + "@" + message.author.id)
                         .setLabel("First 3 champs")
                         .setStyle("SUCCESS")
                 )
