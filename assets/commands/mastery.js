@@ -73,7 +73,7 @@ module.exports = {
             let id = interaction.customId
             let split = id.split('@')
             let fromCommand = split[0]
-            if (fromCommand != 'MASTERY_NEXT' && fromCommand != "MASTERY_PREV") return
+            if (fromCommand != 'MASTERY_NEXT' && fromCommand != "MASTERY_PREV" && fromCommand != "MASTERY_MAIN") return
             let summonerId = split[1]
             let region = split[2]
             let page = parseInt(split[3])
@@ -86,8 +86,15 @@ module.exports = {
 
             if (fromCommand == "MASTERY_NEXT") {
                 let options = []
+
+                let firstId = (page * 25);
+                let lastId = Math.min(masteries.length, (page + 1) * 25);
+                let max = masteries.length
+                if (lastId > max) {
+                    lastId = max
+                }
+
                 for (let i = (page * 25); i < Math.min(masteries.length, (page + 1) * 25); i++) {
-                    console.log(i)
                     let mastery = masteries[i]
                     let champion = message.client.champions[mastery.championId]
                     let level = mastery.championLevel
@@ -99,7 +106,6 @@ module.exports = {
                         value: `${i}`
                     })
                 }
-                console.log(options)
                 page = page + 1
 
                 if (page >= Math.ceil(masteries.length / 25)) {
@@ -118,8 +124,16 @@ module.exports = {
                 components[1].components[1].customId = label.join("@")
 
                 components[0].components[0].options = options
-            } else {
+                components[0].components[0].placeholder = `Nothing selected - page ${page} (${firstId} - ${lastId}/${max})`
+            } else if (fromCommand == "MASTERY_PREV") {
                 let options = []
+
+                let firstId = ((page - 2) * 25);
+                let lastId = Math.min(masteries.length, (page - 1) * 25);
+                let max = masteries.length
+                if (lastId > max) {
+                    lastId = max
+                }
 
                 for (let i = ((page - 2) * 25); i < Math.min(masteries.length, (page - 1) * 25); i++) {
                     let mastery = masteries[i]
@@ -152,6 +166,54 @@ module.exports = {
                 components[1].components[1].customId = label.join("@")
 
                 components[0].components[0].options = options
+                components[0].components[0].placeholder = `Nothing selected - page ${page} (${firstId} - ${lastId}/${max})`
+            } else {
+                const emotes = JSON.parse(fs.readFileSync("./assets/emojis.json"))
+
+                let text = "**First 3 masteries**:\n"
+
+                for (let i = 0; i < 3; i++) {
+                    text += gf.visualizeMastery(masteries[i], emotes, message.client) + "\n\n"
+                }
+
+                let options = []
+
+                for (let i = 0; i < Math.min(masteries.length, 25); i++) {
+                    let mastery = masteries[i]
+                    let champion = message.client.champions[mastery.championId]
+                    let level = mastery.championLevel
+                    let points = mastery.championPoints
+
+                    options.push({
+                        label: `${champion} - level ${level} (${points} points)`,
+                        description: "Select to display mastery for " + champion,
+                        value: `${i}`
+                    })
+                }
+
+                page = 1
+
+                components[1].components[0].disabled = true
+                components[1].components[1].disabled = false
+
+                let label = components[1].components[0].customId
+                label = label.split("@")
+                label[3] = page
+                components[1].components[0].customId = label.join("@")
+
+                label = components[1].components[1].customId
+                label = label.split("@")
+                label[3] = page
+                components[1].components[1].customId = label.join("@")
+
+                components[0].components[0].options = options
+                components[0].components[0].placeholder = `Nothing selected - page ${page} (0 - 25/${masteries.length})`
+
+                return interaction.update({
+                    content: text,
+                    components: components
+                })
+
             }
 
             interaction.update({
@@ -233,7 +295,7 @@ module.exports = {
 
         let row = new MessageActionRow().addComponents(new MessageSelectMenu()
             .setCustomId("MASTERY@" + summoner.id + "@" + region)
-            .setPlaceholder("Nothing selected")
+            .setPlaceholder(`Nothing selected - page 1 (0-25/${masteries.length})`)
             .addOptions(options)
         )
 
@@ -251,6 +313,12 @@ module.exports = {
                         .setCustomId("MASTERY_NEXT@" + summoner.id + "@" + region + "@" + 1)
                         .setLabel("➡️")
                         .setStyle("PRIMARY")
+                )
+                .addComponents(
+                    new MessageButton()
+                        .setCustomId("MASTERY_MAIN@" + summoner.id + "@" + region)
+                        .setLabel("First 3 champs")
+                        .setStyle("SUCCESS")
                 )
         }
 
