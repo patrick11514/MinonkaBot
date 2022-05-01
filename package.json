@@ -1,7 +1,7 @@
 {
   "name": "discord_league_of_legends_bot",
   "description": "Discord bot, that allow you to get informations about your account and your friends",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Patrik Mintěl",
   "license": "ISC",
   "repository": {
@@ -9,7 +9,9 @@
     "url": "https://github.com/patrick11514/MinonkaBot.git"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "sudo service discordbot stop && npm run start",
+    "devstop": "sudo service discordbot start"
   },
   "dependencies": {
     "discord.js": "^13.6.0",
