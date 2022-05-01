@@ -24,8 +24,8 @@ class FindUser {
                 name = split[0]
                 region = split[1].toUpperCase()
             } else {
-                name = this.args[0]
-                region = this.args[1].toUpperCase()
+                name = this.args.slice(0, this.args.length - 1).join(" ")
+                region = this.args[this.args.length - 1].toUpperCase()
             }
         } else {
             let arg = this.args[0]
@@ -130,7 +130,6 @@ class FindUser {
      * 
      * @param {Message} message 
      * @param {boolean} edit 
-     * @returns {self}
      */
     async getSummonerData(message, edit = false) {
         this.gf = message.client.fc
