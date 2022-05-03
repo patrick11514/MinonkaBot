@@ -1,6 +1,6 @@
 const { MessageActionRow, MessageButton, Message, Client } = require('discord.js')
 const FindUser = require('../../functions/findUser.js')
-const Loop = require('../../functions/loop.js')
+const Profile = require('../../functions/profile.js')
 
 module.exports = {
     mainCommand: 'profile',
@@ -60,9 +60,8 @@ module.exports = {
 
 
         if (args.length < 1) {
-            let message = 'Please provide atleast summoner name'
             if (editMessage) {
-                return editMessage.edit(message)
+                return editMessage.edit('Please provide atleast your lol username.')
             } else {
                 return message.reply('Please provide atleast your lol username.')
             }
@@ -83,21 +82,14 @@ module.exports = {
         let region = find.region
 
         let discordId = message.author.id
-        let data
 
-        if (await db.has(discordId)) {
-            data = await db.get(discordId)
+        let profile = new Profile(db, gf)
+        let status = profile.addAccount(discordId, name, region)
 
-            let find = data.find((reg) => reg == `${name}@${region}`)
-            if (find) {
-                return msg.edit(`You already connected \`${name}\` on \`${region}\` with your account.`)
-            }
+        if (status) {
+            return msg.edit(`Connected \`${name}\` on region \`${region}\` to your discord account.`)
         } else {
-            data = []
+            return msg.edit(`You already connected \`${name}\` on \`${region}\` with your account.`)
         }
-
-        await db.set(discordId, [...data, `${name}@${region}`])
-
-        return msg.edit(`Connected \`${name}\` on region \`${region}\` to your discord account.`)
     },
 }
