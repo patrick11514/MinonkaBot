@@ -2,6 +2,7 @@ const { Client, Message, MessageActionRow, MessageSelectMenu, MessageButton } = 
 const FindUser = require('../functions/findUser')
 const fs = require('fs')
 const SendComponent = require('../functions/sendComponents')
+const Profile = require('../functions/profile')
 
 module.exports = {
     name: 'mastery',
@@ -253,31 +254,17 @@ module.exports = {
         let discordId = message.author.id
 
         if (args.length < 1) {
-            if (!await db.has(discordId) || await db.get(discordId).length == 0) {
 
-                let msg = 'Please provide a summoner name'
-                if (editMessage) {
-                    return editMessage.edit(msg)
-                }
-                return message.reply(msg)
+            let profile = new Profile(db, gf)
+            let reply = !editMessage ? true : false
+
+            let account = await profile.getAccount(discordId, "MASTERY", "Please provide a summoner name", reply ? message : editMessage, reply)
+
+            if (!account) {
+                return
             }
 
-            let accounts = await db.get(discordId)
-
-            if (accounts.length > 1) {
-                let component = new SendComponent("MASTERY", "PRIMARY", message, function (name, region, config) {
-                    return `${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`
-                })
-
-                let rows = await component.generate(accounts)
-
-                return message.reply({
-                    content: "Please select one account:",
-                    components: rows,
-                })
-            }
-
-            args[0] = accounts[0]
+            args[0] = account
         }
 
         let find = new FindUser(args, "MASTERY", editMessage)
@@ -340,7 +327,11 @@ module.exports = {
                 )
         }
 
-        message.reply({ content: text, components: [row, row2] })
+        if (editMessage) {
+            editMessage.edit({ content: text, components: [row, row2] })
+        } else {
+            message.reply({ content: text, components: [row, row2] })
+        }
 
     },
 }
