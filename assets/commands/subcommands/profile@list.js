@@ -1,4 +1,5 @@
 const { Message } = require('discord.js')
+const Profile = require('../../functions/profile')
 
 module.exports = {
     mainCommand: 'profile',
@@ -15,14 +16,15 @@ module.exports = {
 
         let discordId = message.author.id
 
-        if (!await db.has(discordId) || await db.get(discordId).length == 0) {
-            return message.reply("You don't have any linked accounts")
+        let profile = new Profile(db, message.client.fc)
+        let accounts = await profile.getAccounts(discordId)
+
+        if (accounts.length == 0) {
+            return message.reply("You don't have any linked accounts! Use `?profile add` to add one!")
         }
 
-        let accounts = await db.get(discordId)
-
         let text = `**Found ${accounts.length} linked accounts:**\n`
-        accounts.forEach((accountString) => {
+        accounts.map((account) => account.name).forEach((accountString) => {
             let [name, region] = accountString.split("@")
 
             text += `${name} on region ${region}\n`
