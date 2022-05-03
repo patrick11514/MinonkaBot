@@ -1,4 +1,5 @@
 const { MessageActionRow, MessageButton, Client, Message } = require('discord.js')
+const Profile = require('../../functions/profile')
 
 module.exports = {
     mainCommand: 'profile',
@@ -47,12 +48,9 @@ module.exports = {
             const db = interaction.client.db
 
             let discordId = message.author.id
-            //remove
-            let accounts = await db.get(discordId)
 
-            let newAccounts = accounts.filter((accountString) => accountString != `${name}@${server.toUpperCase()}`)
-
-            await db.set(discordId, newAccounts)
+            let profile = new Profile(db, interaction.client.fc)
+            profile.removeAccount(discordId, name, server)
 
             //reply with client only message
             interaction.reply({
@@ -74,11 +72,14 @@ module.exports = {
 
         let discordId = message.author.id
 
-        if (!await db.has(discordId)) {
+        let profile = new Profile(db, message.client.fc)
+        let accounts = await profile.getAccounts(discordId)
+
+        accounts = accounts.map(account => account.name)
+
+        if (accounts.length == 0) {
             return message.reply("You don't have any linked accounts")
         }
-
-        let accounts = await db.get(discordId)
 
         let text = `**Found ${accounts.length} linked accounts:**\n`
         accounts.forEach((accountString) => {
