@@ -84,7 +84,7 @@ class FindUser {
                     return `${region}`
                 })
 
-                let rows = components.generate(regions)
+                let rows = components.generate(regions.map(region => `${this.name}@${region}`))
 
                 return this.editMessage.edit({
                     content: `Found ${this.name} on multiple servers, please select one.\n${player_info}`,
