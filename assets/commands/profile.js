@@ -10,6 +10,6 @@ module.exports = {
      * @param {Message} message
      */
     execute: async function (message) {
-        message.reply('Please use argument.')
+        message.client.commands.get("profile").subcommandsExec.get("list").execute(message)
     },
 }
