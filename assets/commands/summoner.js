@@ -2,6 +2,7 @@ const { MessageActionRow, MessageButton, Client, Message } = require('discord.js
 const fs = require('fs')
 const path = require('path')
 const FindUser = require('../functions/findUser.js')
+const Profile = require('../functions/profile.js')
 const SendComponent = require('../functions/sendComponents.js')
 
 module.exports = {
@@ -66,31 +67,17 @@ module.exports = {
 
         //if no arguments, then reply with error message
         if (args.length < 1) {
-            if (!await db.has(discordId) || await db.get(discordId).length == 0) {
 
-                let msg = 'Please provide a summoner name'
-                if (editMessage) {
-                    return editMessage.edit(msg)
-                }
-                return message.reply(msg)
+            let profile = new Profile(db, gf)
+            let reply = !editMessage ? true : false
+
+            let account = await profile.getAccount(discordId, "SUMMONER", "Please provide a summoner name", reply ? message : editMessage, reply)
+
+            if (!account) {
+                return
             }
 
-            let accounts = await db.get(discordId)
-
-            if (accounts.length > 1) {
-                let component = new SendComponent("SUMMONER", "PRIMARY", message, function (name, region, config) {
-                    return `${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`
-                })
-
-                let rows = await component.generate(accounts)
-
-                return message.reply({
-                    content: "Please select one account:",
-                    components: rows,
-                })
-            }
-
-            args[0] = accounts[0]
+            args[0] = account
         }
         //put arguments together with space between them (if somebody have nickname with space)
 
