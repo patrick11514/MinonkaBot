@@ -115,7 +115,7 @@ class Profile {
                 return `${name} - ${Object.keys(config.regions_readable).find(key => config.regions_readable[key] == region)}`
             })
 
-            let rows = await component.generate(accounts.map(account => account.name))
+            let rows = component.generate(accounts.map(account => account.name))
 
             let object = {
                 content: "Please select one account:",

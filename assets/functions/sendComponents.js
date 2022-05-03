@@ -20,7 +20,7 @@ class SendComponent {
      * @param {Array} array 
      * @returns {Array[MessageActionRow]} array of MessageActionRow
      */
-    async generate(array) {
+    generate(array) {
         let rows = []
 
         for (let i = 0, j = array.length; i < j; i += 5) {
