@@ -77,6 +77,9 @@ module.exports = {
         await find.getSummonerData(message, !editMessage ? false : true)
 
         let summoner = find.getData()
+
+        if (!summoner) return
+
         let region = find.region
         let msg = find.editMessage
 
