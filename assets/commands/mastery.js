@@ -274,6 +274,7 @@ module.exports = {
 
         let summoner = find.getData()
         let region = find.region
+        let msg = find.editMessage
 
         let masteries = await gf.getMasteries(summoner.id, region)
 
@@ -328,11 +329,7 @@ module.exports = {
                 )
         }
 
-        if (editMessage) {
-            editMessage.edit({ content: text, components: [row, row2] })
-        } else {
-            message.reply({ content: text, components: [row, row2] })
-        }
 
+        msg.edit({ content: text, components: [row, row2] })
     },
 }
