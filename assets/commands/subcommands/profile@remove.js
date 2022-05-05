@@ -46,10 +46,11 @@ module.exports = {
 
             //db
             const db = interaction.client.db
+            const db2 = interaction.client.db2
 
             let discordId = message.author.id
 
-            let profile = new Profile(db, interaction.client.fc)
+            let profile = new Profile(db, db2, interaction.client.fc)
             profile.removeAccount(discordId, name, server)
 
             //reply with client only message
