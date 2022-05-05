@@ -63,6 +63,7 @@ class Profile {
 
             if (name != newName) {
                 change = true
+                await this.logName(id, newName)
                 newAccounts.push({
                     id: id,
                     name: `${newName}@${region}`
@@ -166,7 +167,7 @@ class Profile {
             }
         ])
 
-
+        await this.logName(id, name)
 
         return true
     }
@@ -200,6 +201,35 @@ class Profile {
         await this.db.set(discordId, newAccounts)
 
         return true
+    }
+
+    async getNameHistory(id, region) {
+        let check = await this.db2.has(id)
+
+        if (!check) {
+            let name = await this.lookupName(id, region)
+            if (name == false) {
+                return false
+            }
+            await this.db2.set(id, [name])
+
+            return [name]
+        }
+
+        return await this.db2.get(id)
+
+    }
+
+    async logName(id, name) {
+        let check = await this.db2.has(id)
+        if (check) {
+            let data = await this.db2.get(id)
+            if (data[0] != name) {
+                await this.db2.set(id, [name, ...data])
+            }
+        } else {
+            await this.db2.set(id, [name])
+        }
     }
 }
 
