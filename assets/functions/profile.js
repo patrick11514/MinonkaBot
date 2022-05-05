@@ -7,10 +7,12 @@ class Profile {
     /**
      * 
      * @param {JSONdb} db 
+     * @param {JSONdb} db2
      * @param {Object} gf
      */
-    constructor(db, gf) {
+    constructor(db, db2, gf) {
         this.db = db
+        this.db2 = db2
         this.gf = gf
     }
 
@@ -163,6 +165,8 @@ class Profile {
                 name: `${name}@${region}`
             }
         ])
+
+
 
         return true
     }
