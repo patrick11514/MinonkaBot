@@ -8,7 +8,7 @@ module.exports = {
     name: 'mastery',
     subcommands: ['champion'],
     description: 'Show masteries of champions',
-    arguments: ['name', 'region'],
+    arguments: ['name', 'server'],
     /**
      * Optional function
      * @param {Client} client
@@ -248,6 +248,7 @@ module.exports = {
     execute: async function (message, args, editMessage = null) {
         const config = message.client.config
         const db = message.client.db
+        const db2 = message.client.db2
         const gf = message.client.fc
         const emotes = JSON.parse(fs.readFileSync("./assets/emojis.json"))
 
@@ -255,7 +256,7 @@ module.exports = {
 
         if (args.length < 1) {
 
-            let profile = new Profile(db, gf)
+            let profile = new Profile(db, db2, gf)
             let reply = !editMessage ? true : false
 
             let account = await profile.getAccount(discordId, "MASTERY", "Please provide a summoner name", reply ? message : editMessage, reply)

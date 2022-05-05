@@ -36,6 +36,10 @@ const db = new JSONdb("./assets/db/userProfiles.json", {
     asyncWrite: true,
     syncOnWrite: true
 })
+const db2 = new JSONdb("./assets/db/nameHistory.json", {
+    asyncWrite: true,
+    syncOnWrite: true
+})
 
 let loaded_commands = []
 let notloaded_commands = []
@@ -95,6 +99,7 @@ client.wf = __dirname
 client.fc = require('./assets/glob.js')
 client.searchingStatus = {}
 client.db = db;
+client.db2 = db2;
 
 (async function () {
     client.champions = await fetch(`http://${process.env.API}/champions`).then((res) => res.json())

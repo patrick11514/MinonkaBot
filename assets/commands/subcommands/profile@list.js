@@ -13,10 +13,11 @@ module.exports = {
     execute: async function (message) {
         //db
         const db = message.client.db
+        const db2 = message.client.db2
 
         let discordId = message.author.id
 
-        let profile = new Profile(db, message.client.fc)
+        let profile = new Profile(db, db2, message.client.fc)
         let accounts = await profile.getAccounts(discordId)
 
         if (accounts.length == 0) {

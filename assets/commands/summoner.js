@@ -62,13 +62,14 @@ module.exports = {
         const gf = message.client.fc
         //db
         const db = message.client.db
+        const db2 = message.client.db2
 
         let discordId = message.author.id
 
         //if no arguments, then reply with error message
         if (args.length < 1) {
 
-            let profile = new Profile(db, gf)
+            let profile = new Profile(db, db2, gf)
             let reply = !editMessage ? true : false
 
             let account = await profile.getAccount(discordId, "SUMMONER", "Please provide a summoner name", reply ? message : editMessage, reply)

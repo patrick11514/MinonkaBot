@@ -57,6 +57,7 @@ module.exports = {
         const gf = message.client.fc
         //get db
         const db = message.client.db
+        const db2 = message.client.db2
 
 
         if (args.length < 1) {
@@ -83,7 +84,7 @@ module.exports = {
 
         let discordId = message.author.id
 
-        let profile = new Profile(db, gf)
+        let profile = new Profile(db, db2, gf)
         let status = profile.addAccount(discordId, name, region)
 
         if (status) {
