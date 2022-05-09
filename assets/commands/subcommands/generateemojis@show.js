@@ -26,8 +26,15 @@ module.exports = {
             texts.push(text)
         }
 
+        let reply = false
+
         for (let text of texts) {
-            await message.reply(text)
+            if (!reply) {
+                await message.reply(text)
+                reply = true
+            } else {
+                await message.channel.send(text)
+            }
         }
     },
 }
