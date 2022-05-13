@@ -38,6 +38,6 @@ module.exports = {
         }
 
         await fs.writeFileSync('./assets/emojis.json', JSON.stringify(emojiList, null, 4))
-        await message.reply(`Fetched ${count} emojis.`)
+        await message.reply(`Fetched ${count} emojis from ${servers.length} servers.`)
     },
 }
