@@ -306,8 +306,9 @@ module.exports = {
             .addOptions(options)
         )
 
-        let row2 = new MessageActionRow()
+        let row2
         if (masteries.length > 25) {
+            row2 = new MessageActionRow()
             row2.addComponents(
                 new MessageButton()
                     .setCustomId("MASTERY_PREV@" + summoner.id + "@" + region + "@" + 1 + "@" + message.author.id)
@@ -330,6 +331,6 @@ module.exports = {
         }
 
 
-        msg.edit({ content: text, components: [row, row2] })
+        msg.edit({ content: text, components: (!row2) ? [row] : [row, row2] })
     },
 }
