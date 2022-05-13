@@ -103,6 +103,7 @@ client.db2 = db2;
 
 (async function () {
     client.champions = await fetch(`http://${process.env.API}/champions`).then((res) => res.json())
+    client.items = await fetch(`http://${process.env.API}/items`).then((res) => res.json())
 })()
 
 //set variables in modules
