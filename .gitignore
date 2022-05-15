@@ -1,4 +1,5 @@
 .env
+.publicWebFiles
 node_modules
 service.sh
 assets/emojis.json
