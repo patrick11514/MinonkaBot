@@ -26,6 +26,15 @@ class FindUser {
             } else {
                 name = this.args.slice(0, this.args.length - 1).join(" ")
                 region = this.args[this.args.length - 1].toUpperCase()
+
+                if (this.config.regions_readable[region]) {
+                    region = this.config.regions_readable[region]
+                }
+
+                if (!this.config.regions.includes(region)) {
+                    name += " " + region
+                    region = null
+                }
             }
         } else {
             let arg = this.args[0]
