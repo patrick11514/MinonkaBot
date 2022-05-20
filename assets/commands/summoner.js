@@ -1,9 +1,8 @@
-const { MessageActionRow, MessageButton, Client, Message } = require('discord.js')
+const { Client, Message } = require('discord.js')
 const fs = require('fs')
-const path = require('path')
 const FindUser = require('../functions/findUser.js')
 const Profile = require('../functions/profile.js')
-const SendComponent = require('../functions/sendComponents.js')
+const fetch = require('node-fetch')
 
 module.exports = {
     name: 'summoner',
@@ -110,14 +109,23 @@ module.exports = {
         try {
             getImage = await gf.getImage('summoner', info)
         } catch (e) {
-            return msg.edit(`Can't get image for summoner \`${name}\` on region \`${region}\` (API Error)`)
-        }
-        let image = path.join('./image_server', getImage)
-
-        if (!fs.existsSync(image)) {
-            return msg.edit(`Can't get image for summoner \`${name}\` on region \`${region}\` (File not found)`)
+            return msg.edit(`Can't get image for summoner \`${summoner.name}\` on region \`${region}\` (API Error)`)
         }
 
-        msg.edit({ content: ' ', files: [image] })
+        let response = await fetch(`http://${process.env.API}/summonerFile/${getImage}`)
+
+        if (response.status == 404) {
+            let json = await response.json()
+            return msg.edit(json.error)
+        }
+
+        let image = await response.buffer()
+
+        msg.edit({
+            content: ' ', files: [{
+                attachment: image,
+                name: `${summoner.name}.png`
+            }]
+        })
     },
 }
