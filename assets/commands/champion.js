@@ -35,7 +35,6 @@ module.exports = {
             .setColor('BLUE')
 
         if (champion.skins.length > 1) {
-            console.log("bb")
             let z = 0;
             let up = null
             let down = null
