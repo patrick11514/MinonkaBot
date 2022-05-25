@@ -20,7 +20,7 @@ module.exports = {
 
         let skin = args.join(" ")
 
-        let response = await fetch(`http://${process.env.API}/skin/${skin}`)
+        let response = await fetch(`http://${process.env.API}/skin/${encodeURIComponent(skin)}`)
         let json = await response.json()
         if (json.error) {
             return message.reply(json.error)
