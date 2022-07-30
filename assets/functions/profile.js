@@ -214,6 +214,21 @@ class Profile {
             await this.db2.set(id, [name])
 
             return [name]
+        } else {
+
+            let [newAccounts, change] = await this.lookupForNewNames([
+                {
+                    id: id,
+                    name: `${await this.db2.get(id)[0]}@${region}`
+                }
+            ])
+
+            if (change) {
+                let accounts = (await this.db2.get(id)).reverse()
+                accounts.push(newAccounts[0].name.split("@")[0])
+                accounts = accounts.reverse()
+                await this.db2.set(id, accounts)
+            }
         }
 
         return await this.db2.get(id)
