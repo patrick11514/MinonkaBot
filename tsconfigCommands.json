@@ -1,0 +1,18 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "build",
+        "removeComments": true,
+        "target": "ES2021",
+        "module": "CommonJS",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true
+    },
+    "files": ["src/types/environment.d.ts"],
+    "include": ["src/registerCommands.ts", "src/environment.d.ts"],
+    "exclude": ["node_modules"]
+}
