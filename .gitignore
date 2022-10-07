@@ -1,2 +1,8 @@
+#Node modules
 node_modules/
+
+#env files
 .env
+
+#build files
+build/
