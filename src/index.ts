@@ -4,6 +4,7 @@ import EventEmitter from 'events'
 import fs from 'fs'
 import path from 'path'
 import Logger from './lib/logger'
+import config from './config'
 
 //dotenv
 import * as dotenv from 'dotenv'
@@ -23,6 +24,7 @@ process.client = client
 //varibales
 let emitter = new EventEmitter()
 client.emitter = emitter
+client.config = config
 const dir = __dirname
 const l = new Logger('Client', 'cyan')
 
@@ -142,6 +144,15 @@ client.on('interactionCreate', (interaction) => {
         } catch (e: any) {
             l.error(e)
             if (interaction.isRepliable()) interaction.reply('Při vykonávání příkazu nastala někde chyba.')
+        }
+    }
+
+    if (interaction.isButton()) {
+        try {
+            emitter.emit('button', interaction)
+        } catch (e: any) {
+            l.error(e)
+            if (interaction.isRepliable()) interaction.editReply('Při zprácování kliku někde nastala chyba.')
         }
     }
 })
