@@ -9,6 +9,7 @@ import config from './config'
 //dotenv
 import * as dotenv from 'dotenv'
 import fetch from 'node-fetch'
+import JSONdb from 'simple-json-db'
 dotenv.config()
 
 //intents
@@ -38,6 +39,12 @@ for (let file of files) {
     //give client to command
     require(filePath).default(client)
 }
+
+let usersDB = new JSONdb('../databases/users.json', {
+    syncOnWrite: true,
+    asyncWrite: true,
+})
+client.usersDB = usersDB
 
 //statuses
 const status: Array<{

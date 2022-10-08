@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import JSONdb from 'simple-json-db'
 import Config from './config'
 
 declare module 'discord.js' {
@@ -6,5 +7,6 @@ declare module 'discord.js' {
         emitter: EventEmitter
         LOL_VERSION: string
         config: Config
+        usersDB: JSONdb
     }
 }
