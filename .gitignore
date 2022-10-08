@@ -6,3 +6,7 @@ node_modules/
 
 #build files
 build/
+
+#folders
+temp/
+databases/
