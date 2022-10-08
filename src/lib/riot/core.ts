@@ -39,7 +39,7 @@ class Riot {
             region: string
         }>
     > {
-        let regions = process.env.REGIONS.split(',')
+        let regions = process.client.config.regions
 
         let foundAccounts: Array<{
             name: string

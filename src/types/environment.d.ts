@@ -5,7 +5,6 @@ declare global {
             DISCORD_TOKEN: string
             RIOT_TOKEN: string
             DDRAGON_URL: string
-            REGIONS: string
         }
     }
 }
