@@ -40,7 +40,7 @@ for (let file of files) {
     require(filePath).default(client)
 }
 
-let usersDB = new JSONdb('../databases/users.json', {
+let usersDB = new JSONdb('databases/users.json', {
     syncOnWrite: true,
     asyncWrite: true,
 })
