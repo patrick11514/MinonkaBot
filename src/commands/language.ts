@@ -4,7 +4,6 @@ import User from '../types/usersDB'
 
 export default (client: Client) => {
     let e = client.emitter
-    let l = new Logger('Language', 'cyanBright')
 
     e.on('command', async (interaction: CommandInteraction) => {
         let db = client.usersDB
