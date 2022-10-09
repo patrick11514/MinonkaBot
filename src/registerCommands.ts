@@ -7,6 +7,20 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN)
 const removeCommands = false
 const guildsIds = ['713520402315608148']
 
+const regions = [
+    { name: 'EUNE', value: 'EUN1' },
+    { name: 'EUW', value: 'EUW1' },
+    { name: 'BR', value: 'BR1' },
+    { name: 'JP', value: 'JP1' },
+    { name: 'KR', value: 'KR' },
+    { name: 'LAN', value: 'LA1' },
+    { name: 'LAS', value: 'LA2' },
+    { name: 'NA', value: 'NA1' },
+    { name: 'OCE', value: 'OC1' },
+    { name: 'TR', value: 'TR1' },
+    { name: 'RU', value: 'RU' },
+]
+
 ;(async () => {
     if (removeCommands) {
         let data = (await rest.get(Routes.applicationCommands(process.env.DISCORD_ID))) as Array<{
@@ -38,27 +52,12 @@ const guildsIds = ['713520402315608148']
             new SlashCommandBuilder()
                 .setName('profile')
                 .setDescription('Zobrazí tvůj league of legends profil')
-                .addStringOption((option) =>
-                    option.setName('username').setDescription('Jméno vyvolávače').setRequired(false)
-                )
+                .addStringOption((option) => option.setName('username').setDescription('Jméno vyvolávače'))
                 .addStringOption((option) =>
                     option
                         .setName('region')
                         .setDescription('Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)')
-                        .addChoices(
-                            { name: 'EUNE', value: 'EUN1' },
-                            { name: 'EUW', value: 'EUW1' },
-                            { name: 'BR', value: 'BR1' },
-                            { name: 'JP', value: 'JP1' },
-                            { name: 'KR', value: 'KR' },
-                            { name: 'LAN', value: 'LA1' },
-                            { name: 'LAS', value: 'LA2' },
-                            { name: 'NA', value: 'NA1' },
-                            { name: 'OCE', value: 'OC1' },
-                            { name: 'TR', value: 'TR1' },
-                            { name: 'RU', value: 'RU' }
-                        )
-                        .setRequired(false)
+                        .addChoices(...regions)
                 )
         )
 
@@ -107,6 +106,19 @@ const guildsIds = ['713520402315608148']
                             { value: 'zh_CN', name: 'Chinese (China)' },
                             { value: 'zh_TW', name: 'Chinese (Taiwan)' }
                         )
+                )
+        )
+
+        rawCommands.push(
+            new SlashCommandBuilder()
+                .setName('link')
+                .setDescription('Linkuje tvůj discord účet s tvým league of legends účtem')
+                .addStringOption((option) => option.setName('username').setDescription('Jméno vyvolávače'))
+                .addStringOption((option) =>
+                    option
+                        .setName('region')
+                        .setDescription('Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)')
+                        .addChoices(...regions)
                 )
         )
 
