@@ -42,6 +42,7 @@ export default (client: Client) => {
             }
 
             let translate = client.config.languageTranslates[lang]
+            await interaction.deferReply()
 
             if (!(await db.has(interaction.user.id))) {
                 await db.set(interaction.user.id, {
@@ -53,7 +54,7 @@ export default (client: Client) => {
                 await db.set(interaction.user.id, data)
             }
 
-            return interaction.reply({
+            return interaction.editReply({
                 content: `Váš jazyk byl nastaven na: ${translate}`,
             })
         }
