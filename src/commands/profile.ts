@@ -4,6 +4,7 @@ import Images from '../lib/images/core'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
 import { UserChallenges } from '../types/riotApi'
+import User from '../types/usersDB'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -92,9 +93,19 @@ export async function generateProfile(
                 }),
             }
 
+            //get user language
+            let db = interaction.client.usersDB
+            let language = 'cs_CZ'
+            if (await db.has(interaction.user.id)) {
+                let data: User = await db.get(interaction.user.id)
+                if (data.language) {
+                    language = data.language
+                }
+            }
+
             let images = new Images()
 
-            let image = await images.generateProfilePicture(dataFor)
+            let image = await images.generateProfilePicture(dataFor, language)
 
             interaction.editReply({ content: '', files: [image] })
         } else {
