@@ -3,4 +3,7 @@ export default interface Config {
     regionTranslates: {
         [region: string]: string
     }
+    languageTranslates: {
+        [language: string]: string
+    }
 }
