@@ -1,10 +1,12 @@
 import JSONdb from 'simple-json-db'
 import User from '../types/usersDB'
 import Riot from './riot/core'
+import Logger from './logger'
 
 class linkedAccounts {
     discordId: string
     database: JSONdb
+    l = new Logger('LinkedAccounts', 'cyanBright')
 
     constructor(discordId: string, database: JSONdb) {
         this.discordId = discordId
@@ -76,6 +78,7 @@ class linkedAccounts {
             let data = await riot.getSummonerBySummonerId(account.id, account.region)
             if (!data) continue
             if (data.name != account.username) {
+                this.l.log('Found new account name ' + data.name + ' for account ' + account.username)
                 changed = true
                 await this.historyAdd(data.name, account.id)
             }
