@@ -23,6 +23,30 @@ class Riot {
         return data
     }
 
+    async getSummonerByAccountId(id: string, region: string): Promise<SummonerByName | null> {
+        region = region.toUpperCase()
+
+        let url = `https://${region}.api.riotgames.com/lol/summoner/v1/summoners/by-account/${id}`
+
+        let data = await this.r.makeRequest(url)
+
+        if (data?.status) return null
+
+        return data
+    }
+
+    async getSummonerBySummonerId(id: string, region: string): Promise<SummonerByName | null> {
+        region = region.toUpperCase()
+
+        let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${id}`
+
+        let data = await this.r.makeRequest(url)
+
+        if (data?.status) return null
+
+        return data
+    }
+
     async getChallenges(puuid: string, region: string): Promise<null | UserChallenges> {
         region = region.toUpperCase()
 

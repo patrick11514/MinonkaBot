@@ -11,6 +11,7 @@ import {
 } from 'discord.js'
 import crypto from 'crypto'
 import { generateProfile } from '../commands/profile'
+import { link } from '../commands/link'
 
 class accountPicker {
     accounts: Array<{
@@ -71,7 +72,7 @@ class accountPicker {
         return this
     }
 
-    bindFunction(name: string) {
+    bindFunction(name: string, args?: any) {
         process.client.emitter.on('button', async (interaction: ButtonInteraction) => {
             let idData = interaction.customId.split('@')
             if (idData.length != 2) return
@@ -86,6 +87,10 @@ class accountPicker {
             switch (name) {
                 case 'profile': {
                     generateProfile(account.name, account.region, this.interaction, false)
+                    break
+                }
+                case 'link': {
+                    link(args, account.name, account.region, this.interaction, false)
                     break
                 }
             }
