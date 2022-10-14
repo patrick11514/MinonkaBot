@@ -113,6 +113,17 @@ const regions = [
             new SlashCommandBuilder()
                 .setName('link')
                 .setDescription('Linkuje tvůj discord účet s tvým league of legends účtem')
+                .addStringOption((option) =>
+                    option
+                        .setName('action')
+                        .setDescription('Akce, kterou chceš provést')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'list', value: 'list' },
+                            { name: 'add', value: 'add' },
+                            { name: 'delete', value: 'delete' }
+                        )
+                )
                 .addStringOption((option) => option.setName('username').setDescription('Jméno vyvolávače'))
                 .addStringOption((option) =>
                     option
