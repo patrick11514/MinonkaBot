@@ -131,10 +131,14 @@ export async function link(
         }
         let accounts = await linking.getAccounts()
         if (!region) {
-            let find = accounts.filter((account) => account.username == username)
+            let find = accounts.filter((account) => account.username.toLowerCase() == username.toLowerCase())
             if (find.length > 1) {
                 return interaction.reply({
                     content: 'Máš propojeno více účtů s tímto jménem, zadej prosím i region.',
+                })
+            } else if (!find) {
+                return interaction.reply({
+                    content: 'Nepovedlo se najít účet s tímto jménem!',
                 })
             }
             await linking.removeAccount(find[0].id)
