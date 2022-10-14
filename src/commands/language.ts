@@ -59,5 +59,3 @@ export default (client: Client) => {
         }
     })
 }
-
-export async function command() {}
