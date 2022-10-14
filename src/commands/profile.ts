@@ -2,6 +2,7 @@ import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
 import accountPicker from '../components/accountPicker'
 import Images from '../lib/images/core'
 import Logger from '../lib/logger'
+import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import { UserChallenges } from '../types/riotApi'
 import User from '../types/usersDB'
@@ -35,7 +36,32 @@ export async function generateProfile(
     }
 
     if (!username) {
-        //tbd
+        let link = new linkedAccounts(interaction.user.id, interaction.client.usersDB)
+        let accounts = await link.getAccounts()
+        if (accounts?.length == 0) {
+            return interaction.reply({
+                content:
+                    'Použil jsi tento příkaz bez argumentů a nemáš propojený žády účet. Bud použij příkaz `/link` nebo použij tento příkaz s argumenty.',
+            })
+        }
+
+        if (accounts?.length == 1) {
+            await generateProfile(accounts[0].username, accounts[0].region, interaction)
+        } else {
+            await interaction.deferReply()
+            new accountPicker(
+                accounts.map((account) => {
+                    return {
+                        name: account.username,
+                        region: account.region,
+                    }
+                }),
+                interaction,
+                true
+            )
+                .bindFunction('profile')
+                .send()
+        }
     } else {
         let riot = new Riot()
 
