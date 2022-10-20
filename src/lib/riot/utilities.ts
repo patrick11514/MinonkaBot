@@ -59,7 +59,13 @@ class Utilities {
         return file
     }
 
-    async getTitleById(id: number, language: string = 'cs_CZ') {
+    async getTitleById(id: string, language: string = 'cs_CZ') {
+        if (id == '') {
+            return null
+        }
+
+        let newId = parseInt(id)
+
         let response = await fetch(
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/challenges.json'
         )
@@ -70,12 +76,12 @@ class Utilities {
         //first 6 digits are challenge id
         //last 2 digits are tier id
         let challengeId: number, tierId: number
-        if (id == 0) {
+        if (newId == 1) {
             challengeId = 0
             tierId = 0
         } else {
-            challengeId = Math.floor(id / 100)
-            tierId = id - challengeId * 100
+            challengeId = Math.floor(newId / 100)
+            tierId = newId - challengeId * 100
         }
 
         let challenge = data.find((el) => el.id == challengeId)
