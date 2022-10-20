@@ -49,7 +49,7 @@ interface UserChallenges {
     }>
     preferences: {
         bannerAccent: string
-        title: number
+        title: string
         challengeIds: Array<number>
     }
 }
