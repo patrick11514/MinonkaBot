@@ -133,6 +133,19 @@ const regions = [
                 )
         )
 
+        rawCommands.push(
+            new SlashCommandBuilder()
+                .setName('rank')
+                .setDescription('Zobrazí tvůj league of legends rank')
+                .addStringOption((option) => option.setName('username').setDescription('Jméno vyvolávače'))
+                .addStringOption((option) =>
+                    option
+                        .setName('region')
+                        .setDescription('Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)')
+                        .addChoices(...regions)
+                )
+        )
+
         //
 
         const commands = rawCommands.map((command) => command.toJSON())
