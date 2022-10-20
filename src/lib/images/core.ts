@@ -21,7 +21,7 @@ class Images {
             username: string
             level: number
             iconId: number
-            title: number
+            title: string
             challenges: Array<{
                 id: number
                 tier: string
