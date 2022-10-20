@@ -81,7 +81,7 @@ class accountPicker {
             if (id != this.id) return
             let account = this.accounts[parseInt(acc)]
 
-            await interaction.reply({ content: 'Účet vybrán, nyní provádníme další akce...', ephemeral: true })
+            await interaction.reply({ content: 'Účet vybrán, nyní provádíme další akce...', ephemeral: true })
             await this.interaction.editReply({ content: 'Načítání...', components: [] })
 
             switch (name) {
