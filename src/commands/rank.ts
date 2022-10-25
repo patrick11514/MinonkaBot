@@ -60,7 +60,7 @@ export async function generateRank(
                 interaction,
                 true
             )
-                .bindFunction('profile')
+                .bindFunction('rank')
                 .send()
         }
     } else {

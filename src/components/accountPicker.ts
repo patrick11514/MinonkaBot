@@ -12,6 +12,7 @@ import {
 import crypto from 'crypto'
 import { generateProfile } from '../commands/profile'
 import { link } from '../commands/link'
+import { generateRank } from '../commands/rank'
 
 class accountPicker {
     accounts: Array<{
@@ -91,6 +92,10 @@ class accountPicker {
                 }
                 case 'link': {
                     link(args, account.name, account.region, this.interaction, false)
+                    break
+                }
+                case 'rank': {
+                    generateRank(account.name, account.region, this.interaction, false)
                     break
                 }
             }
