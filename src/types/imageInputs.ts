@@ -29,6 +29,12 @@ interface rankedProfile {
         inactive: boolean
         freshBlood: boolean
         hotStreak: boolean
+        miniSeries?: {
+            target: number
+            wins: number
+            losses: number
+            progress: string
+        }
     }>
 }
 
