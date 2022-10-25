@@ -54,14 +54,18 @@ interface UserChallenges {
     }
 }
 
+type EncryptedSummonerId = string
+type EncryptedAccountId = string
+type EncryptedPuuid = string
+
 interface SummonerByName {
-    id: string
-    accountId: string
-    puuid: string
+    id: EncryptedSummonerId
+    accountId: EncryptedAccountId
+    puuid: EncryptedPuuid
     name: string
     profileIconId: number
     revisionDate: number
     summonerLevel: number
 }
 
-export { Challenge, UserChallenges, SummonerByName }
+export { Challenge, UserChallenges, SummonerByName, EncryptedAccountId, EncryptedSummonerId, EncryptedPuuid }

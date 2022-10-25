@@ -1,4 +1,10 @@
-import { SummonerByName, UserChallenges } from '../../types/riotApi'
+import {
+    EncryptedAccountId,
+    EncryptedPuuid,
+    EncryptedSummonerId,
+    SummonerByName,
+    UserChallenges,
+} from '../../types/riotApi'
 import Logger from '../logger'
 import Requests from './requests'
 
@@ -23,7 +29,7 @@ class Riot {
         return data
     }
 
-    async getSummonerByAccountId(id: string, region: string): Promise<SummonerByName | null> {
+    async getSummonerByAccountId(id: EncryptedAccountId, region: string): Promise<SummonerByName | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v1/summoners/by-account/${id}`
@@ -35,7 +41,7 @@ class Riot {
         return data
     }
 
-    async getSummonerBySummonerId(id: string, region: string): Promise<SummonerByName | null> {
+    async getSummonerBySummonerId(id: EncryptedSummonerId, region: string): Promise<SummonerByName | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${id}`
@@ -47,7 +53,7 @@ class Riot {
         return data
     }
 
-    async getChallenges(puuid: string, region: string): Promise<null | UserChallenges> {
+    async getChallenges(puuid: EncryptedPuuid, region: string): Promise<null | UserChallenges> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/challenges/v1/player-data/${puuid}`
