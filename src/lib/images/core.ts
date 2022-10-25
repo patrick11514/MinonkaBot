@@ -177,8 +177,34 @@ class Images {
         //add ranks
         this.l.log('Adding ranks...')
         //set default coords
-        let x = 550
+        let x = 650
         let y = 80
+
+        if (
+            userData.rankeds
+                .map((queue) => {
+                    if (queue.miniSeries) {
+                        return true
+                    } else {
+                        return false
+                    }
+                })
+                .includes(true)
+        ) {
+            x = 450
+
+            //add text Promos
+            let promosText = await this.createText({
+                text: 'Promos',
+                textSize: 65,
+                width: 432,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+            })
+            this.composite(promosText, x + 1000 + 350, y)
+        }
         for (let queue of userData.rankeds) {
             //add name of queue
             this.l.log(`Adding ${queue.queueType}...`)
@@ -291,10 +317,10 @@ class Images {
                 let lose = fs.readFileSync('./images/seriesLose_resized.png')
                 let notPlayed = fs.readFileSync('./images/seriesEmpty_resized.png')
 
-                let startX = x + 225 + 250 + 10 + 200 + 200 + 10
+                let startX = x + 1000 + 350
                 for (let prog of progress) {
-                    this.composite(prog == 'W' ? win : prog == 'L' ? lose : notPlayed, startX, y + 100 + 90 + 90)
-                    startX += 84
+                    this.composite(prog == 'W' ? win : prog == 'L' ? lose : notPlayed, startX, y + 100 + 40)
+                    startX += 88
                 }
             }
 
