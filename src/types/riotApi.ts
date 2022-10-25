@@ -58,7 +58,7 @@ type EncryptedSummonerId = string
 type EncryptedAccountId = string
 type EncryptedPuuid = string
 
-interface SummonerByName {
+interface SummonerBy {
     id: EncryptedSummonerId
     accountId: EncryptedAccountId
     puuid: EncryptedPuuid
@@ -68,4 +68,54 @@ interface SummonerByName {
     summonerLevel: number
 }
 
-export { Challenge, UserChallenges, SummonerByName, EncryptedAccountId, EncryptedSummonerId, EncryptedPuuid }
+enum QueueTypes {
+    RANKED_SOLO = 'RANKED_SOLO_5x5',
+    RANKED_FLEX = 'RANKED_FLEX_SR',
+}
+
+enum Tiers {
+    Iron = 'IRON',
+    Bronze = 'BRONZE',
+    Silver = 'SILVER',
+    Gold = 'GOLD',
+    Platinum = 'PLATINUM',
+    Diamond = 'DIAMOND',
+    Master = 'MASTER',
+    Grandmaster = 'GRANDMASTER',
+    Challenger = 'CHALLENGER',
+}
+
+enum Ranks {
+    I = 'I',
+    II = 'II',
+    III = 'III',
+    IV = 'IV',
+}
+interface RankedData {
+    leagueId: string
+    queueType: QueueTypes
+    tier: Tiers
+    rank: Ranks
+    summonerId: EncryptedSummonerId
+    summonerName: string
+    leaguePoints: number
+    wins: number
+    losses: number
+    veteran: boolean
+    inactive: boolean
+    freshBlood: boolean
+    hotStreak: boolean
+}
+
+export {
+    Challenge,
+    UserChallenges,
+    SummonerBy,
+    EncryptedAccountId,
+    EncryptedSummonerId,
+    EncryptedPuuid,
+    QueueTypes,
+    Tiers,
+    Ranks,
+    RankedData,
+}
