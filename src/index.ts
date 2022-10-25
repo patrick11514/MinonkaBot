@@ -127,14 +127,37 @@ async function updateVersion() {
 
 //start tasks
 async function tasks() {
-    let l = new Logger('Clear TEMP', 'red')
-    l.start('Clearing temp folder...')
-    let files = fs.readdirSync('./temp')
-    files.forEach((f) => {
-        l.log(`Deleting ${f}...`)
-        fs.unlinkSync(`./temp/${f}`)
-    })
-    l.stop('Done')
+    //clear temp folder
+    {
+        let l = new Logger('Clear TEMP', 'red')
+        l.start('Clearing temp folder...')
+        let files = fs.readdirSync('./temp')
+        files.forEach((f) => {
+            l.log(`Deleting ${f}...`)
+            fs.unlinkSync(`./temp/${f}`)
+        })
+        l.stop('Done')
+    }
+    //resize ranked images for rank command
+    {
+        let l = new Logger('Resize Ranks', 'red')
+        l.start('Resizing ranks...')
+        let files = fs.readdirSync('./images/ranks')
+        files
+            .filter((f) => !f.includes('_resized'))
+            .forEach((f) => {
+                //check if file X_resized_rank.png exists
+                if (!fs.existsSync(`./images/ranks/${f.split('.')[0]}_resized_rank.png`)) {
+                    l.log(`Resizing ${f}...`)
+                    //resize image
+                    let sharp = require('sharp')
+                    sharp(`./images/ranks/${f}`)
+                        .resize(100, 100)
+                        .toFile(`./images/ranks/${f.split('.')[0]}_resized_rank.png`)
+                }
+            })
+        l.stop('Done')
+    }
 }
 tasks()
 
