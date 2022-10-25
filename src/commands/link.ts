@@ -26,8 +26,6 @@ export async function link(
     interaction: CommandInteraction | ButtonInteraction,
     edit = true
 ) {
-    if (!interaction.isRepliable()) return
-
     let userData: {
         username: string | null
         region: string | null
@@ -41,7 +39,7 @@ export async function link(
 
     if (action == 'list') {
         let accounts = await linking.getAccounts()
-        if (accounts?.length > 0) {
+        if (accounts.length > 0) {
             let text = '**Propojené účty:**\n'
             accounts.forEach((account) => {
                 text += `${account.username} na regionu ${interaction.client.config.regionTranslates[account.region]}\n`
@@ -126,12 +124,29 @@ export async function link(
             })
         }
     } else if (action == 'delete') {
-        if (!username) {
+        let accounts = await linking.getAccounts()
+        if (accounts.length == 0) {
             return interaction.reply({
-                content: 'Nezadal jsi žádné jméno účtu!',
+                content: 'Nemáš propojený žádný účet.',
             })
         }
-        let accounts = await linking.getAccounts()
+
+        if (!username) {
+            new accountPicker(
+                accounts.map((account) => {
+                    return {
+                        name: account.username,
+                        region: account.region,
+                    }
+                }),
+                interaction,
+                true
+            )
+                .bindFunction('link')
+                .send()
+            return
+        }
+
         if (!region) {
             let find = accounts.filter((account) => account.username.toLowerCase() == username.toLowerCase())
             if (find.length > 1) {
