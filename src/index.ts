@@ -158,6 +158,24 @@ async function tasks() {
             })
         l.stop('Done')
     }
+    //resize series images
+    {
+        let l = new Logger('Resize Series', 'red')
+        l.start('Resizing series...')
+        let imageNames = ['seriesWin.png', 'seriesLose.png', 'seriesEmpty.png']
+        imageNames.forEach((f) => {
+            //check if file X_resized_rank.png exists
+            if (!fs.existsSync(`./images/${f.split('.')[0]}_resized.png`)) {
+                l.log(`Resizing ${f}...`)
+                //resize image
+                let sharp = require('sharp')
+                sharp(`./images/${f}`)
+                    .resize(80, 80)
+                    .toFile(`./images/${f.split('.')[0]}_resized.png`)
+            }
+        })
+        l.stop('Done')
+    }
 }
 tasks()
 
