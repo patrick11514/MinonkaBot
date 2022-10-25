@@ -95,7 +95,7 @@ class Riot {
         return foundAccounts
     }
 
-    async getRankedData(id: EncryptedSummonerId, region: string): Promise<null | RankedData> {
+    async getRankedData(id: EncryptedSummonerId, region: string): Promise<null | RankedData[]> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`
