@@ -152,7 +152,7 @@ async function tasks() {
                     //resize image
                     let sharp = require('sharp')
                     sharp(`./images/ranks/${f}`)
-                        .resize(100, 100)
+                        .resize(250, 250)
                         .toFile(`./images/ranks/${f.split('.')[0]}_resized_rank.png`)
                 }
             })
