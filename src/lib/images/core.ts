@@ -3,6 +3,7 @@ import fs from 'fs'
 import utils from '../riot/utilities'
 import Logger from '../logger'
 import crypto from 'crypto'
+import { RankedData } from '../../types/riotApi'
 
 class Images {
     l: Logger
@@ -28,10 +29,10 @@ class Images {
             }>
         },
         language = 'cs_CZ'
-    ) {
-        let background = await fs.readFileSync('./images/profileBackground.png')
+    ): Promise<string> {
+        let background = fs.readFileSync('./images/profileBackground.png')
 
-        let levelBackground = await fs.readFileSync('./images/levelBackground.png')
+        let levelBackground = fs.readFileSync('./images/levelBackground.png')
 
         let profileImage = await utils.downloadProfilePicture(userData.iconId)
 
@@ -140,6 +141,8 @@ class Images {
         this.l.stop('Finished!')
         return `./temp/${name}.png`
     }
+
+    async generateRankedProfile(userData: RankedData) {}
 
     composite(image: Buffer | string, x: number, y: number) {
         this.compositeList.push({
