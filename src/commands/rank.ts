@@ -26,8 +26,6 @@ export async function generateRank(
     interaction: CommandInteraction | ButtonInteraction,
     edit = true
 ) {
-    if (!interaction.isRepliable()) return
-
     let userData: {
         username: string | null
         region: string | null
