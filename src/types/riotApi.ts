@@ -85,12 +85,36 @@ enum Tiers {
     Challenger = 'CHALLENGER',
 }
 
+type lowerTier =
+    | 'Iron'
+    | 'Bronze'
+    | 'Silver'
+    | 'Gold'
+    | 'Platinum'
+    | 'Diamond'
+    | 'Master'
+    | 'Grandmaster'
+    | 'Challenger'
+
 enum Ranks {
     I = 'I',
     II = 'II',
     III = 'III',
     IV = 'IV',
 }
+
+enum RankColors {
+    Iron = '#99978b',
+    Bronze = '#966502',
+    Silver = '#99978b',
+    Gold = '#e6c41c',
+    Platinum = '#49ebaa',
+    Diamond = '#5149eb',
+    Master = '#8117b3',
+    Grandmaster = '#9e0606',
+    Challenger = '#e5f051',
+}
+
 interface RankedData {
     leagueId: string
     queueType: QueueTypes
@@ -105,6 +129,12 @@ interface RankedData {
     inactive: boolean
     freshBlood: boolean
     hotStreak: boolean
+    miniSeries?: {
+        target: number
+        wins: number
+        losses: number
+        progress: string
+    }
 }
 
 export {
@@ -117,5 +147,7 @@ export {
     QueueTypes,
     Tiers,
     Ranks,
+    RankColors,
+    lowerTier,
     RankedData,
 }
