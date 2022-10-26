@@ -3,6 +3,9 @@ import fs from 'fs'
 import utils from '../riot/utilities'
 import Logger from '../logger'
 import crypto from 'crypto'
+import { profilePicture, rankedProfile } from '../../types/imageInputs'
+import { lowerTier, QueueTypes, RankColors, Tiers } from '../../types/riotApi'
+import Path from 'path'
 
 class Images {
     l: Logger
@@ -16,22 +19,10 @@ class Images {
         this.l = new Logger('Images', 'yellow')
     }
 
-    async generateProfilePicture(
-        userData: {
-            username: string
-            level: number
-            iconId: number
-            title: number
-            challenges: Array<{
-                id: number
-                tier: string
-            }>
-        },
-        language = 'cs_CZ'
-    ) {
-        let background = await fs.readFileSync('./images/profileBackground.png')
+    async generateProfilePicture(userData: profilePicture, language = 'cs_CZ'): Promise<string> {
+        let background = fs.readFileSync('./images/profileBackground.png')
 
-        let levelBackground = await fs.readFileSync('./images/levelBackground.png')
+        let levelBackground = fs.readFileSync('./images/levelBackground.png')
 
         let profileImage = await utils.downloadProfilePicture(userData.iconId)
 
@@ -141,6 +132,207 @@ class Images {
         return `./temp/${name}.png`
     }
 
+    async generateRankedProfile(userData: rankedProfile): Promise<string> {
+        let background = fs.readFileSync('./images/rankBackground.png')
+
+        let levelBackground = fs.readFileSync('./images/levelBackground.png')
+
+        let profileImage = await utils.downloadProfilePicture(userData.profileIconId)
+
+        //background
+        this.l.start('Creating background...')
+        let image = sharp(background)
+
+        //add profileicon
+        this.l.log('Adding profileicon...')
+        this.composite(profileImage, 125, 185)
+
+        //add username
+        this.l.log('Adding username...')
+        let nameText = await this.createText({
+            text: userData.summonerName,
+            textSize: 80,
+            width: 700,
+            height: 120,
+            bold: true,
+            color: '#eae1cf',
+            font: 'Beaufort for LOL Ja',
+        })
+        this.composite(nameText, 0, 185 + 480)
+
+        //Add level
+        this.l.log('Adding level...')
+        //add background
+        this.composite(levelBackground, 239, 49)
+        //add number
+        let levelText = await this.createText({
+            text: userData.level.toString(),
+            textSize: 60,
+            width: 222,
+            height: 88 + 40,
+            bold: true,
+        })
+        this.composite(levelText, 239, 49)
+
+        //add ranks
+        this.l.log('Adding ranks...')
+        //set default coords
+        let x = 650
+        let y = 80
+
+        if (
+            userData.rankeds
+                .map((queue) => {
+                    if (queue.miniSeries) {
+                        return true
+                    } else {
+                        return false
+                    }
+                })
+                .includes(true)
+        ) {
+            x = 450
+
+            //add text Promos
+            let promosText = await this.createText({
+                text: 'Promos',
+                textSize: 65,
+                width: 432,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+            })
+            this.composite(promosText, x + 1000 + 350, y)
+        }
+        for (let queue of userData.rankeds) {
+            //add name of queue
+            this.l.log(`Adding ${queue.queueType}...`)
+            let queueText = await this.createText({
+                text: queue.queueType == QueueTypes.RANKED_SOLO ? 'Solo/Duo' : 'Flex',
+                textSize: 65,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+            })
+
+            this.composite(queueText, x + 500, y)
+
+            //add rank icon
+            this.l.log('Adding rank icon...')
+            let rankIcon = fs.readFileSync(Path.join('./images/ranks', queue.tier.toLowerCase() + '_resized_rank.png'))
+            this.composite(rankIcon, x + 225, y + 40)
+
+            //add rank
+            this.l.log('Adding tier and rank...')
+            let rankText = await this.createText({
+                text:
+                    utils.firstUpper(queue.tier.toLowerCase()) +
+                    ' ' +
+                    (queue.tier != Tiers.Master && queue.tier != Tiers.Grandmaster && queue.tier != Tiers.Challenger
+                        ? queue.rank
+                        : ''),
+                textSize: 65,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: RankColors[utils.firstUpper(queue.tier.toLowerCase()) as lowerTier],
+                font: 'Beaufort for LOL Ja',
+                center: false,
+            })
+
+            this.composite(rankText, x + 225 + 250 + 10, y + 100)
+
+            //add lp
+            this.l.log('Adding lp...')
+            let lpText = await this.createText({
+                text: queue.leaguePoints.toString() + ' LP',
+                textSize: 65,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: false,
+            })
+
+            this.composite(lpText, x + 225 + 250 + 10, y + 100 + 90)
+
+            //add winrate
+            //winrate with 2 numbers on the right
+            let winrate = Math.round((queue.wins / (queue.wins + queue.losses)) * 10000) / 100
+
+            this.l.log('Adding winrate...')
+            let winrateText = await this.createText({
+                text: winrate + '%',
+                textSize: 65,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: winrate >= 50 ? '#1fed18' : '#ff0000',
+                font: 'Beaufort for LOL Ja',
+                center: 2,
+            })
+
+            this.composite(winrateText, x + 225 + 250 + 10 + 200, y + 100)
+
+            //add wins and loses
+            this.l.log('Adding wins...')
+            let winsText = await this.createText({
+                text: queue.wins.toString() + ' Wins',
+                textSize: 65,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#1fed18',
+                font: 'Beaufort for LOL Ja',
+                center: true,
+            })
+
+            this.composite(winsText, x + 225 + 250 + 10, y + 100 + 90)
+
+            this.l.log('Adding loses...')
+            let losesText = await this.createText({
+                text: queue.losses.toString() + ' Loses',
+                textSize: 65,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ff0000',
+                font: 'Beaufort for LOL Ja',
+                center: 2,
+            })
+
+            this.composite(losesText, x + 225 + 250 + 10 + 200, y + 100 + 90)
+
+            //generate series
+            if (queue.miniSeries) {
+                this.l.log('Adding series...')
+                let progress = queue.miniSeries.progress.split('') as Array<'W' | 'L' | 'N'>
+
+                //load images
+                let win = fs.readFileSync('./images/seriesWin_resized.png')
+                let lose = fs.readFileSync('./images/seriesLose_resized.png')
+                let notPlayed = fs.readFileSync('./images/seriesEmpty_resized.png')
+
+                let startX = x + 1000 + 350
+                for (let prog of progress) {
+                    this.composite(prog == 'W' ? win : prog == 'L' ? lose : notPlayed, startX, y + 100 + 40)
+                    startX += 88
+                }
+            }
+
+            y += 330
+        }
+
+        let buffer = await this.compositeDone(image).toBuffer()
+        fs.writeFileSync(`./temp/test.png`, buffer)
+
+        return './temp/test.png'
+    }
+
     composite(image: Buffer | string, x: number, y: number) {
         this.compositeList.push({
             input: image,
@@ -170,13 +362,16 @@ class Images {
         width: number
         height: number
         color?: string
-        center?: boolean
+        center?: boolean | 2
         bold?: boolean
         font?: string
     }) {
         let centerText = ''
-        if (center) {
+        if (center == true) {
             centerText = `x="50%" text-anchor="middle"`
+        }
+        if (center == 2) {
+            centerText = `x="50%" text-anchor="right"`
         }
         let txt = `<svg width="${width}" height="${height}">
             <style>

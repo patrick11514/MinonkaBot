@@ -9,19 +9,18 @@ import User from '../types/usersDB'
 
 export default (client: Client) => {
     let e = client.emitter
-    let l = new Logger('Profile', 'cyan')
 
     e.on('command', async (interaction: CommandInteraction) => {
-        if (interaction.commandName === 'profile') {
+        if (interaction.commandName === 'rank') {
             let username = interaction.options.get('username', false)
             let region = interaction.options.get('region', false)
 
-            generateProfile(username?.value as string, region?.value as string, interaction)
+            generateRank(username?.value as string, region?.value as string, interaction)
         }
     })
 }
 
-export async function generateProfile(
+export async function generateRank(
     username: string | null,
     region: string | null,
     interaction: CommandInteraction | ButtonInteraction,
@@ -48,7 +47,7 @@ export async function generateProfile(
         }
 
         if (accounts?.length == 1) {
-            await generateProfile(accounts[0].username, accounts[0].region, interaction)
+            await generateRank(accounts[0].username, accounts[0].region, interaction)
         } else {
             await interaction.deferReply()
             new accountPicker(
@@ -61,7 +60,7 @@ export async function generateProfile(
                 interaction,
                 true
             )
-                .bindFunction('profile')
+                .bindFunction('rank')
                 .send()
         }
     } else {
@@ -90,9 +89,9 @@ export async function generateProfile(
                 return
             }
 
-            let challenges = await riot.getChallenges(data.puuid, userData.region)
+            let rankedData = await riot.getRankedData(data.id, userData.region)
 
-            if (!challenges) {
+            if (!rankedData) {
                 if (edit) {
                     interaction.editReply({ content: 'Nepovedlo se načíst data z Riot API!' })
                 } else {
@@ -105,35 +104,15 @@ export async function generateProfile(
 
             if (edit) await interaction.deferReply()
 
-            let dataFor = {
-                username: data.name,
-                level: data.summonerLevel,
-                iconId: data.profileIconId,
-                title: challenges.preferences.title,
-                challenges: challenges.preferences.challengeIds?.map((id) => {
-                    let challenge = (challenges as UserChallenges).challenges.find((chall) => chall.challengeId === id)
-                    if (!challenge) return { id: 0, tier: '' }
-
-                    return {
-                        id: id,
-                        tier: challenge.level,
-                    }
-                }),
-            }
-
-            //get user language
-            let db = interaction.client.usersDB
-            let language = 'cs_CZ'
-            if (await db.has(interaction.user.id)) {
-                let data: User = await db.get(interaction.user.id)
-                if (data.language) {
-                    language = data.language
-                }
-            }
-
+            //get image
             let images = new Images()
 
-            let image = await images.generateProfilePicture(dataFor, language)
+            let image = await images.generateRankedProfile({
+                summonerName: data.name,
+                level: data.summonerLevel,
+                profileIconId: data.profileIconId,
+                rankeds: rankedData,
+            })
 
             interaction.editReply({ content: '', files: [image] })
         } else {
@@ -142,10 +121,10 @@ export async function generateProfile(
             let accountData = await riot.findAccount(username)
 
             if (accountData.length > 1) {
-                new accountPicker(accountData, interaction, true).bindFunction('profile').send()
+                new accountPicker(accountData, interaction, true).bindFunction('rank').send()
             } else {
                 interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                await generateProfile(accountData[0].name, accountData[0].region, interaction, false)
+                await generateRank(accountData[0].name, accountData[0].region, interaction, false)
             }
         }
     }

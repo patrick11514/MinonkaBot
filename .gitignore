@@ -13,3 +13,6 @@ databases/
 
 #example files
 *.ts.txt
+
+#other files
+*_resized*.png
