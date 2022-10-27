@@ -1,7 +1,6 @@
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
 import accountPicker from '../components/accountPicker'
 import Images from '../lib/images/core'
-import Logger from '../lib/logger'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import { UserChallenges } from '../types/riotApi'
@@ -9,7 +8,6 @@ import User from '../types/usersDB'
 
 export default (client: Client) => {
     let e = client.emitter
-    let l = new Logger('Profile', 'cyan')
 
     e.on('command', async (interaction: CommandInteraction) => {
         if (interaction.commandName === 'profile') {
@@ -24,8 +22,7 @@ export default (client: Client) => {
 export async function generateProfile(
     username: string | null,
     region: string | null,
-    interaction: CommandInteraction | ButtonInteraction,
-    edit = true
+    interaction: CommandInteraction | ButtonInteraction
 ) {
     let userData: {
         username: string | null
@@ -39,7 +36,7 @@ export async function generateProfile(
         let link = new linkedAccounts(interaction.user.id, interaction.client.usersDB)
         let accounts = await link.getAccounts()
         if (accounts?.length == 0) {
-            return interaction.reply({
+            return interaction.editReply({
                 content:
                     'Použil jsi tento příkaz bez argumentů a nemáš propojený žády účet. Bud použij příkaz `/link` nebo použij tento příkaz s argumenty.',
             })
@@ -72,36 +69,22 @@ export async function generateProfile(
             let data = await riot.getSummonerByName(userData.username, userData.region)
 
             if (!data) {
-                if (edit) {
-                    interaction.editReply({
-                        content: 'Jméno :user nebylo nalezeno na serveru :region!'
-                            .replace(':user', userData.username)
-                            .replace(':region', userData.region),
-                    })
-                } else {
-                    interaction.reply({
-                        content: 'Jméno :user nebylo nalezeno na serveru :region!'
-                            .replace(':user', userData.username)
-                            .replace(':region', userData.region),
-                    })
-                }
+                interaction.editReply({
+                    content: 'Jméno :user nebylo nalezeno na serveru :region!'
+                        .replace(':user', userData.username)
+                        .replace(':region', userData.region),
+                })
+
                 return
             }
 
             let challenges = await riot.getChallenges(data.puuid, userData.region)
 
             if (!challenges) {
-                if (edit) {
-                    interaction.editReply({ content: 'Nepovedlo se načíst data z Riot API!' })
-                } else {
-                    interaction.reply({
-                        content: 'Nepovedlo se načíst data z Riot API!',
-                    })
-                }
+                interaction.editReply({ content: 'Nepovedlo se načíst data z Riot API!' })
+
                 return
             }
-
-            if (edit) await interaction.deferReply()
 
             let dataFor = {
                 username: data.name,
@@ -135,7 +118,7 @@ export async function generateProfile(
 
             interaction.editReply({ content: '', files: [image] })
         } else {
-            interaction.reply('Nezadal jsi region, bude to chvíli trvat...')
+            interaction.editReply('Nezadal jsi region, bude to chvíli trvat...')
 
             let accountData = await riot.findAccount(username)
 
@@ -143,7 +126,7 @@ export async function generateProfile(
                 new accountPicker(accountData, interaction, true).bindFunction('profile').send()
             } else {
                 interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                await generateProfile(accountData[0].name, accountData[0].region, interaction, false)
+                await generateProfile(accountData[0].name, accountData[0].region, interaction)
             }
         }
     }

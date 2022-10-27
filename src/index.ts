@@ -185,9 +185,12 @@ client.on('ready', () => {
     updateVersion()
 })
 
-client.on('interactionCreate', (interaction) => {
+client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand()) {
         try {
+            //automatically deffer reply
+            await interaction.deferReply()
+
             emitter.emit('command', interaction)
         } catch (e: any) {
             l.error(e)

@@ -1,14 +1,4 @@
-import {
-    ActionRow,
-    ActionRowBuilder,
-    AnyComponentBuilder,
-    ButtonBuilder,
-    ButtonInteraction,
-    ButtonStyle,
-    Client,
-    CommandInteraction,
-    MessageActionRowComponent,
-} from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CommandInteraction } from 'discord.js'
 import crypto from 'crypto'
 import { generateProfile } from '../commands/profile'
 import { link } from '../commands/link'
@@ -87,15 +77,15 @@ class accountPicker {
 
             switch (name) {
                 case 'profile': {
-                    generateProfile(account.name, account.region, this.interaction, false)
+                    generateProfile(account.name, account.region, this.interaction)
                     break
                 }
                 case 'link': {
-                    link(args, account.name, account.region, this.interaction, false)
+                    link(args, account.name, account.region, this.interaction)
                     break
                 }
                 case 'rank': {
-                    generateRank(account.name, account.region, this.interaction, false)
+                    generateRank(account.name, account.region, this.interaction)
                     break
                 }
             }

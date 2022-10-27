@@ -1,5 +1,4 @@
 import { Client, CommandInteraction } from 'discord.js'
-import Logger from '../lib/logger'
 import User from '../types/usersDB'
 
 export default (client: Client) => {
@@ -18,14 +17,14 @@ export default (client: Client) => {
                     if (data.language) {
                         let translate = client.config.languageTranslates[data.language]
 
-                        return interaction.reply({
+                        return interaction.editReply({
                             content: `Váš jazyk je nastaven na: ${translate}`,
                         })
                     }
                 }
                 let translate = client.config.languageTranslates['cs_CZ']
 
-                return interaction.reply({
+                return interaction.editReply({
                     content: `Váš jazyk je nastaven na: ${translate}`,
                 })
             }
@@ -41,7 +40,6 @@ export default (client: Client) => {
             }
 
             let translate = client.config.languageTranslates[lang]
-            await interaction.deferReply()
 
             if (!(await db.has(interaction.user.id))) {
                 await db.set(interaction.user.id, {

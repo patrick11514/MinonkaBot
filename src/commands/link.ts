@@ -1,12 +1,10 @@
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
 import accountPicker from '../components/accountPicker'
-import Logger from '../lib/logger'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 
 export default (client: Client) => {
     let e = client.emitter
-    let l = new Logger('Link', 'cyanBright')
 
     e.on('command', async (interaction: CommandInteraction) => {
         if (interaction.commandName === 'link') {
@@ -23,8 +21,7 @@ export async function link(
     action: string,
     username: string | null,
     region: string | null,
-    interaction: CommandInteraction | ButtonInteraction,
-    edit = true
+    interaction: CommandInteraction | ButtonInteraction
 ) {
     let userData: {
         username: string | null
@@ -45,11 +42,11 @@ export async function link(
                 text += `${account.username} na regionu ${interaction.client.config.regionTranslates[account.region]}\n`
             })
 
-            return interaction.reply({
+            return interaction.editReply({
                 content: text,
             })
         } else {
-            interaction.reply({
+            interaction.editReply({
                 content: 'Nemáš propojený žádný účet.',
             })
         }
@@ -62,23 +59,14 @@ export async function link(
                 let data = await riot.getSummonerByName(userData.username, userData.region)
 
                 if (!data) {
-                    if (edit) {
-                        interaction.editReply({
-                            content: 'Jméno :user nebylo nalezeno na serveru :region!'
-                                .replace(':user', userData.username)
-                                .replace(':region', userData.region),
-                        })
-                    } else {
-                        interaction.reply({
-                            content: 'Jméno :user nebylo nalezeno na serveru :region!'
-                                .replace(':user', userData.username)
-                                .replace(':region', userData.region),
-                        })
-                    }
+                    interaction.editReply({
+                        content: 'Jméno :user nebylo nalezeno na serveru :region!'
+                            .replace(':user', userData.username)
+                            .replace(':region', userData.region),
+                    })
+
                     return
                 }
-
-                if (edit) await interaction.deferReply()
 
                 let accounts = await linking.getAccounts()
 
@@ -107,7 +95,7 @@ export async function link(
                     })
                 }
             } else {
-                interaction.reply('Nezadal jsi region, bude to chvíli trvat...')
+                interaction.editReply('Nezadal jsi region, bude to chvíli trvat...')
 
                 let accountData = await riot.findAccount(username)
 
@@ -115,18 +103,18 @@ export async function link(
                     new accountPicker(accountData, interaction, true).bindFunction('link', action).send()
                 } else {
                     interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                    await link(action, accountData[0].name, accountData[0].region, interaction, false)
+                    await link(action, accountData[0].name, accountData[0].region, interaction)
                 }
             }
         } else {
-            interaction.reply({
+            interaction.editReply({
                 content: 'Nevyplnil jsi žádné jméno',
             })
         }
     } else if (action == 'delete') {
         let accounts = await linking.getAccounts()
         if (accounts.length == 0) {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'Nemáš propojený žádný účet.',
             })
         }
@@ -150,33 +138,33 @@ export async function link(
         if (!region) {
             let find = accounts.filter((account) => account.username.toLowerCase() == username.toLowerCase())
             if (find.length > 1) {
-                return interaction.reply({
+                return interaction.editReply({
                     content: 'Máš propojeno více účtů s tímto jménem, zadej prosím i region.',
                 })
             } else if (!find) {
-                return interaction.reply({
+                return interaction.editReply({
                     content: 'Nepovedlo se najít účet s tímto jménem!',
                 })
             }
             await linking.removeAccount(find[0].id)
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'Účet byl úspěšně odpojen!',
             })
         }
         let account = accounts.find((account) => account.username == username && account.region == region)
 
         if (!account) {
-            return interaction.reply({
+            return interaction.editReply({
                 content: 'Žádný tvůj účet s tímto jménem a regionem nebyl nalezen!',
             })
         }
 
         await linking.removeAccount(account.id)
 
-        interaction.reply({
+        interaction.editReply({
             content: 'Účet byl úspěšně odpojen!',
         })
     } else {
-        interaction.reply('Nevyplnil jsi žádnou akci.')
+        interaction.editReply('Nevyplnil jsi žádnou akci.')
     }
 }
