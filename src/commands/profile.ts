@@ -1,8 +1,8 @@
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
-import accountPicker from '../components/accountPicker'
-import Images from '../lib/images/core'
-import linkedAccounts from '../lib/nameHistory'
-import Riot from '../lib/riot/core'
+import accountPicker from '@components/accountPicker'
+import Images from '@lib/images/core'
+import linkedAccounts from '@lib/nameHistory'
+import Riot from '@lib/riot/core'
 import { UserChallenges } from '../types/riotApi'
 import User from '../types/usersDB'
 

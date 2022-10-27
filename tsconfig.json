@@ -9,7 +9,13 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "baseUrl": "./",
+        "paths": {
+            "@lib/*": ["src/lib/*"],
+            "@components/*": ["src/components/*"],
+            "@commands/*": ["src/commands/*"],
+        }
     },
     "files": [
         "src/types/discord.d.ts",
