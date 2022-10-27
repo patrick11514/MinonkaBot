@@ -137,7 +137,7 @@ export async function link(
                 interaction,
                 true
             )
-                .bindFunction('link')
+                .bindFunction('link', action)
                 .send()
             return
         }
