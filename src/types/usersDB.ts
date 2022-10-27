@@ -2,7 +2,6 @@ interface User {
     language: string
     linkedAccounts: Array<{
         username: string
-        nameHistory: Array<string>
         id: string
         region: string
     }>
