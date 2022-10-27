@@ -32,7 +32,7 @@ export async function link(
     }
     let riot = new Riot()
 
-    let linking = new linkedAccounts(interaction.user.id, interaction.client.usersDB)
+    let linking = new linkedAccounts(interaction.user.id, interaction.client.usersDB, interaction.client.nameHistoryDB)
 
     if (action == 'list') {
         let accounts = await linking.getAccounts()

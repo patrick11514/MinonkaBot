@@ -31,7 +31,7 @@ export async function generateRank(
     }
 
     if (!username) {
-        let link = new linkedAccounts(interaction.user.id, interaction.client.usersDB)
+        let link = new linkedAccounts(interaction.user.id, interaction.client.usersDB, interaction.client.nameHistoryDB)
         let accounts = await link.getAccounts()
         if (accounts?.length == 0) {
             return interaction.editReply({
