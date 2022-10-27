@@ -53,6 +53,15 @@ export async function link(
     } else if (action == 'add') {
         if (username) {
             if (region) {
+                let accounts = await linking.getAccounts()
+
+                if (accounts.length == 5 * 5) {
+                    interaction.editReply({
+                        content: 'Máš propojeno již 25 účtů, což je maximum. Pro přidání jiného účtu nějaký odeber.',
+                    })
+                    return
+                }
+
                 userData.username = username
                 userData.region = region
 
@@ -67,8 +76,6 @@ export async function link(
 
                     return
                 }
-
-                let accounts = await linking.getAccounts()
 
                 let find = accounts.find((account) => account.id == data?.id)
 
