@@ -8,5 +8,6 @@ declare module 'discord.js' {
         LOL_VERSION: string
         config: Config
         usersDB: JSONdb
+        nameHistoryDB: JSONdb
     }
 }

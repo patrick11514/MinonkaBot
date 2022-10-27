@@ -46,6 +46,12 @@ let usersDB = new JSONdb('databases/users.json', {
 })
 client.usersDB = usersDB
 
+let nameHistoryDB = new JSONdb('databases/nameHistory.json', {
+    syncOnWrite: true,
+    asyncWrite: true,
+})
+client.nameHistoryDB = nameHistoryDB
+
 //statuses
 const status: Array<{
     text: string
