@@ -84,6 +84,21 @@ export async function generateRank(
                 return
             }
 
+            //save check history of account
+            let accounts = new linkedAccounts(
+                interaction.user.id,
+                interaction.client.usersDB,
+                interaction.client.nameHistoryDB
+            )
+
+            accounts.checkHistory([
+                {
+                    username: data.name,
+                    id: data.id,
+                    region: region,
+                },
+            ])
+
             //get image
             let images = new Images()
 
