@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { generateProfile } from '../commands/profile'
 import { link } from '../commands/link'
 import { generateRank } from '../commands/rank'
+import { nameHistory } from '@commands/nameHistory'
 
 class accountPicker {
     accounts: Array<{
@@ -86,6 +87,10 @@ class accountPicker {
                 }
                 case 'rank': {
                     generateRank(account.name, account.region, this.interaction)
+                    break
+                }
+                case 'nameHistory': {
+                    nameHistory(account.name, account.region, this.interaction)
                     break
                 }
             }
