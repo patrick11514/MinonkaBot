@@ -148,6 +148,20 @@ class linkedAccounts {
         this.database.set(this.discordId, user)
         return true
     }
+
+    async getAccountHistory(id: string, username: string, region: string) {
+        await this.checkHistory([
+            {
+                username: username,
+                id: id,
+                region: region,
+            },
+        ])
+
+        let accounts: NameHistory = await this.database2.get(id)
+
+        return accounts.history
+    }
 }
 
 export default linkedAccounts
