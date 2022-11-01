@@ -11,7 +11,8 @@ export default async function handleInteraction(
     region: string | null,
     bindFunction: string,
     calledFunction: Function,
-    otherArguments: Array<any>
+    otherArguments: Array<any>,
+    argumentsForBindFunction: Array<any>
 ) {
     let l = new Logger('CORE', 'white')
 
@@ -46,7 +47,7 @@ export default async function handleInteraction(
                 interaction,
                 true
             )
-                .bindFunction(bindFunction)
+                .bindFunction(bindFunction, argumentsForBindFunction)
                 .send()
         }
     } else {
@@ -83,7 +84,9 @@ export default async function handleInteraction(
             let accountData = await riot.findAccount(username)
 
             if (accountData.length > 1) {
-                new accountPicker(accountData, interaction, true).bindFunction(bindFunction).send()
+                new accountPicker(accountData, interaction, true)
+                    .bindFunction(bindFunction, argumentsForBindFunction)
+                    .send()
             } else {
                 interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
                 await generateProfile(accountData[0].name, accountData[0].region, interaction)
