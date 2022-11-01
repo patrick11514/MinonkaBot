@@ -1,9 +1,10 @@
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
 import accountPicker from '../components/accountPicker'
+import handleInteraction from '../components/core'
 import Images from '../lib/images/core'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
-import { UserChallenges } from '../types/riotApi'
+import { SummonerBy, UserChallenges } from '../types/riotApi'
 import User from '../types/usersDB'
 
 export default (client: Client) => {
@@ -24,60 +25,19 @@ export async function generateProfile(
     region: string | null,
     interaction: CommandInteraction | ButtonInteraction
 ) {
-    let userData: {
-        username: string | null
-        region: string | null
-    } = {
-        username: null,
-        region: null,
-    }
-
-    if (!username) {
-        let link = new linkedAccounts(interaction.user.id, interaction.client.usersDB, interaction.client.nameHistoryDB)
-        let accounts = await link.getAccounts()
-        if (accounts?.length == 0) {
-            return interaction.editReply({
-                content:
-                    'Použil jsi tento příkaz bez argumentů a nemáš propojený žády účet. Bud použij příkaz `/link` nebo použij tento příkaz s argumenty.',
-            })
-        }
-
-        if (accounts?.length == 1) {
-            await generateProfile(accounts[0].username, accounts[0].region, interaction)
-        } else {
-            new accountPicker(
-                accounts.map((account) => {
-                    return {
-                        name: account.username,
-                        region: account.region,
-                    }
-                }),
-                interaction,
-                true
-            )
-                .bindFunction('profile')
-                .send()
-        }
-    } else {
-        let riot = new Riot()
-
-        if (region) {
-            userData.username = username
-            userData.region = region
-
-            let data = await riot.getSummonerByName(userData.username, userData.region)
-
-            if (!data) {
-                interaction.editReply({
-                    content: 'Jméno :user nebylo nalezeno na serveru :region!'
-                        .replace(':user', userData.username)
-                        .replace(':region', userData.region),
-                })
-
-                return
-            }
-
-            let challenges = await riot.getChallenges(data.puuid, userData.region)
+    handleInteraction(
+        interaction,
+        username,
+        region,
+        'profile',
+        async function (
+            username: string,
+            region: string,
+            data: SummonerBy,
+            riot: Riot,
+            interaction: CommandInteraction | ButtonInteraction
+        ) {
+            let challenges = await riot.getChallenges(data.puuid, region)
 
             if (!challenges) {
                 interaction.editReply({ content: 'Nepovedlo se načíst data z Riot API!' })
@@ -131,17 +91,7 @@ export async function generateProfile(
             let image = await images.generateProfilePicture(dataFor, language)
 
             interaction.editReply({ content: '', files: [image] })
-        } else {
-            interaction.editReply('Nezadal jsi region, bude to chvíli trvat...')
-
-            let accountData = await riot.findAccount(username)
-
-            if (accountData.length > 1) {
-                new accountPicker(accountData, interaction, true).bindFunction('profile').send()
-            } else {
-                interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                await generateProfile(accountData[0].name, accountData[0].region, interaction)
-            }
-        }
-    }
+        },
+        []
+    )
 }
