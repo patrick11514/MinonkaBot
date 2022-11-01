@@ -43,4 +43,17 @@ export default {
         zh_CN: 'Chinese (China)',
         zh_TW: 'Chinese (Taiwan)',
     },
+    routes: {
+        AMERICAS: ['NA', 'BR', 'LA1', 'LA2'],
+        ASIA: ['KR', 'JP'],
+        EUROPE: ['EUNE', 'EUW', 'TR', 'RU'],
+        SEA: ['OC1'],
+    },
+    basicGamemodes: {
+        'Blind pick': 2,
+        'Draft pick': 400,
+        'Solo/Duo': 4,
+        Flex: 6,
+        ARAM: 450,
+    },
 }
