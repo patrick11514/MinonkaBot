@@ -1,7 +1,7 @@
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
-import accountPicker from '@components/accountPicker'
-import linkedAccounts from '@lib/nameHistory'
-import Riot from '@lib/riot/core'
+import accountPicker from '../components/accountPicker'
+import linkedAccounts from '../lib/nameHistory'
+import Riot from '../lib/riot/core'
 
 export default (client: Client) => {
     let e = client.emitter

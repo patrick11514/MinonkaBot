@@ -1,6 +1,6 @@
-import accountPicker from '@components/accountPicker'
-import linkedAccounts from '@lib/nameHistory'
-import Riot from '@lib/riot/core'
+import accountPicker from '../components/accountPicker'
+import linkedAccounts from '../lib/nameHistory'
+import Riot from '../lib/riot/core'
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
 import Logger from '../lib/logger'
 
