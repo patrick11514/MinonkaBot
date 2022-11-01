@@ -1,5 +1,4 @@
 import { ButtonInteraction, CommandInteraction } from 'discord.js'
-import { generateProfile } from '../commands/profile'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import accountPicker from './accountPicker'
@@ -11,6 +10,7 @@ export default async function handleInteraction(
     region: string | null,
     bindFunction: string,
     calledFunction: Function,
+    selfFunction: Function,
     otherArguments: Array<any>,
     argumentsForBindFunction: Array<any>
 ) {
@@ -35,7 +35,7 @@ export default async function handleInteraction(
         }
 
         if (accounts?.length == 1) {
-            await generateProfile(accounts[0].username, accounts[0].region, interaction)
+            await selfFunction(accounts[0].username, accounts[0].region, interaction, ...otherArguments)
         } else {
             new accountPicker(
                 accounts.map((account) => {
@@ -89,7 +89,7 @@ export default async function handleInteraction(
                     .send()
             } else {
                 interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                await generateProfile(accountData[0].name, accountData[0].region, interaction)
+                await selfFunction(accountData[0].name, accountData[0].region, interaction, ...otherArguments)
             }
         }
     }

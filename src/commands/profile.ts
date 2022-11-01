@@ -92,6 +92,8 @@ export async function generateProfile(
 
             interaction.editReply({ content: '', files: [image] })
         },
+        generateProfile,
+        [],
         []
     )
 }

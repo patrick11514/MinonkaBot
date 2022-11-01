@@ -71,6 +71,8 @@ export async function generateRank(
 
             interaction.editReply({ content: '', files: [image] })
         },
+        generateRank,
+        [],
         []
     )
 }
