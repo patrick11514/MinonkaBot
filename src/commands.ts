@@ -168,6 +168,39 @@ let commands: {
             },
         ],
     },
+    matchhistory: {
+        description: 'Zobrazí historii až 10 tvých posledních zápasů',
+        options: [
+            {
+                name: 'queue',
+                description: 'Typ zápasu, který chceš zobrazit',
+                required: false,
+            },
+            {
+                name: 'limit',
+                description: 'Počet zápasů, které chceš zobrazit',
+                required: false,
+                choices: [
+                    { name: '1', value: '1' },
+                    { name: '2', value: '2' },
+                    { name: '3', value: '3' },
+                    { name: '4', value: '4' },
+                    { name: '5', value: '5' },
+                ],
+            },
+            {
+                name: 'username',
+                description: 'Jméno vyvolávače',
+                required: false,
+            },
+            {
+                name: 'region',
+                description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
+                required: false,
+                choices: regions,
+            },
+        ],
+    },
 }
 
 commands.help.options[0].choices = Object.keys(commands).map((command: string) => {
