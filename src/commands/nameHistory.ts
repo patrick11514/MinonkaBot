@@ -43,7 +43,6 @@ export async function nameHistory(
         if (accounts?.length == 1) {
             await nameHistory(accounts[0].username, accounts[0].region, interaction)
         } else {
-            await interaction.deferReply()
             new accountPicker(
                 accounts.map((account) => {
                     return {
