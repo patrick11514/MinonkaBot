@@ -61,6 +61,7 @@ class linkedAccounts {
                 region: region,
                 history: [username],
             }
+            this.database2.set(id, accounts)
         }
 
         if (this.database.has(this.discordId)) {
@@ -90,8 +91,6 @@ class linkedAccounts {
     ) {
         let changed = false
         for (let account of accounts) {
-            if (!this.database2.has(account.id)) {
-            }
             let riot = new Riot()
             let data = await riot.getSummonerBySummonerId(account.id, account.region)
             if (!data) continue
@@ -150,16 +149,21 @@ class linkedAccounts {
     }
 
     async getAccountHistory(id: string, username: string, region: string) {
+        if (!this.database2.has(id)) {
+            await this.historyAdd(username, region, id)
+
+            return [username]
+        }
+
+        let accounts: NameHistory = this.database2.get(id)
+
         await this.checkHistory([
             {
-                username: username,
+                username: accounts.username,
                 id: id,
                 region: region,
             },
         ])
-
-        let accounts: NameHistory = await this.database2.get(id)
-
         return accounts.history
     }
 }

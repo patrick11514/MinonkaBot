@@ -87,7 +87,7 @@ export async function nameHistory(
 
             let accounts = await link.getAccountHistory(data.id, data.name, region)
 
-            content += ['', ...accounts].join('\n * ')
+            content += ['', `**${accounts.pop()}** (aktuální)`, ...accounts.reverse()].join('\n * ')
 
             interaction.editReply({ content: content })
         } else {
