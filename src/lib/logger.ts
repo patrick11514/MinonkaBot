@@ -72,6 +72,24 @@ class Logger {
         )
     }
 
+    stopError(message: any) {
+        if (typeof message == 'object') {
+            message = JSON.stringify(message, null, 4)
+        }
+
+        let ms = Date.now() - this.time
+        this.time = 0
+
+        console.log(
+            `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.red(
+                'ERROR'
+                //@ts-ignore
+            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${clc.red(
+                message
+            )} ${clc.white(`(${ms} ms)`)}`
+        )
+    }
+
     error(message: any) {
         if (typeof message == 'object') {
             message = JSON.stringify(message, null, 4)
