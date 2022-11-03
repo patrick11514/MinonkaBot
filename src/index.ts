@@ -1,5 +1,5 @@
 //imports
-import { ActivityType, Client, GatewayIntentBits, Interaction } from 'discord.js'
+import { ActivityType, Client, GatewayIntentBits } from 'discord.js'
 import EventEmitter from 'events'
 import fs from 'fs'
 import path from 'path'
@@ -102,9 +102,11 @@ const status: Array<{
 
 //change status
 function changeStatus() {
+    let l = new Logger('Change status', 'blue')
     //pick random status
     let option = Math.floor(Math.random() * status.length)
 
+    l.log('Changing status to: ' + status[option].status + ' ' + status[option].text)
     client.user?.setActivity(status[option].text, {
         type: status[option].status,
     })
@@ -114,18 +116,35 @@ function changeStatus() {
 
 //update version
 async function updateVersion() {
+    let l = new Logger('Update version', 'blue')
+    l.start('Checking for new version...')
     let response = await fetch(process.env.DDRAGON_URL + '/api/versions.json')
     let json = await response.json()
 
+    let prevVersion = client.LOL_VERSION
     let currentVer = json[0]
 
     //check if dragon data is uploaded
     response = await fetch(process.env.DDRAGON_URL + '/cdn/' + currentVer + '/data/en_US/champions.json')
     if (!response.ok) {
         client.LOL_VERSION = json[0]
+
+        if (prevVersion && prevVersion != currentVer) {
+            l.log('New version found: ' + currentVer)
+            //if yes, delete png files in cache folder and log
+            let l2 = new Logger('Cache', 'blue')
+            l2.start('Deleting cache...')
+            let files = fs.readdirSync('./cache').filter((file) => file.endsWith('.png'))
+            for (let file of files) {
+                fs.unlinkSync('./cache/' + file)
+            }
+            l2.stop('Cache deleted')
+        }
     } else {
         client.LOL_VERSION = json[1]
     }
+
+    l.stop('Done.')
 
     //update version in an hour
     setTimeout(updateVersion, 60 * 60 * 1000)
