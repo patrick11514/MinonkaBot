@@ -11,6 +11,10 @@ build/
 temp/
 databases/
 cache/
+logs/
+
+#lock files
+pnpm-lock.yaml
 
 #example files
 *.ts.txt
