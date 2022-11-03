@@ -98,6 +98,10 @@ class linkedAccounts {
                 this.l.log('Found new account name ' + data.name + ' for account ' + account.username)
                 changed = true
                 await this.historyAdd(data.name, account.region, account.id)
+            } else {
+                if (!this.database2.has(account.id)) {
+                    await this.historyAdd(data.name, account.region, account.id)
+                }
             }
         }
 
