@@ -71,21 +71,6 @@ export async function generateProfile(
                 }
             }
 
-            //save check history of account
-            let accounts = new linkedAccounts(
-                interaction.user.id,
-                interaction.client.usersDB,
-                interaction.client.nameHistoryDB
-            )
-
-            accounts.checkHistory([
-                {
-                    username: data.name,
-                    id: data.id,
-                    region: region,
-                },
-            ])
-
             let images = new Images()
 
             let image = await images.generateProfilePicture(dataFor, language)

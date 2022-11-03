@@ -69,6 +69,21 @@ export default async function handleInteraction(
                 return
             }
 
+            //save check history of account
+            let accounts = new linkedAccounts(
+                interaction.user.id,
+                interaction.client.usersDB,
+                interaction.client.nameHistoryDB
+            )
+
+            accounts.checkHistory([
+                {
+                    username: data.name,
+                    id: data.id,
+                    region: region,
+                },
+            ])
+
             //here call the main function
             l.start('Running calledFunction...')
             try {
