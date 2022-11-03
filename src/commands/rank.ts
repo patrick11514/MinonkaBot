@@ -5,6 +5,7 @@ import Images from '../lib/images/core'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import { SummonerBy } from '../types/riotApi'
+import fs from 'fs'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -54,7 +55,10 @@ export async function generateRank(
                 rankeds: rankedData,
             })
 
-            interaction.editReply({ content: '', files: [image] })
+            await interaction.editReply({ content: '', files: [image] })
+
+            //delte image
+            fs.unlinkSync(image)
         },
         generateRank,
         [],

@@ -1,11 +1,10 @@
 import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
-import accountPicker from '../components/accountPicker'
 import handleInteraction from '../components/core'
 import Images from '../lib/images/core'
-import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import { SummonerBy, UserChallenges } from '../types/riotApi'
 import User from '../types/usersDB'
+import fs from 'fs'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -75,7 +74,10 @@ export async function generateProfile(
 
             let image = await images.generateProfilePicture(dataFor, language)
 
-            interaction.editReply({ content: '', files: [image] })
+            await interaction.editReply({ content: '', files: [image] })
+
+            //delete generated image
+            fs.unlinkSync(image)
         },
         generateProfile,
         [],
