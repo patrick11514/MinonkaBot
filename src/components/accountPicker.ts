@@ -4,7 +4,7 @@ import { generateProfile } from '../commands/profile'
 import { link } from '../commands/link'
 import { generateRank } from '../commands/rank'
 import { nameHistory } from '../commands/nameHistory'
-import { matchHistory } from '../commands/matchHistory'
+//import { matchHistory } from '../commands/matchHistory'
 
 class accountPicker {
     accounts: Array<{
@@ -94,13 +94,13 @@ class accountPicker {
                     nameHistory(account.name, account.region, this.interaction)
                     break
                 }
-                case 'matchHistory': {
+ /*               case 'matchHistory': {
                     let argum = args as {
                         queue: string | null
                         limit: string | null
                     }
                     matchHistory(account.name, account.region, this.interaction, argum.queue, argum.limit)
-                }
+                }*/
             }
         })
         return this
