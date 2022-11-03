@@ -10,6 +10,7 @@ build/
 #folders
 temp/
 databases/
+cache/
 
 #example files
 *.ts.txt
