@@ -15,9 +15,18 @@ class Utilities {
     }
 
     async downloadImage(url: string, resize: boolean | string = true) {
+        //check if file named url without process.env.DDRAGON_URL and removed first / in folder cache exists and replace all other / with _
+        //if exists, return its path if not download it and return its path
+        let path = url.replace(process.env.DDRAGON_URL, '').substring(1).replace(/\//g, '_')
+        if (fs.existsSync(`./cache/${path}`)) {
+            //write to console using cached file
+            this.l.log('Using cached file.')
+            return `./cache/${path}`
+        }
+
         let response = await fetch(url)
         let data = await response.buffer()
-        let name = crypto.randomBytes(10).toString('hex')
+
         try {
             if (resize) {
                 if (typeof resize == 'string') {
@@ -37,9 +46,10 @@ class Utilities {
         } catch (e) {
             this.l.error("Can't resize image: " + data.toString('base64'))
         }
-        await fs.writeFileSync(`./temp/${name}.${url.split('.').pop()}`, data)
 
-        return `./temp/${name}.${url.split('.').pop()}`
+        fs.writeFileSync(`./cache/${path}`, data)
+
+        return `./cache/${path}`
     }
 
     async downloadProfilePicture(id: number) {
