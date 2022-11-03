@@ -1,4 +1,6 @@
 import clc from 'cli-color'
+import strip from 'strip-color'
+import fs from 'fs'
 
 class Logger {
     name: string
@@ -32,7 +34,7 @@ class Logger {
             message = JSON.stringify(message, null, 4)
         }
 
-        console.log(
+        this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.blue(
                 'INFO'
                 //@ts-ignore
@@ -46,7 +48,7 @@ class Logger {
         }
 
         this.time = Date.now()
-        console.log(
+        this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.blue(
                 'INFO'
                 //@ts-ignore
@@ -62,7 +64,7 @@ class Logger {
         let ms = Date.now() - this.time
         this.time = 0
 
-        console.log(
+        this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.blue(
                 'INFO'
                 //@ts-ignore
@@ -80,7 +82,7 @@ class Logger {
         let ms = Date.now() - this.time
         this.time = 0
 
-        console.log(
+        this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.red(
                 'ERROR'
                 //@ts-ignore
@@ -95,12 +97,32 @@ class Logger {
             message = JSON.stringify(message, null, 4)
         }
 
-        console.log(
+        this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.red(
                 'ERROR'
                 //@ts-ignore
             )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${clc.red(message)}`
         )
+    }
+
+    logToFile(formattedMessage: string) {
+        //strip formatting of message and save it to file named by current date YYYY-MM-DD.log if date is only one digit add 0 in front and at the end console log the formatted message
+        let date = new Date()
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+
+        //filename
+        let filename = `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}.log`
+
+        //strip formatting
+        let message = strip(formattedMessage)
+
+        //add it to new line of file
+        fs.appendFileSync(`./logs/${filename}`, message + '\n')
+
+        //log formatted message
+        console.log(formattedMessage)
     }
 }
 
