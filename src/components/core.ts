@@ -3,6 +3,7 @@ import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import accountPicker from './accountPicker'
 import Logger from '../lib/logger'
+import NameHistory from '../types/nameHistoryDB'
 
 export default async function handleInteraction(
     interaction: ButtonInteraction | CommandInteraction,
@@ -76,13 +77,24 @@ export default async function handleInteraction(
                 interaction.client.nameHistoryDB
             )
 
-            accounts.checkHistory([
-                {
-                    username: data.name,
-                    id: data.id,
-                    region: region,
-                },
-            ])
+            if (interaction.client.nameHistoryDB.has(data.id)) {
+                let accountInfo = interaction.client.nameHistoryDB.get(data.id) as NameHistory
+                accounts.checkHistory([
+                    {
+                        username: accountInfo.username,
+                        id: data.id,
+                        region: region,
+                    },
+                ])
+            } else {
+                accounts.checkHistory([
+                    {
+                        username: data.name,
+                        id: data.id,
+                        region: region,
+                    },
+                ])
+            }
 
             //here call the main function
             l.start('Running calledFunction...')
