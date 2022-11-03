@@ -327,10 +327,13 @@ class Images {
             y += 330
         }
 
-        let buffer = await this.compositeDone(image).toBuffer()
-        fs.writeFileSync(`./temp/test.png`, buffer)
+        //generate random name using crypto and tostring hex and add .png
+        let name = crypto.randomBytes(10).toString('hex') + '.png'
 
-        return './temp/test.png'
+        let buffer = await this.compositeDone(image).toBuffer()
+        fs.writeFileSync(`./temp/${name}`, buffer)
+
+        return `./temp/${name}`
     }
 
     composite(image: Buffer | string, x: number, y: number) {
