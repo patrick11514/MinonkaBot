@@ -2,7 +2,9 @@ import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
 import handleInteraction from '../components/core'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
+import utilities from '../lib/riot/utilities'
 import { SummonerBy } from '../types/riotApi'
+import fs from 'fs'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -47,7 +49,26 @@ export async function matchHistory(
             queue: string | null,
             limit: string | null
         ) {
-            interaction.editReply('Ahoj')
+            //Get route
+            let route = utilities.getRoutingValue(region)
+
+            if (!route) {
+                return interaction.editReply({
+                    content: `Nepovedlo se najít route pro region ${region}!`,
+                })
+            }
+
+            let matchIds = await riot.getMatches(data.puuid, route, limit)
+
+            console.log(matchIds)
+
+            //get match info
+            let matchInfo = []
+            for (let match of matchIds) {
+                let matchData = await riot.getMatch(match, route)
+                matchInfo.push(matchData)
+                fs.writeFileSync('match' + match + '.json', JSON.stringify(matchData))
+            }
         },
         matchHistory,
         [queue, limit],
