@@ -205,6 +205,16 @@ class Images {
             })
             this.composite(promosText, x + 1000 + 350, y)
         }
+
+        if (userData.rankeds.length > 1) {
+            //if first ranked is not solo/duo move second ranked to first
+            if (userData.rankeds[0].queueType != QueueTypes.RANKED_SOLO) {
+                let temp = userData.rankeds[0]
+                userData.rankeds[0] = userData.rankeds[1]
+                userData.rankeds[1] = temp
+            }
+        }
+
         for (let queue of userData.rankeds) {
             //add name of queue
             this.l.log(`Adding ${queue.queueType}...`)
