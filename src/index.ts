@@ -106,7 +106,7 @@ function changeStatus() {
     //pick random status
     let option = Math.floor(Math.random() * status.length)
 
-    l.log('Changing status to: ' + status[option].status + ' ' + status[option].text)
+    l.log('Changing status to: ' + config.statuses[status[option].status] + ' ' + status[option].text)
     client.user?.setActivity(status[option].text, {
         type: status[option].status,
     })

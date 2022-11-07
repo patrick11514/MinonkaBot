@@ -56,4 +56,11 @@ export default {
         Flex: 6,
         ARAM: 450,
     },
+    statuses: {
+        0: 'Hraje',
+        1: 'Vysílá',
+        2: 'Poslouchá',
+        3: 'Sleduje',
+        5: 'Soutěží',
+    },
 }
