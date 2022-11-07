@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import crypto from 'crypto'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { Challenge } from '../../types/riotApi'
+import { Challenge, championsData, itemsData } from '../../types/riotApi'
 import Logger from '../logger'
 import sharp from 'sharp'
 dotenv.config()
@@ -140,7 +140,24 @@ class Utilities {
         return s.charAt(0).toUpperCase() + s.slice(1)
     }
 
-    async getChapions(language: string = 'cs_CZ') {
+    async getChampionImage(filename: string) {
+        if (fs.existsSync('./cache/' + filename)) {
+            return './cache/' + filename
+        }
+
+        let path = './cache/' + filename
+
+        let response = await fetch(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/champion/' + filename
+        )
+
+        let buffer = await response.buffer()
+
+        fs.writeFileSync(path, buffer)
+        return path
+    }
+
+    async getChampions(language: string = 'cs_CZ'): Promise<championsData> {
         //check if file is in chace name: champions_{language}.json if yes, return its content
         //if not, download it and return its content
         let path = `./cache/champions_${language}.json`
@@ -158,6 +175,45 @@ class Utilities {
         fs.writeFileSync(path, JSON.stringify(data))
 
         return data
+    }
+
+    async getItemImage(filename: string) {
+        if (fs.existsSync('./cache/' + filename)) {
+            return './cache/' + filename
+        }
+
+        let path = './cache/' + filename
+
+        let response = await fetch(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/item/' + filename
+        )
+
+        let buffer = await response.buffer()
+
+        fs.writeFileSync(path, buffer)
+        return path
+    }
+
+    async getItems(language: string = 'cs_CZ'): Promise<itemsData> {
+        let path = `./cache/items_${language}.json`
+        if (fs.existsSync(path)) {
+            this.l.log('Using cached file.')
+            return JSON.parse(fs.readFileSync(path).toString())
+        }
+
+        let response = await fetch(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/item.json'
+        )
+
+        let data = await response.json()
+
+        fs.writeFileSync(path, JSON.stringify(data))
+
+        return data
+    }
+
+    fixItemName(name: string) {
+        return name.replaceAll(' ', '').replaceAll("'", '').replaceAll('-', '').replaceAll('.', '')
     }
 }
 

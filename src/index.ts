@@ -5,11 +5,14 @@ import fs from 'fs'
 import path from 'path'
 import Logger from './lib/logger'
 import config from './config'
+import fetch from 'node-fetch'
+import JSONdb from 'simple-json-db'
+import utilities from './lib/riot/utilities'
+import sharp from 'sharp'
+import crypto from 'crypto'
 
 //dotenv
 import * as dotenv from 'dotenv'
-import fetch from 'node-fetch'
-import JSONdb from 'simple-json-db'
 dotenv.config()
 
 //intents
@@ -51,6 +54,12 @@ let nameHistoryDB = new JSONdb('databases/nameHistory.json', {
     asyncWrite: true,
 })
 client.nameHistoryDB = nameHistoryDB
+
+let emotesDB = new JSONdb('databases/emotes.json', {
+    syncOnWrite: true,
+    asyncWrite: true,
+})
+client.emotesDB = emotesDB
 
 //statuses
 const status: Array<{
@@ -140,6 +149,12 @@ async function updateVersion() {
             }
             l2.stop('Cache deleted')
         }
+
+        if (prevVersion != currentVer) {
+            //check emotes
+            let l3 = new Logger('Check emotes', 'blue')
+            await checkEmotes(currentVer, l3)
+        }
     } else {
         client.LOL_VERSION = json[1]
     }
@@ -149,6 +164,236 @@ async function updateVersion() {
     //update version in an hour
     setTimeout(updateVersion, 60 * 60 * 1000)
 }
+
+const forceLoadEmojis = true
+
+async function checkEmotes(version: string, l: Logger) {
+    {
+        l.start('Checking champion emotes emotes...')
+        //champions
+        let championsData = await utilities.getChampions()
+
+        //calculate number of emotes
+        let emotes = 0
+        for (let _ of Object.values(championsData.data)) {
+            emotes++
+        }
+
+        let championDiscords = config.emotes.champions
+
+        //on one discord server we can upload 50 emotes, so emotes / 50 = number of servers needed for emotes of champions
+        //if not enough servers, logger.error to console and return
+
+        if (championDiscords.length < emotes / 50) {
+            l.stopError(
+                'Not enough servers for emotes of champions. You need at least ' + Math.ceil(emotes / 50) + ' servers.'
+            )
+        } else {
+            let i = 1
+
+            if (!emotesDB.has('championsCount') && !forceLoadEmojis) {
+                //Delete all emotes
+                let l2 = new Logger('Delete emotes', 'blue')
+                l2.start('Deleting emotes...')
+                for (let discord of championDiscords) {
+                    let l = 1
+                    let guild = await client.guilds.fetch(discord)
+                    let emotes = await guild.emojis.fetch()
+                    let count = emotes.size
+                    process.stdout.write('0/' + count)
+                    for (let emote of emotes.values()) {
+                        process.stdout.clearLine(0)
+                        process.stdout.cursorTo(0)
+                        process.stdout.write(l + '/' + count)
+                        await emote.delete()
+                        l++
+                    }
+                }
+                l2.stop('\nEmotes deleted')
+            } else if (!emotesDB.has('championsCount') && forceLoadEmojis) {
+                let emojisCount = 0
+
+                for (let discord of championDiscords) {
+                    let guild = await client.guilds.fetch(discord)
+                    let emotes = await guild.emojis.fetch()
+                    emojisCount += emotes.size
+
+                    for (let emote of emotes.values()) {
+                        emotesDB.set('champ@' + emote.name, emote.identifier)
+                    }
+                }
+
+                emotesDB.set('championsCount', emojisCount)
+            }
+
+            for (let champion of Object.values(championsData.data)) {
+                if (!emotesDB.has(`champ@${champion.id}`)) {
+                    let filename = await utilities.getChampionImage(champion.image.full)
+                    //resize image to 105x105px
+                    let randomName = crypto.randomBytes(16).toString('hex')
+                    l.log('Resizing image to 105x105px')
+                    await sharp(filename)
+                        .resize(105, 105)
+                        .toFile('./temp/' + randomName + '.png')
+
+                    l.log('Resizing done')
+
+                    //upload emote
+                    //check if is space for emote
+                    let discordServerId = championDiscords[Math.ceil(i / 50) - 1]
+
+                    let guild = await client.guilds.fetch(discordServerId)
+                    if (!guild) {
+                        l.stopError('Guild with id ' + discordServerId + ' not found.')
+                        return
+                    }
+
+                    let emotes = await guild.emojis.fetch()
+
+                    if (emotes.size >= 50) {
+                        //find new server
+                        for (let discord of championDiscords) {
+                            guild = await client.guilds.fetch(discord)
+                            let emotes = await guild.emojis.fetch()
+                            if (emotes.size < 50) {
+                                discordServerId = discord
+                                break
+                            }
+                        }
+                    }
+
+                    let emoji = await guild.emojis.create({
+                        name: champion.id,
+                        attachment: './temp/' + randomName + '.png',
+                    })
+
+                    //Delete temp file
+                    fs.unlinkSync('./temp/' + randomName + '.png')
+
+                    emotesDB.set(`champ@${champion.id}`, emoji.identifier)
+                }
+                i++
+            }
+
+            emotesDB.set('championsCount', emotes)
+        }
+
+        l.stop('Done')
+    }
+    {
+        l.start('Checking item emotes...')
+
+        let itemsData = await utilities.getItems('en_US')
+
+        //calculate number of emotes
+        let emotes = 0
+        for (let item of Object.values(itemsData.data)) {
+            if (Object.hasOwn(item, 'inStore') && !item.inStore) continue
+            emotes++
+        }
+
+        let itemDiscords = config.emotes.items
+
+        //on one discord server we can upload 50 emotes, so emotes / 50 = number of servers needed for emotes of champions
+        //if not enough servers, logger.error to console and return
+
+        if (itemDiscords.length < emotes / 50) {
+            l.stopError(
+                'Not enough servers for emotes of items. You need at least ' + Math.ceil(emotes / 50) + ' servers.'
+            )
+        } else {
+            let i = 1
+
+            if (!emotesDB.has('itemsCount') && !forceLoadEmojis) {
+                //Delete all emotes
+                let l2 = new Logger('Delete emotes', 'blue')
+                l2.start('Deleting emotes...')
+                for (let discord of itemDiscords) {
+                    let l = 1
+                    let guild = await client.guilds.fetch(discord)
+                    let emotes = await guild.emojis.fetch()
+                    let count = emotes.size
+                    process.stdout.write('0/' + count)
+                    for (let emote of emotes.values()) {
+                        process.stdout.clearLine(0)
+                        process.stdout.cursorTo(0)
+                        process.stdout.write(l + '/' + count)
+                        await emote.delete()
+                        l++
+                    }
+                }
+                l2.stop('\nEmotes deleted')
+            } else if (!emotesDB.has('itemsCount') && forceLoadEmojis) {
+                let emojisCount = 0
+
+                for (let discord of itemDiscords) {
+                    let guild = await client.guilds.fetch(discord)
+                    let emotes = await guild.emojis.fetch()
+                    emojisCount += emotes.size
+
+                    for (let emote of emotes.values()) {
+                        emotesDB.set('item@' + emote.name, emote.identifier)
+                    }
+                }
+
+                emotesDB.set('itemsCount', emojisCount)
+            }
+
+            for (let item of Object.values(itemsData.data)) {
+                if (Object.hasOwn(item, 'inStore') && !item.inStore) continue
+                let itemId = utilities.fixItemName(item.name)
+                if (!emotesDB.has(`item@${itemId}`)) {
+                    let filename = await utilities.getItemImage(item.image.full)
+                    //resize image to 105x105px
+                    let randomName = crypto.randomBytes(16).toString('hex')
+                    l.log('Resizing image to 105x105px')
+                    await sharp(filename)
+                        .resize(105, 105)
+                        .toFile('./temp/' + randomName + '.png')
+
+                    l.log('Resizing done')
+
+                    //upload emote
+                    //check if is space for emote
+                    let discordServerId = itemDiscords[Math.ceil(i / 50) - 1]
+
+                    let guild = await client.guilds.fetch(discordServerId)
+                    if (!guild) {
+                        l.stopError('Guild with id ' + discordServerId + ' not found.')
+                        return
+                    }
+
+                    let emotes = await guild.emojis.fetch()
+
+                    if (emotes.size >= 50) {
+                        //find new server
+                        for (let discord of itemDiscords) {
+                            guild = await client.guilds.fetch(discord)
+                            let emotes = await guild.emojis.fetch()
+                            if (emotes.size < 50) {
+                                discordServerId = discord
+                                break
+                            }
+                        }
+                    }
+
+                    let emoji = await guild.emojis.create({
+                        name: itemId,
+                        attachment: './temp/' + randomName + '.png',
+                    })
+
+                    //Delete temp file
+                    fs.unlinkSync('./temp/' + randomName + '.png')
+
+                    emotesDB.set(`item@${itemId}`, emoji.identifier)
+                }
+                i++
+            }
+        }
+    }
+}
+
+//download
 
 //start tasks
 async function tasks() {
@@ -175,7 +420,6 @@ async function tasks() {
                 if (!fs.existsSync(`./images/ranks/${f.split('.')[0]}_resized_rank.png`)) {
                     l.log(`Resizing ${f}...`)
                     //resize image
-                    let sharp = require('sharp')
                     sharp(`./images/ranks/${f}`)
                         .resize(250, 250)
                         .toFile(`./images/ranks/${f.split('.')[0]}_resized_rank.png`)
