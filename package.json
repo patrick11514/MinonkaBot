@@ -7,7 +7,8 @@
         "dev": "ts-node-dev --respawn ./src/index.ts",
         "build": "tsc -p tsconfig.json && mkdir -p temp databases cache logs",
         "start": "node build/index.js",
-        "startCommands": "tsc -p tsconfigCommands.json && node build/registerCommands.js"
+        "startCommands": "tsc -p tsconfigCommands.json && node build/registerCommands.js",
+        "genChampTypes": "tsc -p tsconfigChampTypes.json && node build/types/generateChampions.js"
     },
     "keywords": [],
     "author": "Patrik Mintěl",
