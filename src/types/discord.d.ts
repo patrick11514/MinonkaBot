@@ -9,5 +9,6 @@ declare module 'discord.js' {
         config: Config
         usersDB: JSONdb
         nameHistoryDB: JSONdb
+        emotesDB: JSONdb
     }
 }
