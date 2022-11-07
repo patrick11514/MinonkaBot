@@ -6,4 +6,18 @@ export default interface Config {
     languageTranslates: {
         [language: string]: string
     }
+    routes: {
+        [region: string]: Array<string>
+    }
+    basicGamemodes: {
+        [gamemode: string]: number
+    }
+    statuses: {
+        [status: number]: string
+    }
+    emotes: {
+        champions: Array<string>
+        items: Array<string>
+        mix: Array<string>
+    }
 }
