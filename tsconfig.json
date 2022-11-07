@@ -3,7 +3,7 @@
         "rootDir": "src",
         "outDir": "build",
         "removeComments": true,
-        "target": "ES2021",
+        "target": "ES2022",
         "module": "CommonJS",
         "strict": true,
         "esModuleInterop": true,
