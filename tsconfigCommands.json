@@ -13,6 +13,6 @@
         "resolveJsonModule": true
     },
     "files": ["src/types/environment.d.ts"],
-    "include": ["src/registerCommands.ts", "src/environment.d.ts"],
+    "include": ["src/registerCommands.ts"],
     "exclude": ["node_modules"]
 }
