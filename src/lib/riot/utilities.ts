@@ -215,6 +215,16 @@ class Utilities {
     fixItemName(name: string) {
         return name.replaceAll(' ', '').replaceAll("'", '').replaceAll('-', '').replaceAll('.', '')
     }
+
+    getRoutingValue(region: string) {
+        region = region.toUpperCase()
+        region = process.client.config.regionTranslates[region]
+
+        let routes = Object.keys(process.client.config.routes)
+        let route = routes.find((route: string) => process.client.config.routes[route].includes(region))
+        if (!route) return null
+        return route
+    }
 }
 
 export default new Utilities()
