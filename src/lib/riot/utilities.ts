@@ -139,6 +139,26 @@ class Utilities {
     firstUpper(s: string) {
         return s.charAt(0).toUpperCase() + s.slice(1)
     }
+
+    async getChapions(language: string = 'cs_CZ') {
+        //check if file is in chace name: champions_{language}.json if yes, return its content
+        //if not, download it and return its content
+        let path = `./cache/champions_${language}.json`
+        if (fs.existsSync(path)) {
+            this.l.log('Using cached file.')
+            return JSON.parse(fs.readFileSync(path).toString())
+        }
+
+        let response = await fetch(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/champion.json'
+        )
+
+        let data = await response.json()
+
+        fs.writeFileSync(path, JSON.stringify(data))
+
+        return data
+    }
 }
 
 export default new Utilities()
