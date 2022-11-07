@@ -101,7 +101,7 @@ export default async function handleInteraction(
             try {
                 await calledFunction(userData.username, userData.region, data, riot, interaction, ...otherArguments)
             } catch (e) {
-                l.stopError('Error while running calledFunction!')
+                l.stopError(`Error while running calledFunction (${e})!`)
                 return
             }
             l.stop('calledFunction ran successfully!')
