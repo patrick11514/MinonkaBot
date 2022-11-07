@@ -2,6 +2,7 @@ import {
     EncryptedAccountId,
     EncryptedPuuid,
     EncryptedSummonerId,
+    errorResponse,
     RankedData,
     SummonerBy,
     UserChallenges,
@@ -23,11 +24,11 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}`
 
-        let data = await this.r.makeRequest(url)
+        let data: SummonerBy | errorResponse = await this.r.makeRequest(url)
 
-        if (data?.status) return null
+        if ((data as errorResponse)?.status) return null
 
-        return data
+        return data as SummonerBy
     }
 
     async getSummonerByAccountId(id: EncryptedAccountId, region: string): Promise<SummonerBy | null> {
@@ -35,11 +36,11 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v1/summoners/by-account/${id}`
 
-        let data = await this.r.makeRequest(url)
+        let data: SummonerBy | errorResponse = await this.r.makeRequest(url)
 
-        if (data?.status) return null
+        if ((data as errorResponse)?.status) return null
 
-        return data
+        return data as SummonerBy
     }
 
     async getSummonerBySummonerId(id: EncryptedSummonerId, region: string): Promise<SummonerBy | null> {
@@ -47,14 +48,14 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${id}`
 
-        let data = await this.r.makeRequest(url)
+        let data: SummonerBy | errorResponse = await this.r.makeRequest(url)
 
-        if (data?.status) return null
+        if ((data as errorResponse)?.status) return null
 
-        return data
+        return data as SummonerBy
     }
 
-    async getChallenges(puuid: EncryptedPuuid, region: string): Promise<null | UserChallenges> {
+    async getChallenges(puuid: EncryptedPuuid, region: string): Promise<UserChallenges> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/challenges/v1/player-data/${puuid}`
@@ -95,10 +96,28 @@ class Riot {
         return foundAccounts
     }
 
-    async getRankedData(id: EncryptedSummonerId, region: string): Promise<null | RankedData[]> {
+    async getRankedData(id: EncryptedSummonerId, region: string): Promise<RankedData[]> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`
+
+        let data = await this.r.makeRequest(url)
+
+        return data
+    }
+
+    async getMatches(id: EncryptedPuuid, route: string, count?: string | null): Promise<Array<string>> {
+        let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=0&count=${
+            count ? count : 10
+        }`
+
+        let data = await this.r.makeRequest(url)
+
+        return data
+    }
+
+    async getMatch(id: string, route: string): Promise<null | any> {
+        let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/${id}`
 
         let data = await this.r.makeRequest(url)
 
