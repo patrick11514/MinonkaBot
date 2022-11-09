@@ -1,4 +1,11 @@
-import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
+import {
+    ButtonInteraction,
+    Client,
+    CommandInteraction,
+    EmbedBuilder,
+    Team,
+    TeamMemberMembershipState,
+} from 'discord.js'
 import handleInteraction from '../components/core'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
@@ -60,14 +67,57 @@ export async function matchHistory(
 
             let matchIds = await riot.getMatches(data.puuid, route, limit)
 
-            console.log(matchIds)
+            if (matchIds.length == 0) {
+                return interaction.editReply({
+                    content: `Nepovedlo se načíst match history pro ${data.name}!`,
+                })
+            }
 
             //get match info
             let matchInfo = []
+            interaction.editReply(matchIds.length.toString())
             for (let match of matchIds) {
                 let matchData = await riot.getMatch(match, route)
-                matchInfo.push(matchData)
-                fs.writeFileSync('match' + match + '.json', JSON.stringify(matchData))
+                if (!matchData) continue
+
+                let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
+
+                matchInfo.push({
+                    queue: matchData.info.queueId,
+                    userTeam: userTeam,
+                    bans: matchData.info.teams.map((team) => {
+                        return {
+                            id: team.teamId,
+                            bans: team.bans.map((ban) => {
+                                return {
+                                    champion: ban.championId,
+                                    pickTurn: ban.pickTurn,
+                                }
+                            }),
+                        }
+                    }),
+                    wins: matchData.info.teams.map((team) => {
+                        return {
+                            id: team.teamId,
+                            win: team.win,
+                        }
+                    }),
+                    teams: matchData.info.participants.map((participant) => {
+                        return {
+                            id: participant.teamId,
+                            champion: participant.championId,
+                            summoner: participant.summonerName,
+                            role: participant.teamPosition,
+                            items: [...Array(6).keys()].map((i) => {
+                                let item = `item${i}` as keyof typeof participant
+                                return participant[item]
+                            }),
+                            kills: participant.kills,
+                            asists: participant.assists,
+                            deaths: participant.deaths,
+                        }
+                    }),
+                })
             }
         },
         matchHistory,
