@@ -3,6 +3,7 @@ import {
     EncryptedPuuid,
     EncryptedSummonerId,
     errorResponse,
+    match,
     RankedData,
     SummonerBy,
     UserChallenges,
@@ -96,14 +97,16 @@ class Riot {
         return foundAccounts
     }
 
-    async getRankedData(id: EncryptedSummonerId, region: string): Promise<RankedData[]> {
+    async getRankedData(id: EncryptedSummonerId, region: string): Promise<RankedData[] | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`
 
-        let data = await this.r.makeRequest(url)
+        let data: RankedData[] | errorResponse = await this.r.makeRequest(url)
 
-        return data
+        if ((data as errorResponse)?.status) return null
+
+        return data as RankedData[]
     }
 
     async getMatches(id: EncryptedPuuid, route: string, count?: string | null): Promise<Array<string>> {
@@ -111,17 +114,21 @@ class Riot {
             count ? count : 10
         }`
 
-        let data = await this.r.makeRequest(url)
+        let data: Array<string> | errorResponse = await this.r.makeRequest(url)
 
-        return data
+        if ((data as errorResponse)?.status) return []
+
+        return data as Array<string>
     }
 
-    async getMatch(id: string, route: string): Promise<null | any> {
+    async getMatch(id: string, route: string): Promise<null | match> {
         let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/${id}`
 
-        let data = await this.r.makeRequest(url)
+        let data: match | errorResponse = await this.r.makeRequest(url)
 
-        return data
+        if ((data as errorResponse)?.status) return null
+
+        return data as match
     }
 }
 
