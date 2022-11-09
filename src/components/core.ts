@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction } from 'discord.js'
+import { ButtonInteraction, CommandInteraction, DiscordAPIError } from 'discord.js'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import accountPicker from './accountPicker'
@@ -100,8 +100,38 @@ export default async function handleInteraction(
             l.start('Running calledFunction...')
             try {
                 await calledFunction(userData.username, userData.region, data, riot, interaction, ...otherArguments)
-            } catch (e) {
-                l.stopError(`Error while running calledFunction (${e})!`)
+            } catch (e:
+                | {
+                      name: string
+                      constraint: string
+                      given: string
+                      expected: string
+                  }
+                | any) {
+                if (typeof e == 'object') {
+                    let trace = e as {
+                        errors: Array<{
+                            name: string
+                            validator?: string
+                            constraint?: string
+                            given: string
+                            expected: string
+                        }>
+                    }
+
+                    if (trace.errors.length > 1) {
+                        l.stopError(`Errors while running calledFunction `)
+                        let i = 1
+                        for (let error of trace.errors) {
+                            l.error(i + '. ' + error)
+                            i++
+                        }
+                    } else {
+                        l.stopError(`Error while running calledFunction (${trace})`)
+                    }
+                } else {
+                    l.stopError(`Error while running calledFunction (${e})!`)
+                }
                 return
             }
             l.stop('calledFunction ran successfully!')
