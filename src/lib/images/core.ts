@@ -3,7 +3,7 @@ import fs from 'fs'
 import utils from '../riot/utilities'
 import Logger from '../logger'
 import crypto from 'crypto'
-import { profilePicture, rankedProfile } from '../../types/imageInputs'
+import { matchData, profilePicture, rankedProfile } from '../../types/imageInputs'
 import { lowerTier, QueueTypes, RankColors, Tiers } from '../../types/riotApi'
 import Path from 'path'
 
@@ -340,7 +340,24 @@ class Images {
         //generate random name using crypto and tostring hex and add .png
         let name = crypto.randomBytes(10).toString('hex') + '.png'
 
+        this.l.log('Saving image...')
         let buffer = await this.compositeDone(image).toBuffer()
+        fs.writeFileSync(`./temp/${name}`, buffer)
+        this.l.stop('Done')
+
+        return `./temp/${name}`
+    }
+
+    async generateMatch(matchData: matchData): Promise<string> {
+        let background = fs.readFileSync('./images/matchBackground.png')
+
+        this.l.start('Creating background...')
+        let image = sharp(background)
+
+        let buffer = await this.compositeDone(image).toBuffer()
+        //generate random name using crypto and tostring hex and add .png
+        let name = crypto.randomBytes(10).toString('hex') + '.png'
+
         fs.writeFileSync(`./temp/${name}`, buffer)
 
         return `./temp/${name}`
