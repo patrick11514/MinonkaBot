@@ -1,5 +1,4 @@
 import fetch from 'node-fetch'
-import crypto from 'crypto'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import { Challenge, championsData, itemsData } from '../../types/riotApi'
@@ -141,19 +140,11 @@ class Utilities {
     }
 
     async getChampionImage(filename: string) {
-        if (fs.existsSync('./cache/' + filename)) {
-            return './cache/' + filename
-        }
-
-        let path = './cache/' + filename
-
-        let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/champion/' + filename
+        let path = await this.downloadImage(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/champion/' + filename,
+            false
         )
 
-        let buffer = await response.buffer()
-
-        fs.writeFileSync(path, buffer)
         return path
     }
 
@@ -178,19 +169,11 @@ class Utilities {
     }
 
     async getItemImage(filename: string) {
-        if (fs.existsSync('./cache/' + filename)) {
-            return './cache/' + filename
-        }
-
-        let path = './cache/' + filename
-
-        let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/item/' + filename
+        let path = await this.downloadImage(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/item/' + filename,
+            false
         )
 
-        let buffer = await response.buffer()
-
-        fs.writeFileSync(path, buffer)
         return path
     }
 
