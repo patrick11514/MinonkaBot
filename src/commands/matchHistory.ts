@@ -12,6 +12,7 @@ import Riot from '../lib/riot/core'
 import utilities from '../lib/riot/utilities'
 import { SummonerBy } from '../types/riotApi'
 import fs from 'fs'
+import Images from '../lib/images/core'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -74,7 +75,7 @@ export async function matchHistory(
             }
 
             //get match info
-            let matchInfo = []
+            let matchesInfo = []
             interaction.editReply(matchIds.length.toString())
             for (let match of matchIds) {
                 let matchData = await riot.getMatch(match, route)
@@ -82,9 +83,9 @@ export async function matchHistory(
 
                 let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
 
-                matchInfo.push({
+                matchesInfo.push({
                     queue: matchData.info.queueId,
-                    userTeam: userTeam,
+                    userTeam: userTeam as number,
                     bans: matchData.info.teams.map((team) => {
                         return {
                             id: team.teamId,
@@ -110,7 +111,7 @@ export async function matchHistory(
                             role: participant.teamPosition,
                             items: [...Array(6).keys()].map((i) => {
                                 let item = `item${i}` as keyof typeof participant
-                                return participant[item]
+                                return participant[item] as number
                             }),
                             kills: participant.kills,
                             asists: participant.assists,
@@ -118,6 +119,15 @@ export async function matchHistory(
                         }
                     }),
                 })
+            }
+
+            let images: string[] = []
+
+            let image = new Images()
+
+            for (let match of matchesInfo) {
+                let imagePath = await image.generateMatch(match)
+                images.push(imagePath)
             }
         },
         matchHistory,
