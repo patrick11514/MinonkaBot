@@ -8,7 +8,8 @@
         "build": "tsc -p tsconfig.json && mkdir -p temp databases cache logs",
         "start": "node build/index.js",
         "startCommands": "tsc -p tsconfigCommands.json && node build/registerCommands.js",
-        "genChampTypes": "tsc -p tsconfigChampTypes.json && node build/types/generateChampions.js"
+        "genChampTypes": "tsc -p tsconfigChampTypes.json && node build/types/generateChampions.js",
+        "clearCache": "rm -r cache/*"
     },
     "keywords": [],
     "author": "Patrik Mintěl",
