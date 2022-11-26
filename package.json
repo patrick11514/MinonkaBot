@@ -24,7 +24,7 @@
         "fs": "0.0.1-security",
         "node-fetch": "^2.6",
         "prettier": "^2.7.1",
-        "sharp": "^0.30.7",
+        "sharp": "^0.31.2",
         "simple-json-db": "^2.0.0",
         "strip-color": "^0.1.0"
     },
