@@ -48,6 +48,7 @@ export async function nameHistory(
                     return {
                         name: account.username,
                         region: account.region,
+                        level: -1,
                     }
                 }),
                 interaction,

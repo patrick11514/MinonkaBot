@@ -70,6 +70,7 @@ class Riot {
         Array<{
             name: string
             region: string
+            level: number
         }>
     > {
         let regions = process.client.config.regions
@@ -77,6 +78,7 @@ class Riot {
         let foundAccounts: Array<{
             name: string
             region: string
+            level: number
         }> = []
 
         this.l.start('Searching for accounts by name: ' + username)
@@ -87,10 +89,12 @@ class Riot {
                 this.l.log('Account not found')
                 continue
             }
+
             this.l.log('Account found!')
             foundAccounts.push({
                 name: data.name,
                 region: regions[i],
+                level: data.summonerLevel,
             })
         }
 

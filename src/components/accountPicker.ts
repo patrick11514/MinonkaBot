@@ -10,6 +10,7 @@ class accountPicker {
     accounts: Array<{
         name: string
         region: string
+        level: number
     }> = []
 
     id: string = ''
@@ -22,6 +23,7 @@ class accountPicker {
         accounts: Array<{
             name: string
             region: string
+            level: number
         }>,
         interaction: CommandInteraction | ButtonInteraction,
         edit = false,
@@ -49,7 +51,11 @@ class accountPicker {
             for (let account of accList) {
                 row.addComponents(
                     new ButtonBuilder()
-                        .setLabel(`${account.name} (${process.client.config.regionTranslates[account.region]})`)
+                        .setLabel(
+                            `${account.name} (${process.client.config.regionTranslates[account.region]}) ${
+                                account.level > -1 ? `- ${account.level}` : ''
+                            }`
+                        )
                         .setStyle(ButtonStyle.Primary)
                         .setCustomId(key + '@' + acc)
                 )
@@ -94,7 +100,7 @@ class accountPicker {
                     nameHistory(account.name, account.region, this.interaction)
                     break
                 }
- /*               case 'matchHistory': {
+                /*               case 'matchHistory': {
                     let argum = args as {
                         queue: string | null
                         limit: string | null

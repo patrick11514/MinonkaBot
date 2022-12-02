@@ -132,6 +132,7 @@ export async function link(
                     return {
                         name: account.username,
                         region: account.region,
+                        level: -1,
                     }
                 }),
                 interaction,
