@@ -196,7 +196,7 @@ class Utilities {
     }
 
     fixItemName(name: string) {
-        return name.replaceAll(' ', '').replaceAll("'", '').replaceAll('-', '').replaceAll('.', '')
+        return name.replaceAll(' ', '').replaceAll("'", '').replaceAll('-', '').replaceAll('.', '').replaceAll(',', '')
     }
 
     getRoutingValue(region: string) {
