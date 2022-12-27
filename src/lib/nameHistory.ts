@@ -168,7 +168,9 @@ class linkedAccounts {
                 region: region,
             },
         ])
-        return accounts.history
+
+        //clone object, so pop function wont remove last item from virtual database object
+        return structuredClone(accounts.history)
     }
 }
 
