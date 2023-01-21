@@ -120,7 +120,7 @@ export default async function handleInteraction(
                         }>
                     }
 
-                    if (trace.errors.length > 1) {
+                    if (trace.errors?.length > 1) {
                         l.stopError(`Errors while running calledFunction `)
                         let i = 1
                         for (let error of trace.errors) {
