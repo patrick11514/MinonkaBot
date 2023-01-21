@@ -77,7 +77,11 @@ export async function matchHistory(
             //get match info
             let matchesInfo = []
 
-            interaction.editReply(matchIds.length.toString())
+            interaction.editReply(
+                'Načítám... (+-' +
+                    (limit ? parseInt(limit) : 5) * 2 +
+                    ' sekund stáhnutí obrázků a zpracování, pokud není načtená cache + upload obrázků)'
+            )
 
             for (let match of matchIds) {
                 let matchData = await riot.getMatch(match, route)
@@ -96,6 +100,7 @@ export async function matchHistory(
                         asists: number
                         deaths: number
                         vision: number
+                        level: number
                     }>
                 > = []
 
@@ -104,6 +109,8 @@ export async function matchHistory(
                     if (!teams[teamId]) {
                         teams[teamId] = []
                     }
+
+                    console.log(participant.challenges?.mejaisFullStackInTime)
 
                     teams[teamId].push({
                         id: participant.teamId,
@@ -118,6 +125,7 @@ export async function matchHistory(
                         asists: participant.assists,
                         deaths: participant.deaths,
                         vision: participant.visionScore,
+                        level: participant.champLevel,
                     })
                 })
 
@@ -157,6 +165,7 @@ export async function matchHistory(
             console.log(images)
 
             interaction.editReply({
+                content: '',
                 files: images,
             })
         },
