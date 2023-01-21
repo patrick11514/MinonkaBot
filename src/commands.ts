@@ -1,3 +1,5 @@
+import { coopTitles, queues } from './components/queues'
+
 const regions = [
     { name: 'EUNE', value: 'EUN1' },
     { name: 'EUW', value: 'EUW1' },
@@ -175,6 +177,14 @@ let commands: {
                 name: 'queue',
                 description: 'Typ zápasu, který chceš zobrazit',
                 required: false,
+                choices: Object.entries(queues).map(([key, value]) => {
+                    let kkey = parseInt(key)
+                    if (kkey >= 830 && kkey <= 850) {
+                        return { name: value + ' ' + coopTitles[kkey - 830], value: key }
+                    } else {
+                        return { name: value, value: key }
+                    }
+                }),
             },
             {
                 name: 'limit',
