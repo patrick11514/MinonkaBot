@@ -369,6 +369,57 @@ class Images {
         })
         this.composite(winOrLoseText, 858, 45)
 
+        //add queue type under win or lose text
+        this.l.log('Adding queue type...')
+        let queue = matchData.queue
+
+        //QUEUE TYPES - CHANGE ON NEW
+        let queues = {
+            0: 'Custom',
+            400: 'Draft Pick',
+            430: 'Blind Pick',
+            420: 'Solo/Duo',
+            440: 'Flex',
+            450: 'ARAM',
+            700: 'Clash',
+            720: 'ARAM Clash',
+            830: 'Co-op vs AI',
+            840: 'Co-op vs AI',
+            850: 'Co-op vs AI',
+            900: 'URF',
+            1020: 'One for All',
+            1300: 'Snow ARAM',
+            1400: 'Nexus Blitz',
+        }
+
+        let coopTitles = ['Intro', 'Beginner', 'Intermediate']
+
+        let queueTypeText = await this.createText({
+            text: queues[queue],
+            textSize: 60,
+            width: 700,
+            height: 135,
+            bold: true,
+            color: '#ffffff',
+            font: 'Beaufort for LOL Ja',
+            center: true,
+        })
+        this.composite(queueTypeText, 858, 45 + 80)
+
+        if (queue >= 830 && queue <= 850) {
+            let coopText = await this.createText({
+                text: coopTitles[queue - 830],
+                textSize: 60,
+                width: 700,
+                height: 135,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: true,
+            })
+            this.composite(coopText, 858, 45 + 80 + 60)
+        }
+
         this.l.log('Adding kills...')
         let killTextTeam1 = await this.createText({
             text: matchData.teams[1].reduce((prev, curr) => prev + curr.kills, 0).toString(),
@@ -445,7 +496,7 @@ class Images {
                 let itemBackground = sharp('./images/itemBackground.png')
                 itemBackground = itemBackground.resize(60, 60)
 
-                let x = 550 + i * 60 + 3 * i
+                let x = 600 + i * 60 + 3 * i
                 let y = startY + 7
 
                 this.composite(await itemBackground.toBuffer(), x, y)
@@ -546,7 +597,7 @@ class Images {
                 itemBackground = itemBackground.resize(60, 60)
 
                 // - 60 for item bg width
-                let x = 2424 - 550 - i * 60 - 3 * i - 60
+                let x = 2424 - 600 - i * 60 - 3 * i - 60
                 let y = startY + 7
 
                 this.composite(await itemBackground.toBuffer(), x, y)
