@@ -77,12 +77,6 @@ export async function matchHistory(
             //get match info
             let matchesInfo = []
 
-            interaction.editReply(
-                'Načítám... (+-' +
-                    (limit ? parseInt(limit) : 5) * 2 +
-                    ' sekund stáhnutí obrázků a zpracování, pokud není načtená cache + upload obrázků)'
-            )
-
             for (let match of matchIds) {
                 let matchData = await riot.getMatch(match, route)
                 if (!matchData) continue
@@ -109,8 +103,6 @@ export async function matchHistory(
                     if (!teams[teamId]) {
                         teams[teamId] = []
                     }
-
-                    console.log(participant.challenges?.mejaisFullStackInTime)
 
                     teams[teamId].push({
                         id: participant.teamId,
@@ -157,16 +149,24 @@ export async function matchHistory(
 
             let image = new Images()
 
+            let i = 0
+            interaction.editReply('0/' + matchesInfo.length)
+
             for (let match of matchesInfo) {
                 let imagePath = await image.generateMatch(match)
                 images.push(imagePath)
+                i++
+                await interaction.editReply(`${i}/${matchesInfo.length}`)
             }
 
-            console.log(images)
-
-            interaction.editReply({
+            await interaction.editReply('Nahrávání...')
+            await interaction.editReply({
                 content: '',
                 files: images,
+            })
+            //clear cache
+            images.forEach((image) => {
+                fs.unlinkSync(image)
             })
         },
         matchHistory,
