@@ -62,6 +62,8 @@ interface matchData {
             kills: number
             asists: number
             deaths: number
+            vision: number
+            level: number
         }>
     >
 }
