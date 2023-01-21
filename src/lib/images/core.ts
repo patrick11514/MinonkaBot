@@ -350,15 +350,263 @@ class Images {
 
     async generateMatch(matchData: matchData): Promise<string> {
         let background = fs.readFileSync('./images/matchBackground.png')
+        let tempImages = []
 
         this.l.start('Creating background...')
         let image = sharp(background)
+        let win = matchData.wins.find((w) => w.id == matchData.userTeam)?.win
 
+        this.l.log('Adding win or lose text...')
+        let winOrLoseText = await this.createText({
+            text: win ? 'Victory' : 'Defeat',
+            textSize: 100,
+            width: 700,
+            height: 135,
+            bold: true,
+            color: win ? '#1fed18' : '#ff0000',
+            font: 'Beaufort for LOL Ja',
+            center: true,
+        })
+        this.composite(winOrLoseText, 858, 45)
+
+        this.l.log('Adding kills...')
+        let killTextTeam1 = await this.createText({
+            text: matchData.teams[1].reduce((prev, curr) => prev + curr.kills, 0).toString(),
+            textSize: 100,
+            width: 700,
+            height: 135,
+            bold: true,
+            color: '#ffffff',
+            font: 'Beaufort for LOL Ja',
+            center: true,
+        })
+        this.composite(killTextTeam1, 858 - 300, 45)
+
+        let killTextTeam2 = await this.createText({
+            text: matchData.teams[2].reduce((prev, curr) => prev + curr.kills, 0).toString(),
+            textSize: 100,
+            width: 700,
+            height: 135,
+            bold: true,
+            color: '#ffffff',
+            font: 'Beaufort for LOL Ja',
+            center: true,
+        })
+        this.composite(killTextTeam2, 858 + 300, 45)
+
+        let startY = 145
+        this.l.log('Adding champions...')
+        let imageWidth = 75
+        //left team
+        for (let champ of matchData.teams[1]) {
+            let imageName = await utils.championtIdToImage(champ.champion)
+            let champImage: string
+            if (!imageName) {
+                champImage = await utils.downloadProfilePicture(29)
+            } else {
+                champImage = await utils.getChampionImage(imageName)
+            }
+            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth)
+            tempImages.push(champImage)
+
+            this.composite(champImage, 50, startY)
+
+            //add level image
+            let levelText = await this.createText({
+                text: champ.level.toString(),
+                textSize: 32,
+                width: imageWidth,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: true,
+                outline: true,
+            })
+
+            this.composite(levelText, 50, startY + imageWidth - 40)
+
+            let usernameText = await this.createText({
+                text: champ.summoner,
+                textSize: 50,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: false,
+            })
+            this.composite(usernameText, 50 + imageWidth + 15, startY - 15)
+
+            //items
+            for (let i = 0; i <= 6; i++) {
+                let item = champ.items[i]
+                //background - 130*130 for item, and full is 138*138
+                let itemBackground = sharp('./images/itemBackground.png')
+                itemBackground = itemBackground.resize(60, 60)
+
+                let x = 550 + i * 60 + 3 * i
+                let y = startY + 7
+
+                this.composite(await itemBackground.toBuffer(), x, y)
+
+                //item
+                if (item) {
+                    let itemImage = await utils.getItemImage(item.toString() + '.png')
+                    itemImage = await utils.resizeImage(itemImage, 56, 56)
+                    tempImages.push(itemImage)
+                    this.composite(itemImage, x + 2, y + 2)
+                }
+
+                if (i == 6) {
+                    //add vision score
+                    let visionScoreText = await this.createText({
+                        text: champ.vision.toString(),
+                        textSize: 32,
+                        width: 56,
+                        height: 56,
+                        bold: true,
+                        color: '#FFFFFF',
+                        font: 'Beaufort for LOL Ja',
+                        center: true,
+                        outline: true,
+                    })
+
+                    this.composite(visionScoreText, x + 2, y + 15)
+                }
+            }
+
+            //kda score
+            let kdaText = await this.createText({
+                text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
+                textSize: 50,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: false,
+            })
+
+            this.composite(kdaText, 50 + imageWidth + 15, startY + 50 - 15)
+
+            startY += imageWidth + 60
+        }
+
+        startY = 145
+        //right team is mirrored and calculated from right side (2424px)
+        for (let champ of matchData.teams[2]) {
+            let imageName = await utils.championtIdToImage(champ.champion)
+
+            let champImage: string
+            if (!imageName) {
+                champImage = await utils.downloadProfilePicture(29)
+            } else {
+                champImage = await utils.getChampionImage(imageName)
+            }
+
+            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth)
+            tempImages.push(champImage)
+
+            this.composite(champImage, 2424 - 50 - imageWidth, startY)
+
+            //add level image
+            let levelText = await this.createText({
+                text: champ.level.toString(),
+                textSize: 32,
+                width: imageWidth,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: true,
+                outline: true,
+            })
+
+            this.composite(levelText, 2424 - 50 - imageWidth, startY + imageWidth - 40)
+
+            let usernameText = await this.createText({
+                text: champ.summoner,
+                textSize: 50,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: 2,
+            })
+
+            this.composite(usernameText, 2424 - 50 - imageWidth - 15 - 700, startY - 15)
+
+            //items
+            for (let i = 0; i <= 6; i++) {
+                let item = champ.items[i]
+                //background - 130*130 for item, and full is 138*138
+                let itemBackground = sharp('./images/itemBackground.png')
+                itemBackground = itemBackground.resize(60, 60)
+
+                // - 60 for item bg width
+                let x = 2424 - 550 - i * 60 - 3 * i - 60
+                let y = startY + 7
+
+                this.composite(await itemBackground.toBuffer(), x, y)
+
+                //item
+                if (item) {
+                    let itemImage = await utils.getItemImage(item.toString() + '.png')
+                    itemImage = await utils.resizeImage(itemImage, 56, 56)
+                    tempImages.push(itemImage)
+                    this.composite(itemImage, x + 2, y + 2)
+                }
+
+                if (i == 6) {
+                    //add vision score
+                    let visionScoreText = await this.createText({
+                        text: champ.vision.toString(),
+                        textSize: 32,
+                        width: 56,
+                        height: 56,
+                        bold: true,
+                        color: '#FFFFFF',
+                        font: 'Beaufort for LOL Ja',
+                        center: true,
+                        outline: true,
+                    })
+
+                    this.composite(visionScoreText, x + 2, y + 15)
+                }
+            }
+
+            //kda score
+            let kdaText = await this.createText({
+                text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
+                textSize: 50,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: 2,
+            })
+
+            this.composite(kdaText, 2424 - 50 - imageWidth - 15 - 700, startY + 50 - 15)
+
+            startY += imageWidth + 60
+        }
+
+        this.l.log('Finishing image...')
         let buffer = await this.compositeDone(image).toBuffer()
-        //generate random name using crypto and tostring hex and add .png
         let name = crypto.randomBytes(10).toString('hex') + '.png'
 
+        //delete temp images
+        this.l.log('Deleting temp images...')
+        for (let image of tempImages) {
+            fs.unlinkSync(image)
+        }
+
+        this.l.log('Saving image...')
         fs.writeFileSync(`./temp/${name}`, buffer)
+        this.l.stop('Done')
 
         return `./temp/${name}`
     }
@@ -386,6 +634,7 @@ class Images {
         center = true,
         bold = false,
         font = 'Beaufort for LOL Ja',
+        outline = false,
     }: {
         text: string
         textSize: number
@@ -395,13 +644,14 @@ class Images {
         center?: boolean | 2
         bold?: boolean
         font?: string
+        outline?: boolean
     }) {
         let centerText = ''
         if (center == true) {
             centerText = `x="50%" text-anchor="middle"`
         }
         if (center == 2) {
-            centerText = `x="50%" text-anchor="right"`
+            centerText = `x="100%" text-anchor="end"`
         }
         let txt = `<svg width="${width}" height="${height}">
             <style>
@@ -411,8 +661,15 @@ class Images {
                     fill: ${color};
                     font-weight: ${bold ? 'bold' : 'normal'};
                 }
+                .outline {
+                    paint-order: stroke;
+                    stroke: #000000;
+                    stroke-width: 6px;
+                    stroke-linecap: butt;
+                    stroke-linejoin: miter;
+                }
             </style>
-            <text y="50%" ${centerText} class="text">${text}</text>
+            <text y="50%" ${centerText} class="text${outline ? ' outline' : ''}">${text}</text>
         </svg>`
 
         return Buffer.from(txt)
