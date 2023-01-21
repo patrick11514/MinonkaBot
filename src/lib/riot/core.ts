@@ -113,10 +113,16 @@ class Riot {
         return data as RankedData[]
     }
 
-    async getMatches(id: EncryptedPuuid, route: string, count?: string | null): Promise<Array<string>> {
-        let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=0&count=${
-            count ? count : 1
-        }`
+    async getMatches(
+        id: EncryptedPuuid,
+        route: string,
+        count?: string | null,
+        queue?: string | null
+    ): Promise<Array<string>> {
+        let url =
+            `https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=0&count=${
+                count ? count : 1
+            }` + (queue ? `&queue=${queue}` : '')
 
         let data: Array<string> | errorResponse = await this.r.makeRequest(url)
 

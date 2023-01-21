@@ -66,7 +66,7 @@ export async function matchHistory(
                 })
             }
 
-            let matchIds = await riot.getMatches(data.puuid, route, limit)
+            let matchIds = await riot.getMatches(data.puuid, route, limit, queue)
 
             if (matchIds.length == 0) {
                 return interaction.editReply({
