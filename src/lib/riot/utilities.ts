@@ -4,6 +4,10 @@ import dotenv from 'dotenv'
 import { Challenge, championsData, itemsData } from '../../types/riotApi'
 import Logger from '../logger'
 import sharp from 'sharp'
+import crypto from 'crypto'
+//@ts-ignore
+import isXml from 'is-xml'
+import { XMLParser } from 'fast-xml-parser'
 dotenv.config()
 
 class Utilities {
@@ -24,6 +28,13 @@ class Utilities {
         }
 
         let response = await fetch(url)
+        let text = await response.clone().text()
+        if (isXml(text)) {
+            let parser = new XMLParser()
+            let xml = parser.parse(text)
+            console.log(xml)
+        }
+
         let data = await response.buffer()
 
         try {
@@ -49,6 +60,13 @@ class Utilities {
         fs.writeFileSync(`./cache/${path}`, data)
 
         return `./cache/${path}`
+    }
+
+    async resizeImage(imagePath: string, x: number, y: number) {
+        let data = await sharp(imagePath).resize(x, y).toBuffer()
+        let randomName = crypto.randomBytes(10).toString('hex')
+        fs.writeFileSync(`./temp/${randomName}.png`, data)
+        return `./temp/${randomName}.png`
     }
 
     async downloadProfilePicture(id: number) {
@@ -146,6 +164,30 @@ class Utilities {
         )
 
         return path
+    }
+
+    async championtIdToImage(id: number, language: string = 'cs_CZ') {
+        let data = await this.getChampions(language)
+
+        let champion = Object.values(data.data).find((el) => el.key == id.toString())
+
+        if (!champion) {
+            return null
+        }
+
+        return champion.image.full
+    }
+
+    async championIdToName(id: number, language: string = 'cs_CZ') {
+        let data = await this.getChampions(language)
+
+        let champion = Object.values(data.data).find((el) => el.key == id.toString())
+
+        if (!champion) {
+            return null
+        }
+
+        return champion.name
     }
 
     async getChampions(language: string = 'cs_CZ'): Promise<championsData> {
