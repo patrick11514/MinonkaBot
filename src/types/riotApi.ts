@@ -297,6 +297,7 @@ interface matchChallenges {
     maxKillDeficit: number
     maxLevelLeadLaneOpponent: number
     moreEnemyJungleThanOpponent: number
+    mejaisFullStackInTime?: number
     multiKillOneSpell: number
     multiTurretRiftHeraldCount: number
     multikills: number
@@ -534,7 +535,23 @@ interface match {
     }
 }
 
-enum queues {}
+enum queues {
+    'Custom' = 0,
+    'Draft Pick' = 400,
+    'Blind Pick' = 430,
+    'Solo/Duo' = 420,
+    'Flex' = 440,
+    'ARAM' = 450,
+    'Clash' = 700,
+    'ARAM Clash' = 720,
+    'Co-op vs AI Intro' = 830,
+    'Co-op vs AI Beginner' = 840,
+    'Co-op vs AI Intermediate' = 850,
+    'URF' = 900,
+    'One for All' = 1020,
+    'Snow ARAM' = 1300,
+    'Nexus Blitz' = 1400,
+}
 
 export {
     Challenge,

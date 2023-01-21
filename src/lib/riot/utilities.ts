@@ -1,9 +1,13 @@
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import { Challenge, championsData, itemsData } from '../../types/riotApi'
 import Logger from '../logger'
 import sharp from 'sharp'
+import crypto from 'crypto'
+//@ts-ignore
+import isXml from 'is-xml'
+import { XMLParser } from 'fast-xml-parser'
 dotenv.config()
 
 class Utilities {
@@ -13,7 +17,7 @@ class Utilities {
         this.l = new Logger('Utils', 'magenta')
     }
 
-    async downloadImage(url: string, resize: boolean | string = true) {
+    async downloadImage(url: string, resize: boolean | string = true): Promise<string> {
         //check if file named url without process.env.DDRAGON_URL and removed first / in folder cache exists and replace all other / with _
         //if exists, return its path if not download it and return its path
         let path = url.replace(process.env.DDRAGON_URL, '').substring(1).replace(/\//g, '_')
@@ -23,32 +27,63 @@ class Utilities {
             return `./cache/${path}`
         }
 
-        let response = await fetch(url)
-        let data = await response.buffer()
-
+        let response: Response
         try {
-            if (resize) {
-                if (typeof resize == 'string') {
-                    let [x, y] = resize.split('x')
-                    if (!y) {
-                        this.l.log(`Resizing to ${x}x?...`)
-                        data = await sharp(data).resize(parseInt(x)).toBuffer()
-                    } else {
-                        this.l.log(`Resizing to ${x}x${y}...`)
-                        data = await sharp(data).resize(parseInt(x), parseInt(y)).toBuffer()
+            response = await fetch(url)
+
+            if (response.headers.get('content-type') == 'application/xml') {
+                let copy = response.clone()
+                let text = await copy.text()
+                if (isXml(text)) {
+                    let parser = new XMLParser()
+                    let xml: {
+                        Error: {
+                            Code: string
+                            Message: string
+                        }
+                    } = parser.parse(text)
+                    if (xml.Error) {
+                        this.l.error(`Error ${xml.Error.Code}: ${xml.Error.Message}`)
+                        return this.downloadProfilePicture(29)
                     }
-                } else {
-                    this.l.log('Resizing to 450x450...')
-                    data = await sharp(data).resize(450, 450).toBuffer()
                 }
             }
+
+            let data = await response.buffer()
+
+            try {
+                if (resize) {
+                    if (typeof resize == 'string') {
+                        let [x, y] = resize.split('x')
+                        if (!y) {
+                            this.l.log(`Resizing to ${x}x?...`)
+                            data = await sharp(data).resize(parseInt(x)).toBuffer()
+                        } else {
+                            this.l.log(`Resizing to ${x}x${y}...`)
+                            data = await sharp(data).resize(parseInt(x), parseInt(y)).toBuffer()
+                        }
+                    } else {
+                        this.l.log('Resizing to 450x450...')
+                        data = await sharp(data).resize(450, 450).toBuffer()
+                    }
+                }
+            } catch (e) {
+                this.l.error("Can't resize image: " + data.toString('base64'))
+            }
+
+            fs.writeFileSync(`./cache/${path}`, data)
+
+            return `./cache/${path}`
         } catch (e) {
-            this.l.error("Can't resize image: " + data.toString('base64'))
+            return this.downloadImage(url, resize)
         }
+    }
 
-        fs.writeFileSync(`./cache/${path}`, data)
-
-        return `./cache/${path}`
+    async resizeImage(imagePath: string, x: number, y: number) {
+        let data = await sharp(imagePath).resize(x, y).toBuffer()
+        let randomName = crypto.randomBytes(10).toString('hex')
+        fs.writeFileSync(`./temp/${randomName}.png`, data)
+        return `./temp/${randomName}.png`
     }
 
     async downloadProfilePicture(id: number) {
@@ -146,6 +181,30 @@ class Utilities {
         )
 
         return path
+    }
+
+    async championtIdToImage(id: number, language: string = 'cs_CZ') {
+        let data = await this.getChampions(language)
+
+        let champion = Object.values(data.data).find((el) => el.key == id.toString())
+
+        if (!champion) {
+            return null
+        }
+
+        return champion.image.full
+    }
+
+    async championIdToName(id: number, language: string = 'cs_CZ') {
+        let data = await this.getChampions(language)
+
+        let champion = Object.values(data.data).find((el) => el.key == id.toString())
+
+        if (!champion) {
+            return null
+        }
+
+        return champion.name
     }
 
     async getChampions(language: string = 'cs_CZ'): Promise<championsData> {

@@ -76,12 +76,50 @@ export async function matchHistory(
 
             //get match info
             let matchesInfo = []
-            interaction.editReply(matchIds.length.toString())
+
             for (let match of matchIds) {
                 let matchData = await riot.getMatch(match, route)
                 if (!matchData) continue
 
                 let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
+
+                let teams: Array<
+                    Array<{
+                        id: number
+                        champion: number
+                        summoner: string
+                        role: string
+                        items: number[]
+                        kills: number
+                        asists: number
+                        deaths: number
+                        vision: number
+                        level: number
+                    }>
+                > = []
+
+                matchData.info.participants.forEach((participant) => {
+                    let teamId = participant.teamId / 100
+                    if (!teams[teamId]) {
+                        teams[teamId] = []
+                    }
+
+                    teams[teamId].push({
+                        id: participant.teamId,
+                        champion: participant.championId,
+                        summoner: participant.summonerName,
+                        role: participant.teamPosition,
+                        items: [...Array(7).keys()].map((i) => {
+                            let item = `item${i}` as keyof typeof participant
+                            return participant[item] as number
+                        }),
+                        kills: participant.kills,
+                        asists: participant.assists,
+                        deaths: participant.deaths,
+                        vision: participant.visionScore,
+                        level: participant.champLevel,
+                    })
+                })
 
                 matchesInfo.push({
                     queue: matchData.info.queueId,
@@ -103,21 +141,7 @@ export async function matchHistory(
                             win: team.win,
                         }
                     }),
-                    teams: matchData.info.participants.map((participant) => {
-                        return {
-                            id: participant.teamId,
-                            champion: participant.championId,
-                            summoner: participant.summonerName,
-                            role: participant.teamPosition,
-                            items: [...Array(6).keys()].map((i) => {
-                                let item = `item${i}` as keyof typeof participant
-                                return participant[item] as number
-                            }),
-                            kills: participant.kills,
-                            asists: participant.assists,
-                            deaths: participant.deaths,
-                        }
-                    }),
+                    teams: teams,
                 })
             }
 
@@ -125,10 +149,25 @@ export async function matchHistory(
 
             let image = new Images()
 
+            let i = 0
+            interaction.editReply('0/' + matchesInfo.length)
+
             for (let match of matchesInfo) {
                 let imagePath = await image.generateMatch(match)
                 images.push(imagePath)
+                i++
+                await interaction.editReply(`${i}/${matchesInfo.length}`)
             }
+
+            await interaction.editReply('Nahrávání...')
+            await interaction.editReply({
+                content: '',
+                files: images,
+            })
+            //clear cache
+            images.forEach((image) => {
+                fs.unlinkSync(image)
+            })
         },
         matchHistory,
         [queue, limit],

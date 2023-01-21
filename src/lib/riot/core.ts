@@ -115,7 +115,7 @@ class Riot {
 
     async getMatches(id: EncryptedPuuid, route: string, count?: string | null): Promise<Array<string>> {
         let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=0&count=${
-            count ? count : 10
+            count ? count : 5
         }`
 
         let data: Array<string> | errorResponse = await this.r.makeRequest(url)

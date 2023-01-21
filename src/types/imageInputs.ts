@@ -52,16 +52,20 @@ interface matchData {
         id: number
         win: boolean
     }>
-    teams: Array<{
-        id: number
-        champion: number
-        summoner: string
-        role: string
-        items: number[]
-        kills: number
-        asists: number
-        deaths: number
-    }>
+    teams: Array<
+        Array<{
+            id: number
+            champion: number
+            summoner: string
+            role: string
+            items: number[]
+            kills: number
+            asists: number
+            deaths: number
+            vision: number
+            level: number
+        }>
+    >
 }
 
 export { profilePicture, rankedProfile, matchData }
