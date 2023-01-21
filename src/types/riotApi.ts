@@ -297,6 +297,7 @@ interface matchChallenges {
     maxKillDeficit: number
     maxLevelLeadLaneOpponent: number
     moreEnemyJungleThanOpponent: number
+    mejaisFullStackInTime?: number
     multiKillOneSpell: number
     multiTurretRiftHeraldCount: number
     multikills: number
