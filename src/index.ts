@@ -61,6 +61,12 @@ let emotesDB = new JSONdb('databases/emotes.json', {
 })
 client.emotesDB = emotesDB
 
+let commandsDB = new JSONdb('databases/commands.json', {
+    syncOnWrite: true,
+    asyncWrite: true,
+})
+client.commandsDB = commandsDB
+
 //statuses
 const status: Array<{
     text: string

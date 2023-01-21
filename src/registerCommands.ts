@@ -2,6 +2,7 @@ import { REST, SlashCommandBuilder, Routes } from 'discord.js'
 import * as dotenv from 'dotenv'
 import commands from './commands'
 dotenv.config()
+import JSONdb from 'simple-json-db'
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN)
 
@@ -64,8 +65,22 @@ const guildsIds = ['713520402315608148']
 
         const commandsJson = rawCommands.map((command) => command.toJSON())
 
-        rest.put(Routes.applicationCommands(process.env.DISCORD_ID), { body: commandsJson })
-            .then(() => console.log(`Successfully registered all commands.`))
-            .catch(console.error)
+        try {
+            let cmds = (await rest.put(Routes.applicationCommands(process.env.DISCORD_ID), {
+                body: commandsJson,
+            })) as Array<{
+                id: string
+                application_id: string
+                name: string
+            }>
+
+            console.log(`Successfully registered all commands.`)
+            let db = new JSONdb('databases/commands.json')
+            cmds.forEach((cmd) => {
+                db.set(cmd.name, cmd.id)
+            })
+        } catch (e) {
+            console.error(e)
+        }
     }
 })()

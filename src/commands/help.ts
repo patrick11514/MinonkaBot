@@ -14,7 +14,9 @@ export default (client: Client) => {
                 let message = '**Seznam příkazů:**\nPro zobrazení podrobnost commandu použij /help <příkaz>\n\n'
 
                 for (let command in commands) {
-                    message += `- **${command}** - ${commands[command].description}\n`
+                    message += `- **</${command}:${client.commandsDB.get(command)}>** - ${
+                        commands[command].description
+                    }\n`
                 }
 
                 await interaction.editReply(message)
