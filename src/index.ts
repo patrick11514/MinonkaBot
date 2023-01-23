@@ -139,6 +139,12 @@ async function updateVersion() {
     let prevVersion = client.LOL_VERSION
     let currentVer = json[0]
 
+    if (!prevVersion) {
+        if (fs.existsSync('./cache/lolver')) {
+            prevVersion = fs.readFileSync('./cache/lolver').toString()
+        }
+    }
+
     //check if dragon data is uploaded
     response = await fetch(process.env.DDRAGON_URL + '/cdn/' + currentVer + '/data/en_US/champions.json')
     if (!response.ok) {
@@ -160,6 +166,7 @@ async function updateVersion() {
             //check emotes
             let l3 = new Logger('Check emotes', 'blue')
             await checkEmotes(currentVer, l3)
+            fs.writeFileSync('./cache/lolver', currentVer)
         }
     } else {
         client.LOL_VERSION = json[1]
