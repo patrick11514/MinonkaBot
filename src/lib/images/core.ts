@@ -204,7 +204,7 @@ class Images {
                 color: '#ffffff',
                 font: 'Beaufort for LOL Ja',
             })
-            this.composite(promosText, x + 1000 + 350, y)
+            this.composite(promosText, x + 1000 + 450, y)
         }
 
         if (userData.rankeds.length > 1) {
@@ -328,7 +328,9 @@ class Images {
                 let lose = fs.readFileSync('./images/seriesLose_resized.png')
                 let notPlayed = fs.readFileSync('./images/seriesEmpty_resized.png')
 
-                let startX = x + 1000 + 350
+                let center = x + 1000 + 450 + 220
+
+                let startX = center - (progress.length / 2) * 88
                 for (let prog of progress) {
                     this.composite(prog == 'W' ? win : prog == 'L' ? lose : notPlayed, startX, y + 100 + 40)
                     startX += 88
