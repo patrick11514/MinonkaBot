@@ -8,6 +8,7 @@ import crypto from 'crypto'
 //@ts-ignore
 import isXml from 'is-xml'
 import { XMLParser } from 'fast-xml-parser'
+import path from 'path'
 dotenv.config()
 
 class Utilities {
@@ -79,11 +80,34 @@ class Utilities {
         }
     }
 
-    async resizeImage(imagePath: string, x: number, y: number) {
+    async resizeImage(imagePath: string, x: number, y: number, cache = false) {
+        //get filename and extension separately
+        let basename = path.basename(imagePath)
+
+        let parts = basename.split('.')
+        let extension = parts[parts.length - 1]
+        let filename = parts.slice(0, parts.length - 1).join('.')
+
+        //create filename: originalName-XxY.extension
+        let newFilename = `${filename}-${x}x${y}.${extension}`
+
+        if (cache) {
+            //check if file exists in cache folder
+            if (fs.existsSync(`./cache/${newFilename}`)) {
+                return `./cache/${newFilename}`
+            }
+        }
+
         let data = await sharp(imagePath).resize(x, y).toBuffer()
         let randomName = crypto.randomBytes(10).toString('hex')
-        fs.writeFileSync(`./temp/${randomName}.png`, data)
-        return `./temp/${randomName}.png`
+
+        if (!cache) {
+            fs.writeFileSync(`./temp/${randomName}.png`, data)
+            return `./temp/${randomName}.png`
+        } else {
+            fs.writeFileSync(`./cache/${newFilename}`, data)
+            return `./cache/${newFilename}`
+        }
     }
 
     async downloadProfilePicture(id: number) {
