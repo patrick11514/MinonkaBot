@@ -353,7 +353,6 @@ class Images {
 
     async generateMatch(matchData: matchData): Promise<string> {
         let background = fs.readFileSync('./images/matchBackground.png')
-        let tempImages = []
 
         this.l.start('Creating background...')
         let image = sharp(background)
@@ -439,8 +438,7 @@ class Images {
             } else {
                 champImage = await utils.getChampionImage(imageName)
             }
-            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth)
-            tempImages.push(champImage)
+            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth, true)
 
             this.composite(champImage, 50, startY)
 
@@ -486,8 +484,7 @@ class Images {
                 //item
                 if (item) {
                     let itemImage = await utils.getItemImage(item.toString() + '.png')
-                    itemImage = await utils.resizeImage(itemImage, 56, 56)
-                    tempImages.push(itemImage)
+                    itemImage = await utils.resizeImage(itemImage, 56, 56, true)
                     this.composite(itemImage, x + 2, y + 2)
                 }
 
@@ -538,8 +535,7 @@ class Images {
                 champImage = await utils.getChampionImage(imageName)
             }
 
-            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth)
-            tempImages.push(champImage)
+            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth, true)
 
             this.composite(champImage, 2424 - 50 - imageWidth, startY)
 
@@ -587,8 +583,7 @@ class Images {
                 //item
                 if (item) {
                     let itemImage = await utils.getItemImage(item.toString() + '.png')
-                    itemImage = await utils.resizeImage(itemImage, 56, 56)
-                    tempImages.push(itemImage)
+                    itemImage = await utils.resizeImage(itemImage, 56, 56, true)
                     this.composite(itemImage, x + 2, y + 2)
                 }
 
@@ -633,9 +628,6 @@ class Images {
 
         //delete temp images
         this.l.log('Deleting temp images...')
-        for (let image of tempImages) {
-            fs.unlinkSync(image)
-        }
 
         this.l.log('Saving image...')
         fs.writeFileSync(`./temp/${name}`, buffer)
