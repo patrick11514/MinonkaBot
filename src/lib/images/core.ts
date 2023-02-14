@@ -360,12 +360,12 @@ class Images {
 
         this.l.log('Adding win or lose text...')
         let winOrLoseText = await this.createText({
-            text: win ? 'Victory' : 'Defeat',
+            text: win ? (matchData.ff15 && matchData.length <= 195 ? 'Remake' : 'Victory') : 'Defeat',
             textSize: 100,
             width: 700,
             height: 135,
             bold: true,
-            color: win ? '#1fed18' : '#ff0000',
+            color: win ? (matchData.ff15 && matchData.length <= 195 ? '#7e857f' : '#1fed18') : '#ff0000',
             font: 'Beaufort for LOL Ja',
             center: true,
         })
@@ -459,7 +459,7 @@ class Images {
 
             let usernameText = await this.createText({
                 text: champ.summoner,
-                textSize: 50,
+                textSize: 40,
                 width: 700,
                 height: 90,
                 bold: true,
@@ -468,6 +468,24 @@ class Images {
                 center: false,
             })
             this.composite(usernameText, 50 + imageWidth + 15, startY - 15)
+
+            //summoner spells
+            for (let i = 0; i <= 1; i++) {
+                let x = 600 - 45
+                let y = startY - 5 + 50 * i
+
+                let spell = champ.summoners[i]
+
+                let spellImage = await utils.getSummonerImage(spell)
+
+                if (!spellImage) {
+                    spellImage = await utils.downloadProfilePicture(29)
+                }
+
+                spellImage = await utils.resizeImage(spellImage, 40, 40, true)
+
+                this.composite(spellImage, x, y)
+            }
 
             //items
             for (let i = 0; i <= 6; i++) {
@@ -509,7 +527,7 @@ class Images {
             //kda score
             let kdaText = await this.createText({
                 text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
-                textSize: 50,
+                textSize: 40,
                 width: 700,
                 height: 90,
                 bold: true,
@@ -556,7 +574,7 @@ class Images {
 
             let usernameText = await this.createText({
                 text: champ.summoner,
-                textSize: 50,
+                textSize: 40,
                 width: 700,
                 height: 90,
                 bold: true,
@@ -566,6 +584,24 @@ class Images {
             })
 
             this.composite(usernameText, 2424 - 50 - imageWidth - 15 - 700, startY - 15)
+
+            //summoner spells
+            for (let i = 0; i <= 1; i++) {
+                let x = 2424 - 600 + 5
+                let y = startY - 5 + 50 * i
+
+                let spell = champ.summoners[i]
+
+                let spellImage = await utils.getSummonerImage(spell)
+
+                if (!spellImage) {
+                    spellImage = await utils.downloadProfilePicture(29)
+                }
+
+                spellImage = await utils.resizeImage(spellImage, 40, 40, true)
+
+                this.composite(spellImage, x, y)
+            }
 
             //items
             for (let i = 0; i <= 6; i++) {
@@ -608,7 +644,7 @@ class Images {
             //kda score
             let kdaText = await this.createText({
                 text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
-                textSize: 50,
+                textSize: 40,
                 width: 700,
                 height: 90,
                 bold: true,
@@ -625,9 +661,6 @@ class Images {
         this.l.log('Finishing image...')
         let buffer = await this.compositeDone(image).toBuffer()
         let name = crypto.randomBytes(10).toString('hex') + '.png'
-
-        //delete temp images
-        this.l.log('Deleting temp images...')
 
         this.l.log('Saving image...')
         fs.writeFileSync(`./temp/${name}`, buffer)
