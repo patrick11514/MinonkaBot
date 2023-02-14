@@ -553,6 +553,42 @@ enum queues {
     'Nexus Blitz' = 1400,
 }
 
+interface summoners extends JSONRiotFiles {
+    data: {
+        [key: string]: {
+            id: string
+            name: string
+            description: string
+            tooltip: string
+            maxrank: number
+            cooldown: Array<number>
+            cooldownBurn: string
+            cost: Array<number>
+            costBurn: string
+            datavalues: {}
+            effect: Array<Array<number> | null>
+            effectBurn: Array<string | null>
+            key: string
+            summonerLevel: number
+            modes: Array<string>
+            costType: string
+            maxammo: string
+            range: Array<number>
+            rangeBurn: string
+            image: {
+                full: string
+                sprite: string
+                group: string
+                x: number
+                y: number
+                w: number
+                h: number
+            }
+            resource: string
+        }
+    }
+}
+
 export {
     Challenge,
     UserChallenges,
@@ -571,4 +607,5 @@ export {
     errorResponse,
     match,
     queues,
+    summoners,
 }

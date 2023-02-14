@@ -1,7 +1,7 @@
 import fetch, { Response } from 'node-fetch'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { Challenge, championsData, itemsData } from '../../types/riotApi'
+import { Challenge, championsData, itemsData, summoners } from '../../types/riotApi'
 import Logger from '../logger'
 import sharp from 'sharp'
 import crypto from 'crypto'
@@ -276,6 +276,41 @@ class Utilities {
         fs.writeFileSync(path, JSON.stringify(data))
 
         return data
+    }
+
+    async getSummoners(language: string = 'cs_CZ'): Promise<summoners> {
+        let path = `./cache/summoners_${language}.json`
+        if (fs.existsSync(path)) {
+            this.l.log('Using cached file.')
+            return JSON.parse(fs.readFileSync(path).toString())
+        }
+
+        let response = await fetch(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/summoner.json'
+        )
+
+        let data = await response.json()
+
+        fs.writeFileSync(path, JSON.stringify(data))
+
+        return data
+    }
+
+    async getSummonerImage(id: number) {
+        let data = await this.getSummoners()
+
+        let find = Object.values(data.data).find((el) => el.key == id.toString())
+
+        if (!find) {
+            return null
+        }
+
+        let path = await this.downloadImage(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/spell/' + find.image.full,
+            false
+        )
+
+        return path
     }
 
     fixItemName(name: string) {
