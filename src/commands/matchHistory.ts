@@ -83,12 +83,15 @@ export async function matchHistory(
 
                 let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
 
+                let ff15 = matchData.info.participants.find((p) => p.puuid == data.puuid)?.gameEndedInEarlySurrender
+
                 let teams: Array<
                     Array<{
                         id: number
                         champion: number
                         summoner: string
                         role: string
+                        summoners: number[]
                         items: number[]
                         kills: number
                         asists: number
@@ -109,6 +112,10 @@ export async function matchHistory(
                         champion: participant.championId,
                         summoner: participant.summonerName,
                         role: participant.teamPosition,
+                        summoners: [...Array(2).keys()].map((i) => {
+                            let summoner = `summoner${i + 1}Id` as keyof typeof participant
+                            return participant[summoner] as number
+                        }),
                         items: [...Array(7).keys()].map((i) => {
                             let item = `item${i}` as keyof typeof participant
                             return participant[item] as number
@@ -122,6 +129,8 @@ export async function matchHistory(
                 })
 
                 matchesInfo.push({
+                    length: matchData.info.gameDuration,
+                    ff15: ff15 as boolean,
                     queue: matchData.info.queueId,
                     userTeam: userTeam as number,
                     bans: matchData.info.teams.map((team) => {
@@ -145,19 +154,34 @@ export async function matchHistory(
                 })
             }
 
-            let images: string[] = []
-
             let image = new Images()
 
             let i = 0
+            let images: string[] = []
             interaction.editReply('0/' + matchesInfo.length)
 
+            //let promises = []
+
             for (let match of matchesInfo) {
+                //promises.push(image.generateMatch(match))
+
                 let imagePath = await image.generateMatch(match)
                 images.push(imagePath)
                 i++
                 await interaction.editReply(`${i}/${matchesInfo.length}`)
             }
+
+            /*Promise.all(promises).then(async (images) => {
+                await interaction.editReply('Nahrávání...')
+                await interaction.editReply({
+                    content: '',
+                    files: images,
+                })
+                //clear cache
+                images.forEach((image) => {
+                    fs.unlinkSync(image)
+                })
+            })*/ //zatím nefunguje
 
             await interaction.editReply('Nahrávání...')
             await interaction.editReply({

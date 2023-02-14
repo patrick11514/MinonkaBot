@@ -39,6 +39,8 @@ interface rankedProfile {
 }
 
 interface matchData {
+    length: number
+    ff15: boolean
     queue: queues
     userTeam: number
     bans: Array<{
@@ -58,6 +60,7 @@ interface matchData {
             champion: number
             summoner: string
             role: string
+            summoners: number[]
             items: number[]
             kills: number
             asists: number
