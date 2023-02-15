@@ -175,24 +175,13 @@ export async function matchHistory(
                 })
             }
 
-            let image = new Images()
-
-            let i = 0
-            let images: string[] = []
-            interaction.editReply('0/' + matchesInfo.length)
-
-            //let promises = []
+            let promises = []
 
             for (let match of matchesInfo) {
-                //promises.push(image.generateMatch(match))
-
-                let imagePath = await image.generateMatch(match)
-                images.push(imagePath)
-                i++
-                await interaction.editReply(`${i}/${matchesInfo.length}`)
+                promises.push(new Images().generateMatch(match))
             }
 
-            /*Promise.all(promises).then(async (images) => {
+            Promise.all(promises).then(async (images) => {
                 await interaction.editReply('Nahrávání...')
                 await interaction.editReply({
                     content: '',
@@ -202,17 +191,7 @@ export async function matchHistory(
                 images.forEach((image) => {
                     fs.unlinkSync(image)
                 })
-            })*/ //zatím nefunguje
-
-            await interaction.editReply('Nahrávání...')
-            await interaction.editReply({
-                content: '',
-                files: images,
-            })
-            //clear cache
-            images.forEach((image) => {
-                fs.unlinkSync(image)
-            })
+            }) //zatím nefunguje
         },
         matchHistory,
         [queue, limit],
