@@ -89,7 +89,7 @@ export default async function handleInteraction(
 
             //save check history of account
             let accounts = new linkedAccounts(
-                interaction.user.id,
+                mention?.id ? mention.id : interaction.user.id,
                 interaction.client.usersDB,
                 interaction.client.nameHistoryDB
             )
