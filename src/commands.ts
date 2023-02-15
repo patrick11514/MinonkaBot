@@ -180,7 +180,7 @@ let commands: {
                 choices: Object.entries(queues).map(([key, value]) => {
                     let kkey = parseInt(key)
                     if (kkey >= 830 && kkey <= 850) {
-                        return { name: value + ' ' + coopTitles[kkey - 830], value: key }
+                        return { name: value + ' ' + coopTitles[(kkey - 830) / 10], value: key }
                     } else {
                         return { name: value, value: key }
                     }
