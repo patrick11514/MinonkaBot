@@ -326,6 +326,10 @@ class Utilities {
         if (!route) return null
         return route
     }
+
+    async sleep(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms))
+    }
 }
 
 export default new Utilities()
