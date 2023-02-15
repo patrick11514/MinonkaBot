@@ -1,4 +1,4 @@
-interface User {
+interface DBUser {
     language: string
     linkedAccounts: Array<{
         username: string
@@ -7,4 +7,4 @@ interface User {
     }>
 }
 
-export default User
+export default DBUser
