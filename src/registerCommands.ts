@@ -41,20 +41,98 @@ const guildsIds = ['713520402315608148']
 
             if (commandData.options) {
                 for (let option of commandData.options) {
-                    builder.addStringOption((o) => {
-                        let opt = o.setName(option.name).setDescription(option.description).setRequired(option.required)
-                        if (option.choices) {
-                            opt.addChoices(
-                                ...option.choices.map((choice) => {
-                                    return {
-                                        name: choice.name,
-                                        value: choice.value || choice.name,
-                                    }
-                                })
-                            )
+                    switch (option.type) {
+                        case 'STRING': {
+                            builder.addStringOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                if (option.choices) {
+                                    opt.addChoices(
+                                        ...option.choices.map((choice) => {
+                                            return {
+                                                name: choice.name,
+                                                value: (choice.value as string) || choice.name,
+                                            }
+                                        })
+                                    )
+                                }
+                                return opt
+                            })
+                            break
                         }
-                        return opt
-                    })
+                        case 'INTEGER': {
+                            builder.addIntegerOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                if (option.choices) {
+                                    opt.addChoices(
+                                        ...option.choices.map((choice) => {
+                                            return {
+                                                name: choice.name,
+                                                value: (choice.value as number) || parseInt(choice.name),
+                                            }
+                                        })
+                                    )
+                                }
+                                return opt
+                            })
+                            break
+                        }
+                        case 'BOOLEAN': {
+                            builder.addBooleanOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                return opt
+                            })
+                            break
+                        }
+                        case 'USER': {
+                            builder.addUserOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                return opt
+                            })
+                            break
+                        }
+                        case 'CHANNEL': {
+                            builder.addChannelOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                return opt
+                            })
+                            break
+                        }
+                        case 'ROLE': {
+                            builder.addRoleOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                return opt
+                            })
+                            break
+                        }
+                        case 'MENTIONABLE': {
+                            builder.addMentionableOption((o) => {
+                                let opt = o
+                                    .setName(option.name)
+                                    .setDescription(option.description)
+                                    .setRequired(option.required)
+                                return opt
+                            })
+                            break
+                        }
+                    }
                 }
             }
 

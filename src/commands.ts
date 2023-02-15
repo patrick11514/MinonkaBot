@@ -17,14 +17,16 @@ const regions = [
 let commands: {
     [key: string]: {
         description: string
+        mention?: boolean
         options: Array<{
             name: string
+            type: 'STRING' | 'INTEGER' | 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE'
             description: string
             required: boolean
             choices?: Array<{
                 name: string
                 description?: string
-                value?: string
+                value?: string | number | boolean
             }>
         }>
     }
@@ -34,14 +36,22 @@ let commands: {
         options: [
             {
                 name: 'username',
+                type: 'STRING',
                 description: 'Jméno vyvolávače',
                 required: false,
             },
             {
                 name: 'region',
+                type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
                 choices: regions,
+            },
+            {
+                name: 'mention',
+                type: 'USER',
+                description: 'Označ uživatele s propojeným účtem',
+                required: false,
             },
         ],
     },
@@ -50,6 +60,7 @@ let commands: {
         options: [
             {
                 name: 'language',
+                type: 'STRING',
                 description: 'Jazyk, na který chceš změnit bota',
                 required: false,
                 choices: [
@@ -79,6 +90,7 @@ let commands: {
             },
             {
                 name: 'language2',
+                type: 'STRING',
                 description: 'Jazyk, na který chceš změnit bota',
                 required: false,
                 choices: [
@@ -97,6 +109,7 @@ let commands: {
         options: [
             {
                 name: 'action',
+                type: 'STRING',
                 description: 'Akce, kterou chceš provést',
                 required: true,
                 choices: [
@@ -116,11 +129,13 @@ let commands: {
             },
             {
                 name: 'username',
+                type: 'STRING',
                 description: 'Jméno vyvolávače',
                 required: false,
             },
             {
                 name: 'region',
+                type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
                 choices: regions,
@@ -132,14 +147,22 @@ let commands: {
         options: [
             {
                 name: 'username',
+                type: 'STRING',
                 description: 'Jméno vyvolávače',
                 required: false,
             },
             {
                 name: 'region',
+                type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
                 choices: regions,
+            },
+            {
+                name: 'mention',
+                type: 'USER',
+                description: 'Označ uživatele s propojeným účtem',
+                required: false,
             },
         ],
     },
@@ -148,14 +171,22 @@ let commands: {
         options: [
             {
                 name: 'username',
+                type: 'STRING',
                 description: 'Jméno vyvolávače',
                 required: false,
             },
             {
                 name: 'region',
+                type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
                 choices: regions,
+            },
+            {
+                name: 'mention',
+                type: 'USER',
+                description: 'Označ uživatele s propojeným účtem',
+                required: false,
             },
         ],
     },
@@ -164,6 +195,7 @@ let commands: {
         options: [
             {
                 name: 'command',
+                type: 'STRING',
                 description: 'Příkaz, který chceš zobrazit',
                 required: false,
                 choices: [],
@@ -175,6 +207,7 @@ let commands: {
         options: [
             {
                 name: 'queue',
+                type: 'STRING',
                 description: 'Typ zápasu, který chceš zobrazit',
                 required: false,
                 choices: Object.entries(queues).map(([key, value]) => {
@@ -188,6 +221,7 @@ let commands: {
             },
             {
                 name: 'limit',
+                type: 'STRING',
                 description: 'Počet zápasů, které chceš zobrazit',
                 required: false,
                 choices: [
@@ -200,14 +234,22 @@ let commands: {
             },
             {
                 name: 'username',
+                type: 'STRING',
                 description: 'Jméno vyvolávače',
                 required: false,
             },
             {
                 name: 'region',
+                type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
                 choices: regions,
+            },
+            {
+                name: 'mention',
+                type: 'USER',
+                description: 'Označ uživatele s propojeným účtem',
+                required: false,
             },
         ],
     },
@@ -216,6 +258,7 @@ let commands: {
         options: [
             {
                 name: 'queue',
+                type: 'STRING',
                 description: 'Typ zápasu, který chceš zobrazit',
                 required: true,
                 choices: [
@@ -225,12 +268,20 @@ let commands: {
             },
             {
                 name: 'username',
+                type: 'STRING',
                 description: 'Jméno vyvolávače',
                 required: false,
             },
             {
                 name: 'region',
+                type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
+                required: false,
+            },
+            {
+                name: 'mention',
+                type: 'USER',
+                description: 'Označ uživatele s propojeným účtem',
                 required: false,
             },
         ],
