@@ -351,7 +351,7 @@ interface matchChallenges {
 }
 
 interface match {
-    metdata: {
+    metadata: {
         dataVersion: string
         matchId: string
         participants: Array<EncryptedPuuid>
