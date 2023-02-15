@@ -9,6 +9,7 @@ import crypto from 'crypto'
 import isXml from 'is-xml'
 import { XMLParser } from 'fast-xml-parser'
 import path from 'path'
+import { Client } from 'discord.js'
 dotenv.config()
 
 class Utilities {
@@ -329,6 +330,16 @@ class Utilities {
 
     async sleep(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    mentionCommand(name: string, client: Client) {
+        let db = client.commandsDB
+        if (db.has(name)) {
+            let id = db.get(name)
+            return `</${name}:${id}>`
+        } else {
+            return `/${name}`
+        }
     }
 }
 
