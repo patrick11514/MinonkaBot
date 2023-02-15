@@ -141,6 +141,13 @@ export default async function handleInteraction(
 
             let accountData = await riot.findAccount(username)
 
+            if (accountData.length == 0) {
+                interaction.editReply({
+                    content: 'Účet s tímto jménem nebyl nalezen na žádném serveru. Zkus to znovu.',
+                })
+                return
+            }
+
             if (accountData.length > 1) {
                 new accountPicker(accountData, interaction, true)
                     .bindFunction(bindFunction, argumentsForBindFunction)
