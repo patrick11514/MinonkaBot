@@ -401,6 +401,40 @@ class Images {
             this.composite(coopText, 858, 45 + 80 + 60)
         }
 
+        //add length
+        this.l.log('Adding length...')
+        let lengthText = await this.createText({
+            //text 00:00 format (minutes:seconds)
+            text: `${Math.floor(matchData.length / 60)}:${matchData.length % 60 < 10 ? '0' : ''}${
+                matchData.length % 60
+            }`,
+            textSize: 60,
+            width: 700,
+            height: 135,
+            bold: true,
+            color: '#ffffff',
+            font: 'Beaufort for LOL Ja',
+            center: true,
+        })
+        this.composite(lengthText, 858, 45 + 80 + 60 + (queue >= 830 && queue <= 850 ? 60 : 0))
+
+        //add lp if ranked
+        if ([420, 440].includes(queue)) {
+            this.l.log('Adding lp...')
+            let lpText = await this.createText({
+                text: matchData.lp ? matchData.lp + ' LP' : '? LP',
+                textSize: 60,
+                width: 700,
+                height: 135,
+                bold: true,
+                color: matchData.lp ? (matchData.lp >= 0 ? '#1fed18' : '#ff0000') : '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: true,
+            })
+            this.composite(lpText, 858, 45 + 80 + 60 + (queue >= 830 && queue <= 850 ? 60 : 0) + 60)
+        }
+
+        //add kills
         this.l.log('Adding kills...')
         let killTextTeam1 = await this.createText({
             text: matchData.teams[1].reduce((prev, curr) => prev + curr.kills, 0).toString(),

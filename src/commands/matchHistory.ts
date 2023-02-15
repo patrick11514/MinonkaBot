@@ -13,6 +13,7 @@ import utilities from '../lib/riot/utilities'
 import { SummonerBy } from '../types/riotApi'
 import fs from 'fs'
 import Images from '../lib/images/core'
+import { checkUser, getLP } from '../lib/riot/workers/lpChecker'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -77,6 +78,9 @@ export async function matchHistory(
             //get match info
             let matchesInfo = []
 
+            //check user
+            await checkUser(data.id, data.puuid, region, interaction.client.LPDB)
+
             for (let match of matchIds) {
                 let matchData = await riot.getMatch(match, route)
                 if (!matchData) continue
@@ -128,11 +132,23 @@ export async function matchHistory(
                     })
                 })
 
+                let lp = undefined
+
+                if ([420, 440].includes(matchData.info.queueId)) {
+                    lp = await getLP(
+                        data.id,
+                        matchData.info.queueId,
+                        matchData.metadata.matchId,
+                        interaction.client.LPDB
+                    )
+                }
+
                 matchesInfo.push({
                     length: matchData.info.gameDuration,
                     ff15: ff15 as boolean,
                     queue: matchData.info.queueId,
                     userTeam: userTeam as number,
+                    lp: lp,
                     bans: matchData.info.teams.map((team) => {
                         return {
                             id: team.teamId,

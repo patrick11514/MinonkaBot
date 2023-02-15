@@ -42,6 +42,7 @@ interface matchData {
     length: number
     ff15: boolean
     queue: queues
+    lp: number | undefined | null
     userTeam: number
     bans: Array<{
         id: number
