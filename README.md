@@ -42,19 +42,24 @@
     #pnpm
     $ pnpm build
     ```
-    Run discord bot:
-    ```SHELL
-    #npm
-    $ npm start
-    #pnpm
-    $ pnpm start
-    ```
     Register slash commands on server:
     ```SHELL
     #npm
     $ npm startCommands
     #pnpm
     $ pnpm startCommands
+    ```
+    Run setup script, to copy fonts:
+    ```SHELL
+    $ chmod +x setup.sh
+    $ ./setup.sh
+    ```
+    Run discord bot:
+    ```SHELL
+    #npm
+    $ npm start
+    #pnpm
+    $ pnpm start
     ```
 -   **Run bot in dev mode:**
     ```SHELL
