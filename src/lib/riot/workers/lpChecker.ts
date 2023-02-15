@@ -61,6 +61,8 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
             lp: data.map((d) => {
                 return {
                     queue: d.queueType,
+                    rank: d.rank,
+                    tier: d.tier,
                     lp: d.leaguePoints,
                 }
             }),
@@ -99,6 +101,8 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                     let currentLp = d.leaguePoints
 
                     data.lp[queueArrId].lp = currentLp
+                    data.lp[queueArrId].rank = d.rank
+                    data.lp[queueArrId].tier = d.tier
 
                     if (prevLp == currentLp) {
                         currentMatches[foundMatch] = 0
