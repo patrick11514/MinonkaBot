@@ -52,7 +52,7 @@ export default async function handleInteraction(
         }
 
         if (accounts?.length == 1) {
-            await selfFunction(accounts[0].username, accounts[0].region, interaction, ...otherArguments)
+            await selfFunction(accounts[0].username, accounts[0].region, mention, interaction, ...otherArguments)
         } else {
             new accountPicker(
                 accounts.map((account) => {
