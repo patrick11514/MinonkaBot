@@ -13,6 +13,7 @@ import crypto from 'crypto'
 
 //dotenv
 import * as dotenv from 'dotenv'
+import { startLPChecker } from './lib/riot/workers/lpChecker'
 dotenv.config()
 
 //intents
@@ -25,7 +26,7 @@ let client = new Client({
 })
 process.client = client
 
-//varibales
+//variables
 let emitter = new EventEmitter()
 client.emitter = emitter
 client.config = config
@@ -66,6 +67,13 @@ let commandsDB = new JSONdb('databases/commands.json', {
     asyncWrite: true,
 })
 client.commandsDB = commandsDB
+
+let LPDB = new JSONdb('databases/lp.json', {
+    syncOnWrite: true,
+    asyncWrite: true,
+})
+client.LPDB = LPDB
+startLPChecker(LPDB)
 
 //statuses
 const status: Array<{

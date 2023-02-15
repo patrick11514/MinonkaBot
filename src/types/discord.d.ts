@@ -11,5 +11,6 @@ declare module 'discord.js' {
         nameHistoryDB: JSONdb
         emotesDB: JSONdb
         commandsDB: JSONdb
+        LPDB: JSONdb
     }
 }
