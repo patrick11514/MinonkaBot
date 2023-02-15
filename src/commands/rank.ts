@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
+import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
 import accountPicker from '../components/accountPicker'
 import handleInteraction from '../components/core'
 import Images from '../lib/images/core'
@@ -14,8 +14,9 @@ export default (client: Client) => {
         if (interaction.commandName === 'rank') {
             let username = interaction.options.get('username', false)
             let region = interaction.options.get('region', false)
+            let mention = interaction.options.getUser('mention', false)
 
-            generateRank(username?.value as string, region?.value as string, interaction)
+            generateRank(username?.value as string, region?.value as string, mention, interaction)
         }
     })
 }
@@ -23,12 +24,14 @@ export default (client: Client) => {
 export async function generateRank(
     username: string | null,
     region: string | null,
+    mention: User | null,
     interaction: CommandInteraction | ButtonInteraction
 ) {
     handleInteraction(
         interaction,
         username,
         region,
+        mention,
         'rank',
         async function (
             username: string,

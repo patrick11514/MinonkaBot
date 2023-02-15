@@ -85,7 +85,7 @@ class accountPicker {
 
             switch (name) {
                 case 'profile': {
-                    generateProfile(account.name, account.region, this.interaction)
+                    generateProfile(account.name, account.region, null, this.interaction)
                     break
                 }
                 case 'link': {
@@ -93,11 +93,11 @@ class accountPicker {
                     break
                 }
                 case 'rank': {
-                    generateRank(account.name, account.region, this.interaction)
+                    generateRank(account.name, account.region, null, this.interaction)
                     break
                 }
                 case 'nameHistory': {
-                    nameHistory(account.name, account.region, this.interaction)
+                    nameHistory(account.name, account.region, null, this.interaction)
                     break
                 }
                 /*               case 'matchHistory': {

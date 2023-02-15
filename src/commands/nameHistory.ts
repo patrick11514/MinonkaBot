@@ -1,7 +1,7 @@
 import accountPicker from '../components/accountPicker'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
-import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
+import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
 import Logger from '../lib/logger'
 
 export default (client: Client) => {
@@ -11,8 +11,9 @@ export default (client: Client) => {
         if (interaction.commandName === 'namehistory') {
             let username = interaction.options.get('username', false)
             let region = interaction.options.get('region', false)
+            let mention = interaction.options.getUser('mention', false)
 
-            nameHistory(username?.value as string, region?.value as string, interaction)
+            nameHistory(username?.value as string, region?.value as string, mention, interaction)
         }
     })
 }
@@ -20,6 +21,7 @@ export default (client: Client) => {
 export async function nameHistory(
     username: string | null,
     region: string | null,
+    mention: User | null,
     interaction: CommandInteraction | ButtonInteraction
 ) {
     let userData: {
@@ -31,7 +33,11 @@ export async function nameHistory(
     }
 
     if (!username) {
-        let link = new linkedAccounts(interaction.user.id, interaction.client.usersDB, interaction.client.nameHistoryDB)
+        let link = new linkedAccounts(
+            mention?.id ? mention.id : interaction.user.id,
+            interaction.client.usersDB,
+            interaction.client.nameHistoryDB
+        )
         let accounts = await link.getAccounts()
         if (accounts?.length == 0) {
             return interaction.editReply({
@@ -41,7 +47,7 @@ export async function nameHistory(
         }
 
         if (accounts?.length == 1) {
-            await nameHistory(accounts[0].username, accounts[0].region, interaction)
+            await nameHistory(accounts[0].username, accounts[0].region, null, interaction)
         } else {
             new accountPicker(
                 accounts.map((account) => {
@@ -99,7 +105,7 @@ export async function nameHistory(
                 new accountPicker(accountData, interaction, true).bindFunction('nameHistory').send()
             } else {
                 interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                await nameHistory(accountData[0].name, accountData[0].region, interaction)
+                await nameHistory(accountData[0].name, accountData[0].region, null, interaction)
             }
         }
     }

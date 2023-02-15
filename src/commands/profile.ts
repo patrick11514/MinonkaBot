@@ -1,9 +1,9 @@
-import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
+import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
 import handleInteraction from '../components/core'
 import Images from '../lib/images/core'
 import Riot from '../lib/riot/core'
 import { SummonerBy, UserChallenges } from '../types/riotApi'
-import User from '../types/usersDB'
+import DBUser from '../types/usersDB'
 import fs from 'fs'
 
 export default (client: Client) => {
@@ -13,8 +13,9 @@ export default (client: Client) => {
         if (interaction.commandName === 'profile') {
             let username = interaction.options.get('username', false)
             let region = interaction.options.get('region', false)
+            let mention = interaction.options.getUser('mention', false)
 
-            generateProfile(username?.value as string, region?.value as string, interaction)
+            generateProfile(username?.value as string, region?.value as string, mention, interaction)
         }
     })
 }
@@ -22,12 +23,14 @@ export default (client: Client) => {
 export async function generateProfile(
     username: string | null,
     region: string | null,
+    mention: User | null,
     interaction: CommandInteraction | ButtonInteraction
 ) {
     handleInteraction(
         interaction,
         username,
         region,
+        mention,
         'profile',
         async function (
             username: string,
@@ -63,8 +66,8 @@ export async function generateProfile(
             //get user language
             let db = interaction.client.usersDB
             let language = 'cs_CZ'
-            if (await db.has(interaction.user.id)) {
-                let data: User = await db.get(interaction.user.id)
+            if (db.has(interaction.user.id)) {
+                let data: DBUser = await db.get(interaction.user.id)
                 if (data.language) {
                     language = data.language
                 }

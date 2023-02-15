@@ -5,6 +5,7 @@ import {
     EmbedBuilder,
     Team,
     TeamMemberMembershipState,
+    User,
 } from 'discord.js'
 import handleInteraction from '../components/core'
 import Logger from '../lib/logger'
@@ -25,10 +26,12 @@ export default (client: Client) => {
             let limit = interaction.options.get('limit', false)
             let username = interaction.options.get('username', false)
             let region = interaction.options.get('region', false)
+            let mention = interaction.options.getUser('mention', false)
 
             matchHistory(
                 username?.value as string,
                 region?.value as string,
+                mention,
                 interaction,
                 queue?.value as string,
                 limit?.value as string
@@ -40,6 +43,7 @@ export default (client: Client) => {
 export async function matchHistory(
     username: string | null,
     region: string | null,
+    mention: User | null,
     interaction: CommandInteraction | ButtonInteraction,
     queue: string | null,
     limit: string | null
@@ -48,6 +52,7 @@ export async function matchHistory(
         interaction,
         username,
         region,
+        mention,
         'handleInteraction',
         async function (
             username: string,
