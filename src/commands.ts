@@ -211,6 +211,30 @@ let commands: {
             },
         ],
     },
+    liverank: {
+        description: 'Vygeneruje odkaz na obrázek s tvým rankem, který se aktualizuje',
+        options: [
+            {
+                name: 'queue',
+                description: 'Typ zápasu, který chceš zobrazit',
+                required: true,
+                choices: [
+                    { name: 'Solo/Duo', value: '420' },
+                    { name: 'Flex 5v5', value: '440' },
+                ],
+            },
+            {
+                name: 'username',
+                description: 'Jméno vyvolávače',
+                required: false,
+            },
+            {
+                name: 'region',
+                description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
+                required: false,
+            },
+        ],
+    },
 }
 
 commands.help.options[0].choices = Object.keys(commands).map((command: string) => {
