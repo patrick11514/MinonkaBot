@@ -16,8 +16,8 @@ class Riot {
     l: Logger
 
     constructor() {
-        this.r = new Requests()
         this.l = new Logger('Riot', 'green')
+        this.r = new Requests(this.l)
     }
 
     async getSummonerByName(name: string, region: string): Promise<SummonerBy | null> {
