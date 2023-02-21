@@ -420,6 +420,8 @@ class Images {
 
         //add lp if ranked
         if ([420, 440].includes(queue)) {
+            let yPos = 45 + 80 + 60 + (queue >= 830 && queue <= 850 ? 60 : 0) + 60
+
             this.l.log('Adding lp...')
             let lpText = await this.createText({
                 text: matchData.lp ? matchData.lp + ' LP' : '? LP',
@@ -431,8 +433,32 @@ class Images {
                 font: 'Beaufort for LOL Ja',
                 center: true,
             })
-            this.composite(lpText, 858, 45 + 80 + 60 + (queue >= 830 && queue <= 850 ? 60 : 0) + 60)
+            this.composite(lpText, 858, yPos)
         }
+
+        //add game creation time
+        let startTimestamp = new Date(matchData.createTimestamp)
+        //create string of HH:MM:ss DD.MM.YYYY with 0 if number is one digit
+        let startString = `${startTimestamp.getHours() < 10 ? '0' : ''}${startTimestamp.getHours()}:${
+            startTimestamp.getMinutes() < 10 ? '0' : ''
+        }${startTimestamp.getMinutes()}:${startTimestamp.getSeconds() < 10 ? '0' : ''}${startTimestamp.getSeconds()} ${
+            startTimestamp.getDate() < 10 ? '0' : ''
+        }${startTimestamp.getDate()}.${startTimestamp.getMonth() < 9 ? '0' : ''}${
+            startTimestamp.getMonth() + 1
+        }.${startTimestamp.getFullYear()}`
+
+        this.l.log('Adding game creation time...')
+        let startText = await this.createText({
+            text: startString,
+            textSize: 45,
+            width: 700,
+            height: 135,
+            bold: true,
+            color: '#ffffff',
+            font: 'Beaufort for LOL Ja',
+            center: true,
+        })
+        this.composite(startText, 858, 820 - 90)
 
         //add kills
         this.l.log('Adding kills...')

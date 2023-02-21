@@ -44,6 +44,7 @@ interface matchData {
     queue: queues
     lp: number | undefined | null
     userTeam: number
+    createTimestamp: number
     bans: Array<{
         id: number
         bans: Array<{

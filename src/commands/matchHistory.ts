@@ -1,12 +1,4 @@
-import {
-    ButtonInteraction,
-    Client,
-    CommandInteraction,
-    EmbedBuilder,
-    Team,
-    TeamMemberMembershipState,
-    User,
-} from 'discord.js'
+import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
 import handleInteraction from '../components/core'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
@@ -154,6 +146,7 @@ export async function matchHistory(
                     queue: matchData.info.queueId,
                     userTeam: userTeam as number,
                     lp: lp,
+                    createTimestamp: matchData.info.gameStartTimestamp,
                     bans: matchData.info.teams.map((team) => {
                         return {
                             id: team.teamId,
