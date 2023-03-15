@@ -360,12 +360,12 @@ class Images {
 
         this.l.log('Adding win or lose text...')
         let winOrLoseText = await this.createText({
-            text: win ? (matchData.ff15 && matchData.length <= 195 ? 'Remake' : 'Victory') : 'Defeat',
+            text: matchData.ff15 && matchData.length <= 195 ? 'Remake' : win ? 'Victory' : 'Defeat',
             textSize: 100,
             width: 700,
             height: 135,
             bold: true,
-            color: win ? (matchData.ff15 && matchData.length <= 195 ? '#7e857f' : '#1fed18') : '#ff0000',
+            color: matchData.ff15 && matchData.length <= 195 ? '#7e857f' : win ? '#1fed18' : '#ff0000',
             font: 'Beaufort for LOL Ja',
             center: true,
         })
