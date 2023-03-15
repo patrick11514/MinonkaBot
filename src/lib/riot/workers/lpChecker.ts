@@ -49,6 +49,17 @@ async function startLPChecker(db: JSONdb) {
     log.stop('Done starting ' + Object.keys(json).length + ' LPCheckers')
 }
 
+function translate(rank: string) {
+    let table = {
+        I: 1,
+        II: 2,
+        III: 3,
+        IV: 4,
+    }
+
+    return table[rank as keyof typeof table]
+}
+
 async function checkUser(id: string, puuid: string, region: string, db: JSONdb) {
     let riot = new Riot()
     let data = await riot.getRankedData(id, region)
@@ -100,6 +111,9 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                     let prevLp = data.lp.find((l) => l.queue == d.queueType)?.lp as number
                     let currentLp = d.leaguePoints
 
+                    let prevRank = translate(data.lp[queueArrId].rank)
+                    let currentRank = translate(d.rank)
+
                     data.lp[queueArrId].lp = currentLp
                     data.lp[queueArrId].rank = d.rank
                     data.lp[queueArrId].tier = d.tier
@@ -109,6 +123,10 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                     } else if (prevLp == 100) {
                         currentMatches[foundMatch] = currentLp
                     } else if (prevLp == 0) {
+                        currentMatches[foundMatch] = currentLp - 100
+                    } else if (prevRank < currentRank) {
+                        currentMatches[foundMatch] = currentLp
+                    } else if (prevRank > currentRank) {
                         currentMatches[foundMatch] = currentLp - 100
                     } else {
                         currentMatches[foundMatch] = currentLp - prevLp
