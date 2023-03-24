@@ -106,17 +106,14 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
 
             if (!match && match != 0) {
                 //check if prev match is checked
+                let currentLp = d.leaguePoints
+
                 let pMatch = currentMatches[prevMatch]
                 if (pMatch || pMatch == 'NULL') {
                     let prevLp = data.lp.find((l) => l.queue == d.queueType)?.lp as number
-                    let currentLp = d.leaguePoints
 
                     let prevRank = translate(data.lp[queueArrId].rank)
                     let currentRank = translate(d.rank)
-
-                    data.lp[queueArrId].lp = currentLp
-                    data.lp[queueArrId].rank = d.rank
-                    data.lp[queueArrId].tier = d.tier
 
                     if (prevLp == currentLp) {
                         currentMatches[foundMatch] = 0
@@ -124,9 +121,9 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                         currentMatches[foundMatch] = currentLp
                     } else if (prevLp == 0) {
                         currentMatches[foundMatch] = currentLp - 100
-                    } else if (prevRank < currentRank) {
-                        currentMatches[foundMatch] = currentLp
                     } else if (prevRank > currentRank) {
+                        currentMatches[foundMatch] = currentLp
+                    } else if (prevRank < currentRank) {
                         currentMatches[foundMatch] = currentLp - 100
                     } else {
                         currentMatches[foundMatch] = currentLp - prevLp
@@ -134,6 +131,10 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                 } else {
                     currentMatches[foundMatch] = 'NULL'
                 }
+
+                data.lp[queueArrId].lp = currentLp
+                data.lp[queueArrId].rank = d.rank
+                data.lp[queueArrId].tier = d.tier
             }
 
             data.lastUpdate = Date.now()
