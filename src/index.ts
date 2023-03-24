@@ -163,7 +163,7 @@ async function updateVersion() {
             //if yes, delete png files in cache folder and log
             let l2 = new Logger('Cache', 'blue')
             l2.start('Deleting cache...')
-            let files = fs.readdirSync('./cache').filter((file) => file.endsWith('.png'))
+            let files = fs.readdirSync('./cache').filter((file) => file.endsWith('.png') || file.endsWith('.json'))
             for (let file of files) {
                 fs.unlinkSync('./cache/' + file)
             }
