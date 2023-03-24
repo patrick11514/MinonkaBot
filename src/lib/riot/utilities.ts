@@ -1,7 +1,7 @@
 import fetch, { Response } from 'node-fetch'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { Challenge, championsData, itemsData, summoners } from '../../types/riotApi'
+import { Challenge, championsData, itemsData, runeData, summoners } from '../../types/riotApi'
 import Logger from '../logger'
 import sharp from 'sharp'
 import crypto from 'crypto'
@@ -310,6 +310,78 @@ class Utilities {
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/spell/' + find.image.full,
             false
         )
+
+        return path
+    }
+
+    async getRunes(language: string = 'cs_CZ'): Promise<runeData[]> {
+        //check if file is in cache name: runesReforged_{language}.json if yes, return its content
+        //if not, download it and return its content
+        let path = `./cache/runesReforged_${language}.json`
+        if (fs.existsSync(path)) {
+            this.l.log('Using cached file.')
+            return JSON.parse(fs.readFileSync(path).toString())
+        }
+
+        let response = await fetch(
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/runesReforged.json'
+        )
+
+        let data = await response.json()
+
+        fs.writeFileSync(path, JSON.stringify(data))
+
+        return data
+    }
+
+    async getRuneById(style: number, id: number, language: string = 'cs_CZ') {
+        let data = await this.getRunes(language)
+
+        let runeStyle = Object.values(data).find((el) => el.id == style)
+
+        if (!runeStyle) {
+            return null
+        }
+
+        let rune:
+            | {
+                  id: number
+                  key: string
+                  icon: string
+                  name: string
+                  shortDesc: string
+                  longDesc: string
+              }
+            | undefined
+
+        runeStyle.slots.forEach((set) => {
+            let current = set.runes.find((rune) => rune.id == id)
+            if (current) {
+                rune = current
+            }
+        })
+
+        if (!rune) {
+            return null
+        }
+
+        return rune.icon
+    }
+
+    async getRuneCategoryById(id: number, language: string = 'cs_CZ') {
+        let data = await this.getRunes(language)
+
+        let runeStyle = Object.values(data).find((el) => el.id == id)
+
+        if (!runeStyle) {
+            return null
+        }
+
+        return runeStyle.icon
+    }
+
+    async getRuneImage(filename: string) {
+        let path = await this.downloadImage(process.env.DDRAGON_URL + '/cdn/img/' + filename, false)
 
         return path
     }

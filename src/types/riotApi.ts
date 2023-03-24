@@ -1,4 +1,4 @@
-interface Challenge {
+export interface Challenge {
     id: number
     name: string
     description: string
@@ -25,7 +25,7 @@ interface Challenge {
     }
 }
 
-interface UserChallenges {
+export interface UserChallenges {
     totalPoints: {
         level: string
         current: number
@@ -54,11 +54,11 @@ interface UserChallenges {
     }
 }
 
-type EncryptedSummonerId = string
-type EncryptedAccountId = string
-type EncryptedPuuid = string
+export type EncryptedSummonerId = string
+export type EncryptedAccountId = string
+export type EncryptedPuuid = string
 
-interface SummonerBy {
+export interface SummonerBy {
     id: EncryptedSummonerId
     accountId: EncryptedAccountId
     puuid: EncryptedPuuid
@@ -68,12 +68,12 @@ interface SummonerBy {
     summonerLevel: number
 }
 
-enum QueueTypes {
+export enum QueueTypes {
     RANKED_SOLO = 'RANKED_SOLO_5x5',
     RANKED_FLEX = 'RANKED_FLEX_SR',
 }
 
-enum Tiers {
+export enum Tiers {
     Iron = 'IRON',
     Bronze = 'BRONZE',
     Silver = 'SILVER',
@@ -85,7 +85,7 @@ enum Tiers {
     Challenger = 'CHALLENGER',
 }
 
-type lowerTier =
+export type lowerTier =
     | 'Iron'
     | 'Bronze'
     | 'Silver'
@@ -96,14 +96,14 @@ type lowerTier =
     | 'Grandmaster'
     | 'Challenger'
 
-enum Ranks {
+export enum Ranks {
     I = 'I',
     II = 'II',
     III = 'III',
     IV = 'IV',
 }
 
-enum RankColors {
+export enum RankColors {
     Iron = '#99978b',
     Bronze = '#966502',
     Silver = '#99978b',
@@ -115,7 +115,7 @@ enum RankColors {
     Challenger = '#e5f051',
 }
 
-interface RankedData {
+export interface RankedData {
     leagueId: string
     queueType: QueueTypes
     tier: Tiers
@@ -143,7 +143,7 @@ interface JSONRiotFiles {
     version: string
 }
 
-interface championData {
+export interface championData {
     version: string
     id: string
     key: string
@@ -190,13 +190,13 @@ interface championData {
         attackspeed: number
     }
 }
-interface championsData extends JSONRiotFiles {
+export interface championsData extends JSONRiotFiles {
     data: {
         [key: string]: championData
     }
 }
 
-interface itemData {
+export interface itemData {
     name: string
     description: string
     colloq: string
@@ -225,20 +225,20 @@ interface itemData {
     stats: {}
 }
 
-interface itemsData extends JSONRiotFiles {
+export interface itemsData extends JSONRiotFiles {
     data: {
         [key: number]: itemData
     }
 }
 
-interface errorResponse {
+export interface errorResponse {
     status: {
         message: string
         status_code: number
     }
 }
 
-interface matchChallenges {
+export interface matchChallenges {
     '12AssistStreakCount': number
     abilityUses: number
     acesBefore15Minutes: number
@@ -350,7 +350,7 @@ interface matchChallenges {
     wardsGuarded: number
 }
 
-interface match {
+export interface match {
     metadata: {
         dataVersion: string
         matchId: string
@@ -535,7 +535,7 @@ interface match {
     }
 }
 
-enum queues {
+export enum queues {
     'Custom' = 0,
     'Draft Pick' = 400,
     'Blind Pick' = 430,
@@ -553,7 +553,7 @@ enum queues {
     'Nexus Blitz' = 1400,
 }
 
-interface summoners extends JSONRiotFiles {
+export interface summoners extends JSONRiotFiles {
     data: {
         [key: string]: {
             id: string
@@ -589,23 +589,19 @@ interface summoners extends JSONRiotFiles {
     }
 }
 
-export {
-    Challenge,
-    UserChallenges,
-    SummonerBy,
-    EncryptedAccountId,
-    EncryptedSummonerId,
-    EncryptedPuuid,
-    QueueTypes,
-    Tiers,
-    Ranks,
-    RankColors,
-    lowerTier,
-    RankedData,
-    championsData,
-    itemsData,
-    errorResponse,
-    match,
-    queues,
-    summoners,
+export interface runeData {
+    id: number
+    key: string
+    icon: string
+    name: string
+    slots: {
+        runes: {
+            id: number
+            key: string
+            icon: string
+            name: string
+            shortDesc: string
+            longDesc: string
+        }[]
+    }[]
 }

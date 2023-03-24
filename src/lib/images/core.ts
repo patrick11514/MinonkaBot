@@ -486,12 +486,59 @@ class Images {
         })
         this.composite(killTextTeam2, 858 + 300, 45)
 
+        this.l.log('Adding champioon bans...')
+        //left
+        let bans = matchData.bans.find((ban) => ban.id === matchData.teams[1][0].id)
+
+        if (!bans) return ''
+
+        let banY = 55
+        let banX = 450
+
+        for (let ban of bans?.bans) {
+            let imageName = await utils.championIdToImage(ban.champion)
+            let champImage: string
+            if (!imageName) {
+                champImage = await utils.downloadProfilePicture(29)
+            } else {
+                champImage = await utils.getChampionImage(imageName)
+            }
+            champImage = await utils.resizeImage(champImage, 60, 60)
+
+            this.composite(champImage, banX, banY)
+
+            banX += 70
+        }
+
+        //right
+
+        bans = matchData.bans.find((ban) => ban.id === matchData.teams[2][0].id)
+
+        if (!bans) return ''
+
+        banX += 832
+
+        for (let ban of bans?.bans) {
+            let imageName = await utils.championIdToImage(ban.champion)
+            let champImage: string
+            if (!imageName) {
+                champImage = await utils.downloadProfilePicture(29)
+            } else {
+                champImage = await utils.getChampionImage(imageName)
+            }
+            champImage = await utils.resizeImage(champImage, 60, 60)
+
+            this.composite(champImage, banX, banY)
+
+            banX += 70
+        }
+
         let startY = 145
         this.l.log('Adding champions...')
         let imageWidth = 75
         //left team
         for (let champ of matchData.teams[1]) {
-            let imageName = await utils.championtIdToImage(champ.champion)
+            let imageName = await utils.championIdToImage(champ.champion)
             let champImage: string
             if (!imageName) {
                 champImage = await utils.downloadProfilePicture(29)
@@ -528,6 +575,44 @@ class Images {
                 center: false,
             })
             this.composite(usernameText, 50 + imageWidth + 15, startY - 15)
+
+            //runes
+            {
+                let x = 600 - 45 - 45
+                let y = startY - 5
+
+                //first rune
+                let style = champ.perks.styles[0]
+
+                let image = await utils.getRuneById(style.style, style.selections[0].perk)
+
+                if (!image) {
+                    image = await utils.downloadProfilePicture(29)
+                } else {
+                    image = await utils.getRuneImage(image)
+                }
+
+                image = await utils.resizeImage(image, 40, 40, true)
+
+                this.composite(image, x, y)
+
+                //second rune
+                y += 55
+
+                style = champ.perks.styles[1]
+
+                image = await utils.getRuneCategoryById(style.style)
+
+                if (!image) {
+                    image = await utils.downloadProfilePicture(29)
+                } else {
+                    image = await utils.getRuneImage(image)
+                }
+
+                image = await utils.resizeImage(image, 30, 30, true)
+
+                this.composite(image, x + 5, y)
+            }
 
             //summoner spells
             for (let i = 0; i <= 1; i++) {
@@ -604,7 +689,7 @@ class Images {
         startY = 145
         //right team is mirrored and calculated from right side (2424px)
         for (let champ of matchData.teams[2]) {
-            let imageName = await utils.championtIdToImage(champ.champion)
+            let imageName = await utils.championIdToImage(champ.champion)
 
             let champImage: string
             if (!imageName) {
@@ -644,6 +729,44 @@ class Images {
             })
 
             this.composite(usernameText, 2424 - 50 - imageWidth - 15 - 700, startY - 15)
+
+            //runes
+            {
+                let x = 2424 - 600 + 45
+                let y = startY - 5
+
+                //first rune
+                let style = champ.perks.styles[0]
+
+                let image = await utils.getRuneById(style.style, style.selections[0].perk)
+
+                if (!image) {
+                    image = await utils.downloadProfilePicture(29)
+                } else {
+                    image = await utils.getRuneImage(image)
+                }
+
+                image = await utils.resizeImage(image, 40, 40, true)
+
+                this.composite(image, x, y)
+
+                //second rune
+                y += 55
+
+                style = champ.perks.styles[1]
+
+                image = await utils.getRuneCategoryById(style.style)
+
+                if (!image) {
+                    image = await utils.downloadProfilePicture(29)
+                } else {
+                    image = await utils.getRuneImage(image)
+                }
+
+                image = await utils.resizeImage(image, 30, 30, true)
+
+                this.composite(image, x + 5, y)
+            }
 
             //summoner spells
             for (let i = 0; i <= 1; i++) {

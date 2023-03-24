@@ -99,6 +99,24 @@ export async function matchHistory(
                         deaths: number
                         vision: number
                         level: number
+                        perks: {
+                            statPerks: {
+                                defense: number
+                                flex: number
+                                offense: number
+                            }
+                            styles: Array<{
+                                description: string
+                                selections: Array<{
+                                    perk: number
+                                    var1: number
+                                    var2: number
+                                    var3: number
+                                }>
+
+                                style: number
+                            }>
+                        }
                     }>
                 > = []
 
@@ -126,6 +144,7 @@ export async function matchHistory(
                         deaths: participant.deaths,
                         vision: participant.visionScore,
                         level: participant.champLevel,
+                        perks: participant.perks,
                     })
                 })
 
