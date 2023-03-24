@@ -208,7 +208,7 @@ class Utilities {
         return path
     }
 
-    async championtIdToImage(id: number, language: string = 'cs_CZ') {
+    async championIdToImage(id: number, language: string = 'cs_CZ') {
         let data = await this.getChampions(language)
 
         let champion = Object.values(data.data).find((el) => el.key == id.toString())
