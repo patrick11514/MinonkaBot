@@ -170,7 +170,7 @@ export default async function handleInteraction(
                     .send()
             } else {
                 interaction.editReply({ content: 'Máme tvůj účet! Nyní získáváme data o něm...' })
-                await selfFunction(accountData[0].name, accountData[0].region, interaction, ...otherArguments)
+                await selfFunction(accountData[0].name, accountData[0].region, null, interaction, ...otherArguments)
             }
         }
     }
