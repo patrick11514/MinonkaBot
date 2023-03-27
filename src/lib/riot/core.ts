@@ -82,19 +82,25 @@ class Riot {
         }> = []
 
         this.l.start('Searching for accounts by name: ' + username)
+        let promises = []
+
         for (let i = 0; i < regions.length; i++) {
-            this.l.log('Searching ' + regions[i] + '...')
-            let data = await this.getSummonerByName(username, regions[i])
-            if (!data) {
-                this.l.log('Account not found')
+            promises.push(this.getSummonerByName(username, regions[i]))
+        }
+
+        let data = await Promise.all(promises)
+        for (let id in data) {
+            const account = data[id]
+            if (!account) {
+                this.l.log('Account not found for region: ' + regions[id])
                 continue
             }
 
-            this.l.log('Account found!')
+            this.l.log('Account found for region: ' + regions[id])
             foundAccounts.push({
-                name: data.name,
-                region: regions[i],
-                level: data.summonerLevel,
+                name: account.name,
+                region: regions[id],
+                level: account.summonerLevel,
             })
         }
 
