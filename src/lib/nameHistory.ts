@@ -170,6 +170,10 @@ class linkedAccounts {
         ])
 
         //clone object, so pop function wont remove last item from virtual database object
+        if (typeof structuredClone === 'undefined') {
+            return JSON.parse(JSON.stringify(accounts.history))
+        }
+
         return structuredClone(accounts.history)
     }
 }
