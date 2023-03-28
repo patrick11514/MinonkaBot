@@ -1,4 +1,4 @@
-import { EncryptedSummonerId, queues, QueueTypes, Ranks, Tiers } from './riotApi'
+import { EncryptedSummonerId, queues, QueueTypes, Ranks, teamMember, Tiers } from './riotApi'
 
 interface profilePicture {
     username: string
@@ -56,39 +56,7 @@ interface matchData {
         id: number
         win: boolean
     }>
-    teams: Array<
-        Array<{
-            id: number
-            champion: number
-            summoner: string
-            role: string
-            summoners: number[]
-            items: number[]
-            kills: number
-            asists: number
-            deaths: number
-            vision: number
-            level: number
-            perks: {
-                statPerks: {
-                    defense: number
-                    flex: number
-                    offense: number
-                }
-                styles: Array<{
-                    description: string
-                    selections: Array<{
-                        perk: number
-                        var1: number
-                        var2: number
-                        var3: number
-                    }>
-
-                    style: number
-                }>
-            }
-        }>
-    >
+    teams: Array<Array<teamMember>>
 }
 
 export { profilePicture, rankedProfile, matchData }

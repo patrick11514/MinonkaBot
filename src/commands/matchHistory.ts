@@ -3,7 +3,7 @@ import handleInteraction from '../components/core'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
 import utilities from '../lib/riot/utilities'
-import { SummonerBy } from '../types/riotApi'
+import { SummonerBy, teamMember } from '../types/riotApi'
 import fs from 'fs'
 import Images from '../lib/images/core'
 import { checkUser, getLP } from '../lib/riot/workers/lpChecker'
@@ -86,39 +86,7 @@ export async function matchHistory(
 
                 let ff15 = matchData.info.participants.find((p) => p.puuid == data.puuid)?.gameEndedInEarlySurrender
 
-                let teams: Array<
-                    Array<{
-                        id: number
-                        champion: number
-                        summoner: string
-                        role: string
-                        summoners: number[]
-                        items: number[]
-                        kills: number
-                        asists: number
-                        deaths: number
-                        vision: number
-                        level: number
-                        perks: {
-                            statPerks: {
-                                defense: number
-                                flex: number
-                                offense: number
-                            }
-                            styles: Array<{
-                                description: string
-                                selections: Array<{
-                                    perk: number
-                                    var1: number
-                                    var2: number
-                                    var3: number
-                                }>
-
-                                style: number
-                            }>
-                        }
-                    }>
-                > = []
+                let teams: Array<Array<teamMember>> = []
 
                 matchData.info.participants.forEach((participant) => {
                     let teamId = participant.teamId / 100
