@@ -116,6 +116,11 @@ export async function matchHistory(
                     })
                 })
 
+                //sort team mebers
+                teams = teams.map((team) => {
+                    return utilities.sortTeam(team)
+                })
+
                 let lp = undefined
 
                 if ([420, 440].includes(matchData.info.queueId)) {
