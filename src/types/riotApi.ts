@@ -528,7 +528,6 @@ export interface match {
         gameVersion: string
         mapId: number
         participants: Array<participant>
-
         platformId: string
         queueId: queues
         teams: Array<{
