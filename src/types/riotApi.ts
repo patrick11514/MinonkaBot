@@ -638,3 +638,9 @@ export interface runeData {
         }[]
     }[]
 }
+
+export interface Rotation {
+    maxNewPlayerLevel: number
+    freeChampionIdsForNewPlayers: number[]
+    freeChampionIds: number[]
+}

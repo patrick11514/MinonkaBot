@@ -253,6 +253,18 @@ let commands: {
             },
         ],
     },
+    rotation: {
+        description: 'Zobrazí aktuální champion rotaci',
+        options: [
+            {
+                name: 'region',
+                type: 'STRING',
+                description: 'Region, na kterém chceš zobrazit champion rotaci',
+                required: false,
+                choices: regions,
+            },
+        ],
+    },
     liverank: {
         description: 'Vygeneruje odkaz na obrázek s tvým rankem, který se aktualizuje',
         options: [
