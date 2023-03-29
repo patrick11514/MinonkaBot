@@ -232,6 +232,18 @@ class Utilities {
         return champion.name
     }
 
+    async championIdToObject(id: number, language: string = 'cs_CZ') {
+        let data = await this.getChampions(language)
+
+        let champion = Object.values(data.data).find((el) => el.key == id.toString())
+
+        if (!champion) {
+            return null
+        }
+
+        return champion
+    }
+
     async getChampions(language: string = 'cs_CZ'): Promise<championsData> {
         //check if file is in chace name: champions_{language}.json if yes, return its content
         //if not, download it and return its content
