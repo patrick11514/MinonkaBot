@@ -5,6 +5,7 @@ import {
     errorResponse,
     match,
     RankedData,
+    Rotation,
     SummonerBy,
     UserChallenges,
 } from '../../types/riotApi'
@@ -20,7 +21,7 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}`
 
-        let data: SummonerBy | errorResponse = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<SummonerBy>(url)
 
         if ((data as errorResponse)?.status) return null
 
@@ -32,7 +33,7 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v1/summoners/by-account/${id}`
 
-        let data: SummonerBy | errorResponse = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<SummonerBy>(url)
 
         if ((data as errorResponse)?.status) return null
 
@@ -44,21 +45,23 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${id}`
 
-        let data: SummonerBy | errorResponse = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<SummonerBy>(url)
 
         if ((data as errorResponse)?.status) return null
 
         return data as SummonerBy
     }
 
-    static async getChallenges(puuid: EncryptedPuuid, region: string): Promise<UserChallenges> {
+    static async getChallenges(puuid: EncryptedPuuid, region: string): Promise<UserChallenges | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/challenges/v1/player-data/${puuid}`
 
-        let data = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<UserChallenges>(url)
 
-        return data
+        if ((data as errorResponse).status) return null
+
+        return data as UserChallenges | null
     }
 
     static async findAccount(username: string): Promise<
@@ -107,7 +110,7 @@ class Riot {
 
         let url = `https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`
 
-        let data: RankedData[] | errorResponse = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<RankedData[]>(url)
 
         if ((data as errorResponse)?.status) return null
 
@@ -125,7 +128,7 @@ class Riot {
                 count ? count : 1
             }` + (queue ? `&queue=${queue}` : '')
 
-        let data: Array<string> | errorResponse = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<Array<string>>(url)
 
         if ((data as errorResponse)?.status) return []
 
@@ -135,11 +138,21 @@ class Riot {
     static async getMatch(id: string, route: string): Promise<null | match> {
         let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/${id}`
 
-        let data: match | errorResponse = await this.r.makeRequest(url)
+        let data = await this.r.makeRequest<match>(url)
 
         if ((data as errorResponse)?.status) return null
 
-        return data as match
+        return data as match | null
+    }
+
+    static async getRotation(region: string): Promise<Rotation | null> {
+        let url = `https://${region}.api.riotgames.com/lol/platform/v3/champion-rotations`
+
+        let data = await this.r.makeRequest<Rotation>(url)
+
+        if ((data as errorResponse).status) return null
+
+        return data as Rotation | null
     }
 }
 

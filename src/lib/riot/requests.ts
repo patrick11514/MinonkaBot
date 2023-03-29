@@ -1,4 +1,5 @@
 import fetch from 'node-fetch'
+import { errorResponse } from '../../types/riotApi'
 import Logger from '../logger'
 
 class Requests {
@@ -7,7 +8,7 @@ class Requests {
         this.l = logger
     }
 
-    async makeRequest(url: string) {
+    async makeRequest<T>(url: string): Promise<T | errorResponse | null> {
         try {
             let request = await fetch(url, {
                 method: 'GET',
