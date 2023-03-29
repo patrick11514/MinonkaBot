@@ -1,5 +1,6 @@
 export default {
-    regions: ['EUN1', 'EUW1', 'BR1', 'JP1', 'KR', 'LA1', 'LA2', 'NA1', 'OC1', 'TR1', 'RU'],
+    regions: ['EUN1', 'EUW1', 'BR1', 'JP1', 'KR', 'LA1', 'LA2', 'NA1', 'OC1', 'TR1', 'RU', 'PH2', 'SG2', 'TH2', 'TW2'],
+
     regionTranslates: {
         EUN1: 'EUNE',
         EUW1: 'EUW',
@@ -12,6 +13,10 @@ export default {
         OC1: 'OC',
         TR1: 'TR',
         RU: 'RU',
+        PH2: 'PH',
+        SG2: 'SG',
+        TH2: 'TH',
+        TW2: 'TW',
     },
     languageTranslates: {
         cs_CZ: 'Czech (Czech Republic)',
@@ -47,7 +52,7 @@ export default {
         AMERICAS: ['NA', 'BR', 'LA1', 'LA2'],
         ASIA: ['KR', 'JP'],
         EUROPE: ['EUNE', 'EUW', 'TR', 'RU'],
-        SEA: ['OC1'],
+        SEA: ['OC1', 'PH2', 'SG2', 'TH2', 'TW2'],
     },
     basicGamemodes: {
         'Blind pick': 2,
