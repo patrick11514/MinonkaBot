@@ -30,7 +30,6 @@ export async function link(
         username: null,
         region: null,
     }
-    let riot = new Riot()
 
     let linking = new linkedAccounts(interaction.user.id, interaction.client.usersDB, interaction.client.nameHistoryDB)
 
@@ -65,7 +64,7 @@ export async function link(
                 userData.username = username
                 userData.region = region
 
-                let data = await riot.getSummonerByName(userData.username, userData.region)
+                let data = await Riot.getSummonerByName(userData.username, userData.region)
 
                 if (!data) {
                     interaction.editReply({
@@ -104,7 +103,7 @@ export async function link(
             } else {
                 interaction.editReply('Nezadal jsi region, bude to chvíli trvat...')
 
-                let accountData = await riot.findAccount(username)
+                let accountData = await Riot.findAccount(username)
 
                 if (accountData.length > 1) {
                     new accountPicker(accountData, interaction, true).bindFunction('link', action).send()

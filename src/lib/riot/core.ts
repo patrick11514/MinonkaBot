@@ -12,15 +12,10 @@ import Logger from '../logger'
 import Requests from './requests'
 
 class Riot {
-    r: Requests
-    l: Logger
+    static l = new Logger('Riot', 'green')
+    static r = new Requests(Riot.l)
 
-    constructor() {
-        this.l = new Logger('Riot', 'green')
-        this.r = new Requests(this.l)
-    }
-
-    async getSummonerByName(name: string, region: string): Promise<SummonerBy | null> {
+    static async getSummonerByName(name: string, region: string): Promise<SummonerBy | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}`
@@ -32,7 +27,7 @@ class Riot {
         return data as SummonerBy
     }
 
-    async getSummonerByAccountId(id: EncryptedAccountId, region: string): Promise<SummonerBy | null> {
+    static async getSummonerByAccountId(id: EncryptedAccountId, region: string): Promise<SummonerBy | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v1/summoners/by-account/${id}`
@@ -44,7 +39,7 @@ class Riot {
         return data as SummonerBy
     }
 
-    async getSummonerBySummonerId(id: EncryptedSummonerId, region: string): Promise<SummonerBy | null> {
+    static async getSummonerBySummonerId(id: EncryptedSummonerId, region: string): Promise<SummonerBy | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/summoner/v4/summoners/${id}`
@@ -56,7 +51,7 @@ class Riot {
         return data as SummonerBy
     }
 
-    async getChallenges(puuid: EncryptedPuuid, region: string): Promise<UserChallenges> {
+    static async getChallenges(puuid: EncryptedPuuid, region: string): Promise<UserChallenges> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/challenges/v1/player-data/${puuid}`
@@ -66,7 +61,7 @@ class Riot {
         return data
     }
 
-    async findAccount(username: string): Promise<
+    static async findAccount(username: string): Promise<
         Array<{
             name: string
             region: string
@@ -81,7 +76,7 @@ class Riot {
             level: number
         }> = []
 
-        this.l.start('Searching for accounts by name: ' + username)
+        Riot.l.start('Searching for accounts by name: ' + username)
         let promises = []
 
         for (let i = 0; i < regions.length; i++) {
@@ -92,11 +87,11 @@ class Riot {
         for (let id in data) {
             const account = data[id]
             if (!account) {
-                this.l.log('Account not found for region: ' + regions[id])
+                Riot.l.log('Account not found for region: ' + regions[id])
                 continue
             }
 
-            this.l.log('Account found for region: ' + regions[id])
+            Riot.l.log('Account found for region: ' + regions[id])
             foundAccounts.push({
                 name: account.name,
                 region: regions[id],
@@ -107,7 +102,7 @@ class Riot {
         return foundAccounts
     }
 
-    async getRankedData(id: EncryptedSummonerId, region: string): Promise<RankedData[] | null> {
+    static async getRankedData(id: EncryptedSummonerId, region: string): Promise<RankedData[] | null> {
         region = region.toUpperCase()
 
         let url = `https://${region}.api.riotgames.com/lol/league/v4/entries/by-summoner/${id}`
@@ -119,7 +114,7 @@ class Riot {
         return data as RankedData[]
     }
 
-    async getMatches(
+    static async getMatches(
         id: EncryptedPuuid,
         route: string,
         count?: string | null,
@@ -137,7 +132,7 @@ class Riot {
         return data as Array<string>
     }
 
-    async getMatch(id: string, route: string): Promise<null | match> {
+    static async getMatch(id: string, route: string): Promise<null | match> {
         let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/${id}`
 
         let data: match | errorResponse = await this.r.makeRequest(url)

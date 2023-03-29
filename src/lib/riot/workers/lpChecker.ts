@@ -61,8 +61,7 @@ function translate(rank: string) {
 }
 
 async function checkUser(id: string, puuid: string, region: string, db: JSONdb) {
-    let riot = new Riot()
-    let data = await riot.getRankedData(id, region)
+    let data = await Riot.getRankedData(id, region)
     if (!data) return
 
     if (!db.has(id)) {
@@ -93,7 +92,7 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
         let queueId = d.queueType == 'RANKED_SOLO_5x5' ? '420' : '440'
         let queueArrId = d.queueType == 'RANKED_SOLO_5x5' ? 0 : 1
 
-        let matches = await riot.getMatches(puuid, route as string, '2', queueId)
+        let matches = await Riot.getMatches(puuid, route as string, '2', queueId)
 
         if (matches.length > 0) {
             let data = db.get(id) as user

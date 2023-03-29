@@ -91,8 +91,7 @@ class linkedAccounts {
     ) {
         let changed = false
         for (let account of accounts) {
-            let riot = new Riot()
-            let data = await riot.getSummonerBySummonerId(account.id, account.region)
+            let data = await Riot.getSummonerBySummonerId(account.id, account.region)
             if (!data) continue
             if (data.name != account.username) {
                 this.l.log('Found new account name ' + data.name + ' for account ' + account.username)

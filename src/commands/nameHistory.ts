@@ -64,13 +64,11 @@ export async function nameHistory(
                 .send()
         }
     } else {
-        let riot = new Riot()
-
         if (region) {
             userData.username = username
             userData.region = region
 
-            let data = await riot.getSummonerByName(userData.username, userData.region)
+            let data = await Riot.getSummonerByName(userData.username, userData.region)
 
             if (!data) {
                 interaction.editReply({
@@ -99,7 +97,7 @@ export async function nameHistory(
         } else {
             interaction.editReply('Nezadal jsi region, bude to chvíli trvat...')
 
-            let accountData = await riot.findAccount(username)
+            let accountData = await Riot.findAccount(username)
 
             if (accountData.length > 1) {
                 new accountPicker(accountData, interaction, true).bindFunction('nameHistory').send()

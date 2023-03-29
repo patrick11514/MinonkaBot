@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction, DiscordAPIError, User } from 'discord.js'
+import { ButtonInteraction, CommandInteraction, User } from 'discord.js'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
 import accountPicker from './accountPicker'
@@ -69,13 +69,11 @@ export default async function handleInteraction(
                 .send()
         }
     } else {
-        let riot = new Riot()
-
         if (region) {
             userData.username = username
             userData.region = region
 
-            let data = await riot.getSummonerByName(userData.username, userData.region)
+            let data = await Riot.getSummonerByName(userData.username, userData.region)
 
             if (!data) {
                 interaction.editReply({
@@ -116,7 +114,7 @@ export default async function handleInteraction(
             //here call the main function
             l.start('Running calledFunction...')
             try {
-                await calledFunction(userData.username, userData.region, data, riot, interaction, ...otherArguments)
+                await calledFunction(userData.username, userData.region, data, interaction, ...otherArguments)
             } catch (e:
                 | {
                       name: string
@@ -155,7 +153,7 @@ export default async function handleInteraction(
         } else {
             interaction.editReply('Nezadal jsi region, bude to chvíli trvat...')
 
-            let accountData = await riot.findAccount(username)
+            let accountData = await Riot.findAccount(username)
 
             if (accountData.length == 0) {
                 interaction.editReply({

@@ -50,7 +50,6 @@ export async function matchHistory(
             username: string,
             region: string,
             data: SummonerBy,
-            riot: Riot,
             interaction: CommandInteraction | ButtonInteraction,
             queue: string | null,
             limit: string | null
@@ -64,7 +63,7 @@ export async function matchHistory(
                 })
             }
 
-            let matchIds = await riot.getMatches(data.puuid, route, limit, queue)
+            let matchIds = await Riot.getMatches(data.puuid, route, limit, queue)
 
             if (matchIds.length == 0) {
                 return interaction.editReply({
@@ -79,7 +78,7 @@ export async function matchHistory(
             await checkUser(data.id, data.puuid, region, interaction.client.LPDB)
 
             for (let match of matchIds) {
-                let matchData = await riot.getMatch(match, route)
+                let matchData = await Riot.getMatch(match, route)
                 if (!matchData) continue
 
                 let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId

@@ -36,10 +36,9 @@ export async function generateProfile(
             username: string,
             region: string,
             data: SummonerBy,
-            riot: Riot,
             interaction: CommandInteraction | ButtonInteraction
         ) {
-            let challenges = await riot.getChallenges(data.puuid, region)
+            let challenges = await Riot.getChallenges(data.puuid, region)
 
             if (!challenges) {
                 interaction.editReply({ content: 'Nepovedlo se načíst data z Riot API!' })

@@ -37,10 +37,9 @@ export async function generateRank(
             username: string,
             region: string,
             data: SummonerBy,
-            riot: Riot,
             interaction: CommandInteraction | ButtonInteraction
         ) {
-            let rankedData = await riot.getRankedData(data.id, region)
+            let rankedData = await Riot.getRankedData(data.id, region)
 
             if (!rankedData) {
                 interaction.editReply({ content: 'Nepovedlo se načíst data z Riot API!' })
