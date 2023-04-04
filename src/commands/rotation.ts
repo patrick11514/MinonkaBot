@@ -25,7 +25,7 @@ async function fromIds(ids: Array<number>, emotes: JSONdb) {
 
         let emote = emotes.get('champ@' + champion.id)
 
-        message.push(`<${emote}> ${champion.name}`)
+        message.push(`<:${emote}> ${champion.name}`)
     }
 
     return message.join(', ')
@@ -34,7 +34,11 @@ export async function command(interaction: CommandInteraction, region?: string) 
     let db = new JSONdb<{
         champions: number[]
         updated: number
-    }>('databases/rotation.json')
+    }>('databases/rotation.json', {
+        jsonSpaces: false,
+        asyncWrite: false,
+        syncOnWrite: true,
+    })
 
     if (region) {
         let rotation = await Riot.getRotation(region)
@@ -56,7 +60,7 @@ export async function command(interaction: CommandInteraction, region?: string) 
             return interaction.editReply(
                 `**Champion rotace pro server ${
                     interaction.client.config.regionTranslates[region]
-                }**\n${message}\n*Poslední aktualizace: ${date.toLocaleString()}*`
+                }**\n${message}\n*Platné k: ${date.toLocaleString('cs-CZ')}*`
             )
         }
 
@@ -87,22 +91,60 @@ export async function command(interaction: CommandInteraction, region?: string) 
         ids: Array<number>
     }> = []
 
+    let unsucessfull = []
+    let gotButCache: Array<{
+        region: string
+        date: number
+    }> = []
+
     for (let regId in data) {
         let region = data[regId]
-        if (!region) continue
+        let regionName = interaction.client.config.regions[regId]
+        if (!region) {
+            if (db.has(regionName)) {
+                let rotation = db.get(regionName) as {
+                    champions: number[]
+                    updated: number
+                }
+
+                region = {
+                    freeChampionIds: rotation.champions,
+                    freeChampionIdsForNewPlayers: [],
+                    maxNewPlayerLevel: -1,
+                }
+
+                gotButCache.push({
+                    region: regionName,
+                    date: rotation.updated,
+                })
+            } else {
+                unsucessfull.push(regionName)
+                continue
+            }
+        } else {
+            db.set(regionName, {
+                champions: region.freeChampionIds,
+                updated: Date.now(),
+            })
+        }
 
         let mapped = rotations.map((r) => r.ids)
+
+        let found = false
 
         for (let id in mapped) {
             let rot = mapped[id]
             if (rot.every((id) => region?.freeChampionIds.includes(id))) {
-                rotations[id].regions.push(interaction.client.config.regions[regId])
-            } else {
-                rotations.push({
-                    regions: [interaction.client.config.regionTranslates[regId]],
-                    ids: region.freeChampionIds,
-                })
+                rotations[id].regions.push(interaction.client.config.regionTranslates[regionName])
+                found = true
             }
+        }
+
+        if (!found) {
+            rotations.push({
+                regions: [interaction.client.config.regionTranslates[regionName]],
+                ids: region.freeChampionIds,
+            })
         }
     }
 
@@ -114,6 +156,22 @@ export async function command(interaction: CommandInteraction, region?: string) 
         let champs = await fromIds(rotation.ids, interaction.client.emotesDB)
         message += `**${rotation.regions.join(', ')}**:\n${champs}\n`
     }
+
+    if (gotButCache.length > 0) {
+        message += `\n**Rotace, které se nepodařilo získat, ale jsou v záloze:**\n${gotButCache
+            .map(
+                (r) =>
+                    `${interaction.client.config.regionTranslates[r.region]}: ${new Date(r.date).toLocaleString(
+                        'cs-CZ'
+                    )}`
+            )
+            .join('\n')}\n`
+    }
+
+    if (unsucessfull.length > 0)
+        message += `\n***Nepovedlo se získat rotaci pro** ${unsucessfull
+            .map((reg) => interaction.client.config.regionTranslates[reg])
+            .join(', ')}*`
 
     return interaction.editReply(message)
 }
