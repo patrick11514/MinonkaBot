@@ -115,7 +115,11 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                     let currentRank = translate(d.rank)
 
                     if (prevLp == currentLp) {
-                        currentMatches[foundMatch] = 0
+                        if (d.miniSeries) {
+                            currentMatches[foundMatch] = d.miniSeries.progress
+                        } else {
+                            currentMatches[foundMatch] = 0
+                        }
                     } else if (prevLp == 100) {
                         currentMatches[foundMatch] = currentLp
                     } else if (prevLp == 0) {
@@ -128,7 +132,11 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                         currentMatches[foundMatch] = currentLp - prevLp
                     }
                 } else {
-                    currentMatches[foundMatch] = 'NULL'
+                    if (d.miniSeries) {
+                        currentMatches[foundMatch] = d.miniSeries.progress
+                    } else {
+                        currentMatches[foundMatch] = 'NULL'
+                    }
                 }
 
                 data.lp[queueArrId].lp = currentLp
