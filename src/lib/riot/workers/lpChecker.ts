@@ -121,7 +121,7 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                     } else if (prevLp == 0) {
                         currentMatches[foundMatch] = currentLp - 100
                     } else if (prevRank > currentRank) {
-                        currentMatches[foundMatch] = currentLp
+                        currentMatches[foundMatch] = currentLp + (100 - prevLp)
                     } else if (prevRank < currentRank) {
                         currentMatches[foundMatch] = currentLp - 100
                     } else {
