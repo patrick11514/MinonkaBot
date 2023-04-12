@@ -321,20 +321,8 @@ class Images {
             //generate series
             if (queue.miniSeries) {
                 this.l.log('Adding series...')
-                let progress = queue.miniSeries.progress.split('') as Array<'W' | 'L' | 'N'>
-
-                //load images
-                let win = fs.readFileSync('./images/seriesWin_resized.png')
-                let lose = fs.readFileSync('./images/seriesLose_resized.png')
-                let notPlayed = fs.readFileSync('./images/seriesEmpty_resized.png')
-
                 let center = x + 1000 + 450 + 220
-
-                let startX = center - (progress.length / 2) * 88
-                for (let prog of progress) {
-                    this.composite(prog == 'W' ? win : prog == 'L' ? lose : notPlayed, startX, y + 100 + 40)
-                    startX += 88
-                }
+                this.generateMiniSeries(queue.miniSeries.progress, center, y + 100 + 40)
             }
 
             y += 330
@@ -423,17 +411,24 @@ class Images {
             let yPos = 45 + 80 + 60 + (queue >= 830 && queue <= 850 ? 60 : 0) + 60
 
             this.l.log('Adding lp...')
-            let lpText = await this.createText({
-                text: matchData.lp ? matchData.lp + ' LP' : '? LP',
-                textSize: 60,
-                width: 700,
-                height: 135,
-                bold: true,
-                color: matchData.lp ? (matchData.lp >= 0 ? '#1fed18' : '#ff0000') : '#ffffff',
-                font: 'Beaufort for LOL Ja',
-                center: true,
-            })
-            this.composite(lpText, 858, yPos)
+            if (matchData.lp && typeof matchData.lp == 'string') {
+                let center = 1212
+                let y = yPos + 20
+
+                this.generateMiniSeries(matchData.lp, center, y)
+            } else {
+                let lpText = await this.createText({
+                    text: matchData.lp ? matchData.lp + ' LP' : '? LP',
+                    textSize: 60,
+                    width: 700,
+                    height: 135,
+                    bold: true,
+                    color: matchData.lp ? ((matchData.lp as number) >= 0 ? '#1fed18' : '#ff0000') : '#ffffff',
+                    font: 'Beaufort for LOL Ja',
+                    center: true,
+                })
+                this.composite(lpText, 858, yPos)
+            }
         }
 
         //add game creation time
@@ -914,6 +909,21 @@ class Images {
         </svg>`
 
         return Buffer.from(txt)
+    }
+
+    async generateMiniSeries(string: string, center: number, y: number) {
+        let progress = string.split('') as Array<'W' | 'L' | 'N'>
+
+        //load images
+        let win = fs.readFileSync('./images/seriesWin_resized.png')
+        let lose = fs.readFileSync('./images/seriesLose_resized.png')
+        let notPlayed = fs.readFileSync('./images/seriesEmpty_resized.png')
+
+        let startX = center - (progress.length / 2) * 88
+        for (let prog of progress) {
+            this.composite(prog == 'W' ? win : prog == 'L' ? lose : notPlayed, startX, y)
+            startX += 88
+        }
     }
 }
 

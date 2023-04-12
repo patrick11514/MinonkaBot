@@ -150,7 +150,7 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
     }
 }
 
-async function getLP(id: string, queue: number, matchId: string, db: JSONdb): Promise<number | null> {
+async function getLP(id: string, queue: number, matchId: string, db: JSONdb): Promise<number | null | string> {
     let data = db.get(id) as user
     let queueArrId = queue == 420 ? 0 : 1
 
@@ -158,6 +158,8 @@ async function getLP(id: string, queue: number, matchId: string, db: JSONdb): Pr
 
     if (match == 'NULL') {
         return null
+    } else if (typeof match == 'string') {
+        return match as string
     } else {
         return match as number
     }
