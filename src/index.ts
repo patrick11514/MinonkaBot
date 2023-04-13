@@ -452,7 +452,14 @@ async function tasks() {
     {
         let l = new Logger('Resize Series', 'red')
         l.start('Resizing series...')
-        let imageNames = ['seriesWin.png', 'seriesLose.png', 'seriesEmpty.png']
+        let imageNames = [
+            'seriesWin.png',
+            'seriesLose.png',
+            'seriesEmpty.png',
+            'seriesWin2.png',
+            'seriesLose2.png',
+            'seriesEmpty2.png',
+        ]
         imageNames.forEach((f) => {
             //check if file X_resized_rank.png exists
             if (!fs.existsSync(`./images/${f.split('.')[0]}_resized.png`)) {

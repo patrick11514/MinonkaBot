@@ -415,7 +415,11 @@ class Images {
                 let center = 1212
                 let y = yPos + 20
 
-                this.generateMiniSeries(matchData.lp, center, y)
+                this.generateMiniSeries(matchData.lp, center, y, [
+                    'seriesWin2_resized.png',
+                    'seriesLose2_resized.png',
+                    'seriesEmpty2_resized.png',
+                ])
             } else {
                 let lpText = await this.createText({
                     text: matchData.lp ? matchData.lp + ' LP' : '? LP',
@@ -482,7 +486,7 @@ class Images {
         this.composite(killTextTeam2, 858 + 300, 45)
 
         this.l.log('Adding champioon bans...')
-        //left
+        //lefts
         let bans = matchData.bans.find((ban) => ban.id === matchData.teams[1][0].id)
 
         if (!bans) return ''
@@ -911,13 +915,18 @@ class Images {
         return Buffer.from(txt)
     }
 
-    async generateMiniSeries(string: string, center: number, y: number) {
+    async generateMiniSeries(
+        string: string,
+        center: number,
+        y: number,
+        images = ['seriesWin_resized.png', 'seriesLose_resized.png', 'seriesEmpty_resized.png']
+    ) {
         let progress = string.split('') as Array<'W' | 'L' | 'N'>
 
         //load images
-        let win = fs.readFileSync('./images/seriesWin_resized.png')
-        let lose = fs.readFileSync('./images/seriesLose_resized.png')
-        let notPlayed = fs.readFileSync('./images/seriesEmpty_resized.png')
+        let win = fs.readFileSync('./images/' + images[0])
+        let lose = fs.readFileSync('./images/' + images[1])
+        let notPlayed = fs.readFileSync('./images/' + images[2])
 
         let startX = center - (progress.length / 2) * 88
         for (let prog of progress) {
