@@ -439,6 +439,10 @@ class Utilities {
             }
         }
 
+        if (sorted.length == 0) {
+            return team
+        }
+
         return sorted
     }
 }
