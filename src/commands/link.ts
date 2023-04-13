@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, CommandInteraction } from 'discord.js'
+import { ButtonInteraction, ChatInputCommandInteraction, Client } from 'discord.js'
 import accountPicker from '../components/accountPicker'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
@@ -6,13 +6,13 @@ import Riot from '../lib/riot/core'
 export default (client: Client) => {
     let e = client.emitter
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         if (interaction.commandName === 'link') {
-            let action = interaction.options.get('action', true)
-            let username = interaction.options.get('username', false)
-            let region = interaction.options.get('region', false)
+            let action = interaction.options.getString('action', true)
+            let username = interaction.options.getString('username', false)
+            let region = interaction.options.getString('region', false)
 
-            link(action.value as string, username?.value as string, region?.value as string, interaction)
+            link(action, username, region, interaction)
         }
     })
 }
@@ -21,7 +21,7 @@ export async function link(
     action: string,
     username: string | null,
     region: string | null,
-    interaction: CommandInteraction | ButtonInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction
 ) {
     let userData: {
         username: string | null

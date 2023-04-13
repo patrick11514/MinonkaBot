@@ -1,15 +1,15 @@
-import { Client, CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction, Client } from 'discord.js'
 import User from '../types/usersDB'
 
 export default (client: Client) => {
     let e = client.emitter
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         let db = client.usersDB
 
         if (interaction.commandName === 'language') {
-            let language = interaction.options.get('language', false)
-            let language2 = interaction.options.get('language2', false)
+            let language = interaction.options.getString('language', false)
+            let language2 = interaction.options.getString('language2', false)
 
             if (!language && !language2) {
                 if (await db.has(interaction.user.id)) {
@@ -33,10 +33,10 @@ export default (client: Client) => {
             if (language) {
                 //if language or language and language2 is set
 
-                lang = language.value as string
+                lang = language
             } else if (language2) {
                 //if only language 2 is set
-                lang = language2.value as string
+                lang = language2
             }
 
             let translate = client.config.languageTranslates[lang]

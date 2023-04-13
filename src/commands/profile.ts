@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
+import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
 import handleInteraction from '../components/core'
 import Images from '../lib/images/core'
 import Riot from '../lib/riot/core'
@@ -9,13 +9,13 @@ import fs from 'fs'
 export default (client: Client) => {
     let e = client.emitter
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         if (interaction.commandName === 'profile') {
-            let username = interaction.options.get('username', false)
-            let region = interaction.options.get('region', false)
+            let username = interaction.options.getString('username', false)
+            let region = interaction.options.getString('region', false)
             let mention = interaction.options.getUser('mention', false)
 
-            generateProfile(username?.value as string, region?.value as string, mention, interaction)
+            generateProfile(username, region, mention, interaction)
         }
     })
 }
@@ -24,7 +24,7 @@ export async function generateProfile(
     username: string | null,
     region: string | null,
     mention: User | null,
-    interaction: CommandInteraction | ButtonInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction
 ) {
     handleInteraction(
         interaction,
@@ -36,7 +36,7 @@ export async function generateProfile(
             username: string,
             region: string,
             data: SummonerBy,
-            interaction: CommandInteraction | ButtonInteraction
+            interaction: ChatInputCommandInteraction | ButtonInteraction
         ) {
             let challenges = await Riot.getChallenges(data.puuid, region)
 

@@ -1,19 +1,19 @@
 import accountPicker from '../components/accountPicker'
 import linkedAccounts from '../lib/nameHistory'
 import Riot from '../lib/riot/core'
-import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
+import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
 import Logger from '../lib/logger'
 
 export default (client: Client) => {
     let e = client.emitter
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         if (interaction.commandName === 'namehistory') {
-            let username = interaction.options.get('username', false)
-            let region = interaction.options.get('region', false)
+            let username = interaction.options.getString('username', false)
+            let region = interaction.options.getString('region', false)
             let mention = interaction.options.getUser('mention', false)
 
-            nameHistory(username?.value as string, region?.value as string, mention, interaction)
+            nameHistory(username, region, mention, interaction)
         }
     })
 }
@@ -22,7 +22,7 @@ export async function nameHistory(
     username: string | null,
     region: string | null,
     mention: User | null,
-    interaction: CommandInteraction | ButtonInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction
 ) {
     let userData: {
         username: string | null

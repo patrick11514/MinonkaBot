@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, CommandInteraction, User } from 'discord.js'
+import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
 import handleInteraction from '../components/core'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
@@ -12,22 +12,15 @@ export default (client: Client) => {
     let e = client.emitter
     let l = new Logger('command', 'color')
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         if (interaction.commandName === 'matchhistory') {
-            let queue = interaction.options.get('queue', false)
-            let limit = interaction.options.get('limit', false)
-            let username = interaction.options.get('username', false)
-            let region = interaction.options.get('region', false)
+            let queue = interaction.options.getString('queue', false)
+            let limit = interaction.options.getString('limit', false)
+            let username = interaction.options.getString('username', false)
+            let region = interaction.options.getString('region', false)
             let mention = interaction.options.getUser('mention', false)
 
-            matchHistory(
-                username?.value as string,
-                region?.value as string,
-                mention,
-                interaction,
-                queue?.value as string,
-                limit?.value as string
-            )
+            matchHistory(username, region, mention, interaction, queue, limit)
         }
     })
 }
@@ -36,7 +29,7 @@ export async function matchHistory(
     username: string | null,
     region: string | null,
     mention: User | null,
-    interaction: CommandInteraction | ButtonInteraction,
+    interaction: ChatInputCommandInteraction | ButtonInteraction,
     queue: string | null,
     limit: string | null
 ) {
@@ -50,7 +43,7 @@ export async function matchHistory(
             username: string,
             region: string,
             data: SummonerBy,
-            interaction: CommandInteraction | ButtonInteraction,
+            interaction: ChatInputCommandInteraction | ButtonInteraction,
             queue: string | null,
             limit: string | null
         ) {

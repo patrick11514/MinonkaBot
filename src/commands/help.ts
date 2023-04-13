@@ -1,14 +1,12 @@
-import { Client, CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction, Client } from 'discord.js'
 import commands from '../commands'
 
 export default (client: Client) => {
     let e = client.emitter
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         if (interaction.commandName === 'help') {
-            let command = interaction.options.get('command', false)
-
-            let value = command ? (command.value as string) : null
+            let value = interaction.options.getString('command', false)
 
             if (!value) {
                 let message = '**Seznam příkazů:**\nPro zobrazení podrobnost commandu použij /help <příkaz>\n\n'
@@ -19,7 +17,8 @@ export default (client: Client) => {
                     }\n`
                 }
 
-               message += "\n*Miňonka is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc*"
+                message +=
+                    '\n*Miňonka is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc*'
 
                 await interaction.editReply(message)
             } else {

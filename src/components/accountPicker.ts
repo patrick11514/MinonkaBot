@@ -1,4 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, CommandInteraction } from 'discord.js'
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonInteraction,
+    ButtonStyle,
+    ChatInputCommandInteraction,
+    CommandInteraction,
+} from 'discord.js'
 import crypto from 'crypto'
 import { generateProfile } from '../commands/profile'
 import { link } from '../commands/link'
@@ -15,7 +22,7 @@ class accountPicker {
 
     id: string = ''
     rows: Array<ActionRowBuilder<ButtonBuilder>> = []
-    interaction: CommandInteraction | ButtonInteraction = null as unknown as CommandInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction = null as unknown as ChatInputCommandInteraction
     message: string = ''
     edit: boolean = false
 
@@ -25,7 +32,7 @@ class accountPicker {
             region: string
             level: number
         }>,
-        interaction: CommandInteraction | ButtonInteraction,
+        interaction: ChatInputCommandInteraction | ButtonInteraction,
         edit = false,
         message = 'Zde je seznam nalezených účtů:'
     ) {

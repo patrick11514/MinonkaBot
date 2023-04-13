@@ -1,4 +1,4 @@
-import { Client, CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction, Client } from 'discord.js'
 import JSONdb from 'simple-json-db'
 import Logger from '../lib/logger'
 import Riot from '../lib/riot/core'
@@ -8,10 +8,10 @@ export default (client: Client) => {
     let e = client.emitter
     let l = new Logger('Rotation', 'color')
 
-    e.on('command', async (interaction: CommandInteraction) => {
+    e.on('command', async (interaction: ChatInputCommandInteraction) => {
         if (interaction.commandName === 'rotation') {
-            let param = interaction.options.get('region', false)
-            command(interaction, param?.value as string)
+            let param = interaction.options.getString('region', false)
+            command(interaction, param)
         }
     })
 }
@@ -30,7 +30,7 @@ async function fromIds(ids: Array<number>, emotes: JSONdb) {
 
     return message.join(', ')
 }
-export async function command(interaction: CommandInteraction, region?: string) {
+export async function command(interaction: ChatInputCommandInteraction, region: string | null) {
     let db = new JSONdb<{
         champions: number[]
         updated: number
