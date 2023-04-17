@@ -269,7 +269,7 @@ let commands: {
     liverank: {
         description: 'Vygeneruje odkaz na obrázek s tvým rankem, který se aktualizuje',
         options: [
-            {
+            /*{
                 name: 'queue',
                 type: 'STRING',
                 description: 'Typ zápasu, který chceš zobrazit',
@@ -278,7 +278,7 @@ let commands: {
                     { name: 'Solo/Duo', value: '420' },
                     { name: 'Flex 5v5', value: '440' },
                 ],
-            },
+            },*/
             {
                 name: 'username',
                 type: 'STRING',
