@@ -2,7 +2,8 @@ import express, { NextFunction, Request, Response } from 'express'
 import Logger from '$lib/logger'
 import Riot from '$lib/riot/core'
 import Images from '$lib/images/core'
-import path from 'path'
+import path, { basename } from 'path'
+import fs from 'fs'
 
 const l = new Logger('LIVE SERVER', 'magentaBright')
 l.start('Starting live server...')
@@ -104,7 +105,13 @@ app.get('/profile/:region/:summonerName', async (req: Request, res: Response) =>
     if (liveRank.files.hasOwnProperty(profile.id)) {
         let file = liveRank.files[profile.id]
         if (file) {
-            res.sendFile(path.join(process.cwd(), file))
+            const HTML = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8')
+
+            res.send(
+                HTML.replaceAll('%USER%', profile.name)
+                    .replaceAll('%REGION%', region)
+                    .replaceAll('%IMG%', basename(file))
+            )
             return
         }
     }
@@ -129,7 +136,15 @@ app.get('/profile/:region/:summonerName', async (req: Request, res: Response) =>
 
     liveRank.files[profile.id] = imagePath
 
-    res.sendFile(path.join(process.cwd(), imagePath))
+    const HTML = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8')
+
+    res.send(
+        HTML.replaceAll('%USER%', profile.name).replaceAll('%REGION%', region).replaceAll('%IMG%', basename(imagePath))
+    )
+})
+
+app.get('/image/:path', (req: Request, res: Response) => {
+    res.sendFile(path.join(process.cwd(), 'temp', req.params.path))
 })
 
 app.listen(process.env.PORT, () => {
