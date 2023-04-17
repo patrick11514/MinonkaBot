@@ -144,7 +144,12 @@ app.get('/profile/:region/:summonerName', async (req: Request, res: Response) =>
 })
 
 app.get('/image/:path', (req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'temp', req.params.path))
+    let p = path.join(process.cwd(), 'temp', req.params.path)
+
+    if (!fs.existsSync(p)) {
+        res.status(404)
+    }
+    res.sendFile(p)
 })
 
 app.listen(process.env.PORT, () => {
