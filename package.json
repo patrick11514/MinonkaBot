@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "ts-node-dev -r tsconfig-paths/register --respawn ./src/index.ts",
-        "build": "tsc && mkdir -p temp databases cache logs",
+        "build": "tsc && mkdir -p temp databases cache logs && cp src/liveServer/index.html build/liveServer",
         "start": "node -r module-alias/register build/index.js",
         "startCommands": "tsc -p tsconfigCommands.json && node build/registerCommands.js",
         "genChampTypes": "tsc -p tsconfigChampTypes.json && node build/types/generateChampions.js",
