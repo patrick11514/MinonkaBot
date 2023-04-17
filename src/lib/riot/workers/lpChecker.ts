@@ -37,12 +37,11 @@ async function startLPChecker(db: JSONdb) {
     }
 
     let log = new Logger('Start LPChecker', 'yellow')
-    let l = new Logger('LPChecker', 'green')
     log.start('Starting LPChecker with intervals of 0.5 seconds')
 
     for (let key in json) {
         let user = json[key]
-        let checker = new LPChecker(key, user.puuid, user.region, db, l)
+        let checker = new LPChecker(key, user.puuid, user.region, db, new Logger('LPChecker', 'green'))
         checker.check()
         await utilities.sleep(500)
     }
