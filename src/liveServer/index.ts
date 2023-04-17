@@ -30,13 +30,13 @@ function logRequest(req: Request, res: Response, next: NextFunction) {
 
 app.use(logRequest)
 
-app.get('/', (_, res) => {
+app.get('/', (_, res: Response) => {
     res.send(
         'Hello :3, this is a server for serving live profile images of user\'s league of legends\'s profiles within my discord bot, check <a href="https://patrick115.eu">https://patrick115.eu</a> for more info. ^^'
     )
 })
 
-app.get('/raw/:region/:summonerName', async (req, res) => {
+app.get('/raw/:region/:summonerName', async (req: Request, res: Response) => {
     let { region, summonerName } = req.params
 
     const config = process.client.config
@@ -71,7 +71,7 @@ app.get('/raw/:region/:summonerName', async (req, res) => {
     })
 })
 
-app.get('/profile/:region/:summonerName', async (req, res) => {
+app.get('/profile/:region/:summonerName', async (req: Request, res: Response) => {
     let { region, summonerName } = req.params
 
     const config = process.client.config
