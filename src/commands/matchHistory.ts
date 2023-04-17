@@ -1,12 +1,12 @@
 import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
-import handleInteraction from '../components/core'
-import Logger from '../lib/logger'
-import Riot from '../lib/riot/core'
-import utilities from '../lib/riot/utilities'
-import { SummonerBy, teamMember } from '../types/riotApi'
+import handleInteraction from '$components/core'
+import Logger from '$lib/logger'
+import Riot from '$lib/riot/core'
+import utilities from '$lib/riot/utilities'
+import { SummonerBy, teamMember } from '$types/riotApi'
 import fs from 'fs'
-import Images from '../lib/images/core'
-import { checkUser, getLP } from '../lib/riot/workers/lpChecker'
+import Images from '$lib/images/core'
+import { checkUser, getLP } from '$lib/riot/workers/lpChecker'
 
 export default (client: Client) => {
     let e = client.emitter

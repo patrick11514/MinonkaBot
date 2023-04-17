@@ -1,8 +1,8 @@
 import JSONdb from 'simple-json-db'
 import Riot from './riot/core'
 import Logger from './logger'
-import User from '../types/usersDB'
-import NameHistory from '../types/nameHistoryDB'
+import User from '$types/usersDB'
+import NameHistory from '$types/nameHistoryDB'
 
 class linkedAccounts {
     discordId: string

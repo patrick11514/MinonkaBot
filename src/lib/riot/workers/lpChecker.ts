@@ -3,6 +3,7 @@ import user from '../../../types/LPDB'
 import Logger from '../../logger'
 import Riot from '../core'
 import utilities from '../utilities'
+import { EncryptedSummonerId } from '../../../types/riotApi'
 
 class LPChecker {
     private id: string
@@ -33,7 +34,7 @@ class LPChecker {
 
 async function startLPChecker(db: JSONdb) {
     let json = db.JSON() as {
-        [key: string]: user
+        [key: EncryptedSummonerId]: user
     }
 
     let log = new Logger('Start LPChecker', 'yellow')

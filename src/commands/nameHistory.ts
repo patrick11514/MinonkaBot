@@ -1,8 +1,8 @@
-import accountPicker from '../components/accountPicker'
-import linkedAccounts from '../lib/nameHistory'
-import Riot from '../lib/riot/core'
+import accountPicker from '$components/accountPicker'
+import linkedAccounts from '$lib/nameHistory'
+import Riot from '$lib/riot/core'
 import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
-import Logger from '../lib/logger'
+import Logger from '$lib/logger'
 
 export default (client: Client) => {
     let e = client.emitter

@@ -1,10 +1,10 @@
 import { ButtonInteraction, ChatInputCommandInteraction, User } from 'discord.js'
-import linkedAccounts from '../lib/nameHistory'
-import Riot from '../lib/riot/core'
+import linkedAccounts from '$lib/nameHistory'
+import Riot from '$lib/riot/core'
 import accountPicker from './accountPicker'
-import Logger from '../lib/logger'
-import NameHistory from '../types/nameHistoryDB'
-import utilities from '../lib/riot/utilities'
+import Logger from '$lib/logger'
+import NameHistory from '$types/nameHistoryDB'
+import utilities from '$lib/riot/utilities'
 
 export default async function handleInteraction(
     interaction: ButtonInteraction | ChatInputCommandInteraction,

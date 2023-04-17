@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client } from 'discord.js'
-import User from '../types/usersDB'
+import User from '$types/usersDB'
 
 export default (client: Client) => {
     let e = client.emitter

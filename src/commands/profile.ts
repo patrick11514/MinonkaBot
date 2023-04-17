@@ -1,9 +1,9 @@
 import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
-import handleInteraction from '../components/core'
-import Images from '../lib/images/core'
-import Riot from '../lib/riot/core'
-import { SummonerBy, UserChallenges } from '../types/riotApi'
-import DBUser from '../types/usersDB'
+import handleInteraction from '$components/core'
+import Images from '$lib/images/core'
+import Riot from '$lib/riot/core'
+import { SummonerBy, UserChallenges } from '$types/riotApi'
+import DBUser from '$types/usersDB'
 import fs from 'fs'
 
 export default (client: Client) => {

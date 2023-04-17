@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Client } from 'discord.js'
 import JSONdb from 'simple-json-db'
-import Logger from '../lib/logger'
-import Riot from '../lib/riot/core'
-import utilities from '../lib/riot/utilities'
+import Logger from '$lib/logger'
+import Riot from '$lib/riot/core'
+import utilities from '$lib/riot/utilities'
 
 export default (client: Client) => {
     let e = client.emitter

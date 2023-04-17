@@ -10,16 +10,16 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
+        "paths": {
+            "$types": ["./src/types"],
+            "$types/*": ["./src/types/*"],
+            "$lib": ["./src/lib"],
+            "$lib/*": ["./src/lib/*"],
+            "$components": ["./src/components"],
+            "$components/*": ["./src/components/*"]
+        }
     },
-    "files": [
-        "src/types/discord.d.ts",
-        "src/types/environment.d.ts",
-        "src/types/process.d.ts"
-    ],
-    "include": [
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-    ]
+    "files": ["src/types/discord.d.ts", "src/types/environment.d.ts", "src/types/process.d.ts"],
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
 }
