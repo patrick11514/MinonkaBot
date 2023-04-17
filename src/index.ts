@@ -14,6 +14,7 @@ import crypto from 'crypto'
 //dotenv
 import * as dotenv from 'dotenv'
 import { startLPChecker } from './lib/riot/workers/lpChecker'
+import { LiveRank } from '$lib/riot/workers/liveRank'
 dotenv.config()
 
 //intents
@@ -21,20 +22,20 @@ const intents = []
 intents.push(GatewayIntentBits.Guilds)
 
 //creating client
-let client = new Client({
+const client = new Client({
     intents: intents,
 })
 process.client = client
 
 //variables
-let emitter = new EventEmitter()
+const emitter = new EventEmitter()
 client.emitter = emitter
 client.config = config
 const dir = __dirname
 const l = new Logger('Client', 'cyan')
 
 //give client to commands
-let files = fs
+const files = fs
     .readdirSync(path.join(dir, 'commands'))
     .filter((file: string) => file.endsWith('.ts') || file.endsWith('.js'))
 
@@ -44,36 +45,45 @@ for (let file of files) {
     require(filePath).default(client)
 }
 
-let usersDB = new JSONdb('databases/users.json', {
+const usersDB = new JSONdb('databases/users.json', {
     syncOnWrite: true,
     asyncWrite: true,
 })
 client.usersDB = usersDB
 
-let nameHistoryDB = new JSONdb('databases/nameHistory.json', {
+const nameHistoryDB = new JSONdb('databases/nameHistory.json', {
     syncOnWrite: true,
     asyncWrite: true,
 })
 client.nameHistoryDB = nameHistoryDB
 
-let emotesDB = new JSONdb('databases/emotes.json', {
+const emotesDB = new JSONdb('databases/emotes.json', {
     syncOnWrite: true,
     asyncWrite: true,
 })
 client.emotesDB = emotesDB
 
-let commandsDB = new JSONdb('databases/commands.json', {
+const commandsDB = new JSONdb('databases/commands.json', {
     syncOnWrite: true,
     asyncWrite: true,
 })
 client.commandsDB = commandsDB
 
-let LPDB = new JSONdb('databases/lp.json', {
+const LPDB = new JSONdb('databases/lp.json', {
     syncOnWrite: true,
     asyncWrite: true,
 })
 client.LPDB = LPDB
 startLPChecker(LPDB)
+
+const LRDB = new JSONdb('databases/liveRank.json', {
+    syncOnWrite: true,
+    asyncWrite: true,
+})
+
+client.LRDB = LRDB
+client.liveRank = new LiveRank(LRDB)
+client.liveRank.startLiveRank()
 
 //statuses
 const status: Array<{
@@ -506,3 +516,6 @@ client.on('interactionCreate', async (interaction) => {
 })
 
 client.login(process.env.DISCORD_TOKEN)
+
+//express server
+require('./liveServer/index')
