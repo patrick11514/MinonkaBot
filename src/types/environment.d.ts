@@ -5,6 +5,8 @@ declare global {
             DISCORD_TOKEN: string
             RIOT_TOKEN: string
             DDRAGON_URL: string
+            PORT: string
+            WEB_PATH: string
         }
     }
 }

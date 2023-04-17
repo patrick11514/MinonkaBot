@@ -1,6 +1,7 @@
 import EventEmitter from 'events'
 import JSONdb from 'simple-json-db'
 import Config from './config'
+import { LiveRank } from '$lib/riot/workers/liveRank'
 
 declare module 'discord.js' {
     export interface Client {
@@ -12,5 +13,7 @@ declare module 'discord.js' {
         emotesDB: JSONdb
         commandsDB: JSONdb
         LPDB: JSONdb
+        LRDB: JSONdb
+        liveRank: LiveRank
     }
 }
