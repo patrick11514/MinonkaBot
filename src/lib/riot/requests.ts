@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { errorResponse } from '../../types/riotApi'
+import { errorResponse } from '$types/riotApi'
 import Logger from '../logger'
 
 class Requests {

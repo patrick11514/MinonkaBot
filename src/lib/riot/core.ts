@@ -8,7 +8,7 @@ import {
     Rotation,
     SummonerBy,
     UserChallenges,
-} from '../../types/riotApi'
+} from '$types/riotApi'
 import Logger from '../logger'
 import Requests from './requests'
 

@@ -1,9 +1,9 @@
 import JSONdb from 'simple-json-db'
-import user from '../../../types/LPDB'
-import Logger from '../../logger'
+import user from '$types/LPDB'
+import Logger from '$lib/logger'
 import Riot from '../core'
 import utilities from '../utilities'
-import { EncryptedSummonerId } from '../../../types/riotApi'
+import { EncryptedSummonerId } from '$types/riotApi'
 
 class LPChecker {
     private id: string

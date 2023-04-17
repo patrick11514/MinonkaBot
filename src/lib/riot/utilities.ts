@@ -1,7 +1,7 @@
 import fetch, { Response } from 'node-fetch'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { Challenge, championsData, itemsData, runeData, summoners, teamMember } from '../../types/riotApi'
+import { Challenge, championsData, itemsData, runeData, summoners, teamMember } from '$types/riotApi'
 import Logger from '../logger'
 import sharp from 'sharp'
 import crypto from 'crypto'
