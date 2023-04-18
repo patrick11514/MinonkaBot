@@ -152,6 +152,56 @@ app.get('/image/:path', (req: Request, res: Response) => {
     res.sendFile(p)
 })
 
+app.get('/api/:region/:summonerName', async (req: Request, res: Response) => {
+    let { region, summonerName } = req.params
+
+    const config = process.client.config
+
+    if (!config.regions.includes(region)) {
+        const translate = Object.entries(config.regionTranslates).find(([_, translate]) => translate === region)
+        if (!translate) {
+            res.status(400).json({
+                status: false,
+                error: 'Invalid region',
+            })
+            return
+        }
+        region = translate[0]
+    }
+    const profile = await Riot.getSummonerByName(summonerName, region)
+    if (!profile) {
+        res.status(400).json({
+            status: false,
+            error: 'Invalid username',
+        })
+        return
+    }
+
+    const liveRank = process.client.liveRank
+    if (!liveRank.has(profile.id)) {
+        res.send({
+            status: false,
+            error: 'No rank data found',
+        })
+        return
+    }
+
+    if (liveRank.files.hasOwnProperty(profile.id)) {
+        let file = liveRank.files[profile.id]
+        if (file) {
+            res.send({
+                status: true,
+                url: file,
+            })
+            return
+        }
+    }
+    res.send({
+        status: false,
+        error: 'No rank data found',
+    })
+})
+
 app.listen(process.env.PORT, () => {
     l.stop(`Server started on port ${process.env.PORT}`)
 })

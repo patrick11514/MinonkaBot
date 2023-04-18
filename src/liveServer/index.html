@@ -9,9 +9,13 @@
     <body style="margin: 0; padding: 0; overflow: hidden">
         <img src="/image/%IMG%" alt="image" style="width: 100vw; height: auto" />
         <script>
-            setInterval(() => {
-                //update image with ? to prevent cache
-                document.querySelector('img').src = `/image/%IMG%?${Date.now()}`
+            setInterval(async () => {
+                let request = await fetch('/api/%REGION/%USER%')
+                let data = await request.json()
+                if (data.status) {
+                    //update image with ? to prevent cache
+                    document.querySelector('img').src = `/image/${data.url}?${Date.now()}`
+                }
             }, 1 * 60 * 1000) // 1 minute
         </script>
     </body>
