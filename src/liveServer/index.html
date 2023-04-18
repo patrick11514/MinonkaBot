@@ -10,7 +10,7 @@
         <img src="/image/%IMG%" alt="image" style="width: 100vw; height: auto" />
         <script>
             setInterval(async () => {
-                let request = await fetch('/api/%REGION/%USER%')
+                let request = await fetch('/api/%REGION%/%USER%')
                 let data = await request.json()
                 if (data.status) {
                     //update image with ? to prevent cache
