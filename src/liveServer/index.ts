@@ -191,14 +191,35 @@ app.get('/api/:region/:summonerName', async (req: Request, res: Response) => {
         if (file) {
             res.send({
                 status: true,
-                url: file,
+                url: path.basename(file),
             })
             return
         }
     }
+
+    const rank = liveRank.get(profile.id)
+
+    if (!rank) {
+        res.json({
+            status: false,
+            error: 'No rank data found',
+        })
+        return
+    }
+
+    let images = new Images()
+    let imagePath = await images.generateRankedProfile({
+        summonerName: profile.name,
+        level: profile.summonerLevel,
+        profileIconId: profile.profileIconId,
+        rankeds: rank.data,
+    })
+
+    liveRank.files[profile.id] = imagePath
+
     res.send({
-        status: false,
-        error: 'No rank data found',
+        status: true,
+        url: path.basename(imagePath),
     })
 })
 
