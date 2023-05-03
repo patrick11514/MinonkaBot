@@ -1,16 +1,15 @@
+import crypto from 'crypto'
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
     ChatInputCommandInteraction,
-    CommandInteraction,
 } from 'discord.js'
-import crypto from 'crypto'
-import { generateProfile } from '../commands/profile'
 import { link } from '../commands/link'
-import { generateRank } from '../commands/rank'
 import { nameHistory } from '../commands/nameHistory'
+import { generateProfile } from '../commands/profile'
+import { generateRank } from '../commands/rank'
 //import { matchHistory } from '../commands/matchHistory'
 
 class accountPicker {
@@ -79,43 +78,46 @@ class accountPicker {
     }
 
     bindFunction(name: string, args?: any) {
-        process.client.emitter.on('button', async (interaction: ButtonInteraction) => {
-            let idData = interaction.customId.split('@')
-            if (idData.length != 2) return
-            let id = idData[0]
-            let acc = idData[1]
-            if (id != this.id) return
-            let account = this.accounts[parseInt(acc)]
+        let eventList = process.client.emitter.eventNames()
+        if (!eventList.includes('button')) {
+            process.client.emitter.on('button', async (interaction: ButtonInteraction) => {
+                let idData = interaction.customId.split('@')
+                if (idData.length != 2) return
+                let id = idData[0]
+                let acc = idData[1]
+                if (id != this.id) return
+                let account = this.accounts[parseInt(acc)]
 
-            await interaction.reply({ content: 'Účet vybrán, nyní provádíme další akce...', ephemeral: true })
-            await this.interaction.editReply({ content: 'Načítání...', components: [] })
+                await interaction.reply({ content: 'Účet vybrán, nyní provádíme další akce...', ephemeral: true })
+                await this.interaction.editReply({ content: 'Načítání...', components: [] })
 
-            switch (name) {
-                case 'profile': {
-                    generateProfile(account.name, account.region, null, this.interaction)
-                    break
-                }
-                case 'link': {
-                    link(args, account.name, account.region, this.interaction)
-                    break
-                }
-                case 'rank': {
-                    generateRank(account.name, account.region, null, this.interaction)
-                    break
-                }
-                case 'nameHistory': {
-                    nameHistory(account.name, account.region, null, this.interaction)
-                    break
-                }
-                /*               case 'matchHistory': {
+                switch (name) {
+                    case 'profile': {
+                        generateProfile(account.name, account.region, null, this.interaction)
+                        break
+                    }
+                    case 'link': {
+                        link(args, account.name, account.region, this.interaction)
+                        break
+                    }
+                    case 'rank': {
+                        generateRank(account.name, account.region, null, this.interaction)
+                        break
+                    }
+                    case 'nameHistory': {
+                        nameHistory(account.name, account.region, null, this.interaction)
+                        break
+                    }
+                    /*               case 'matchHistory': {
                     let argum = args as {
                         queue: string | null
                         limit: string | null
                     }
                     matchHistory(account.name, account.region, this.interaction, argum.queue, argum.limit)
                 }*/
-            }
-        })
+                }
+            })
+        }
         return this
     }
     send() {
