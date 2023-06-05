@@ -299,6 +299,36 @@ let commands: {
             },
         ],
     },
+    clash: {
+        description: 'Command, pro clashe v league of legends',
+        options: [
+            {
+                name: 'action',
+                type: 'STRING',
+                description: 'Akce, kterou chceš provést',
+                required: true,
+                choices: [{ name: 'schedule', value: 'schedule' }],
+            },
+            {
+                name: 'username',
+                type: 'STRING',
+                description: 'Jméno vyvolávače',
+                required: false,
+            },
+            {
+                name: 'region',
+                type: 'STRING',
+                description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
+                required: false,
+            },
+            {
+                name: 'mention',
+                type: 'USER',
+                description: 'Označ uživatele s propojeným účtem',
+                required: false,
+            },
+        ],
+    },
 }
 
 commands.help.options[0].choices = Object.keys(commands).map((command: string) => {

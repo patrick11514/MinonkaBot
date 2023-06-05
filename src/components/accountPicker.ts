@@ -1,4 +1,3 @@
-import crypto from 'crypto'
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -47,8 +46,7 @@ class accountPicker {
             accounts = accounts.slice(5)
         }
 
-        let key = crypto.randomBytes(4).toString('hex')
-        this.id = key
+        this.id = process.env.KEY
 
         let acc = 0
         for (let accList of accs) {
@@ -63,7 +61,7 @@ class accountPicker {
                             }`
                         )
                         .setStyle(ButtonStyle.Primary)
-                        .setCustomId(key + '@' + acc)
+                        .setCustomId(this.id + '@' + acc)
                 )
                 acc++
             }
@@ -78,6 +76,7 @@ class accountPicker {
     }
 
     bindFunction(name: string, args?: any) {
+        console.log(name)
         let eventList = process.client.emitter.eventNames()
         if (!eventList.includes('button')) {
             process.client.emitter.on('button', async (interaction: ButtonInteraction) => {

@@ -7,6 +7,7 @@ declare global {
             DDRAGON_URL: string
             PORT: string
             WEB_PATH: string
+            KEY: string
         }
     }
 }
