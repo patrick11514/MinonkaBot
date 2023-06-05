@@ -20,6 +20,9 @@
     DISCORD_TOKEN=1234567890ABCDEF.ABCDEF.1234567890
     RIOT_TOKEN=RGAPI-12345678-90AB-CD12-3456-7890ABCDE
     DDRAGON_URL=https://ddragon.leagueoflegends.com
+    PORT=3000
+    WEB_PATH=http://localhost:3000
+    KEY=RANDOM_KEY
     ```
     -   https://discord.com/devlopers
         -   Create new app and new bot in it
@@ -27,6 +30,9 @@
     -   https://developer.riotgames.com/
         -   Create new app
         -   Then copy API KEY to RIOT_TOKEN
+    -   PORT is port on which will be running the web server, which serves live rank
+    -   WEB_PATH is path to web server, which serves live rank and bot will use it in command
+    -   KEY will be used in buttons, to check if the buttons are from this specific bot
 -   **Building bot**
     Install node modules:
     ```SHELL
