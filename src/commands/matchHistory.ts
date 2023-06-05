@@ -153,7 +153,7 @@ export async function matchHistory(
                 })
             }
 
-            let promises = []
+            let promises: Promise<string>[] = []
 
             for (let match of matchesInfo) {
                 promises.push(new Images().generateMatch(match))
@@ -169,7 +169,7 @@ export async function matchHistory(
                 images.forEach((image) => {
                     fs.unlinkSync(image)
                 })
-            }) //zatím nefunguje
+            })
         },
         matchHistory,
         [queue, limit],
