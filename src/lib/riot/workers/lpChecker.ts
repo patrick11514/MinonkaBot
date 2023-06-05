@@ -1,9 +1,9 @@
-import JSONdb from 'simple-json-db'
-import user from '$types/LPDB'
 import Logger from '$lib/logger'
+import user from '$types/LPDB'
+import { EncryptedSummonerId } from '$types/riotApi'
+import JSONdb from 'simple-json-db'
 import Riot from '../core'
 import utilities from '../utilities'
-import { EncryptedSummonerId } from '$types/riotApi'
 
 class LPChecker {
     private id: string
@@ -108,7 +108,7 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                 let currentLp = d.leaguePoints
 
                 let pMatch = currentMatches[prevMatch]
-                if (pMatch || pMatch == 'NULL') {
+                if ((pMatch || pMatch == 'NULL') && data.lp[queueArrId]) {
                     let prevLp = data.lp.find((l) => l.queue == d.queueType)?.lp as number
 
                     let prevRank = translate(data.lp[queueArrId].rank)
