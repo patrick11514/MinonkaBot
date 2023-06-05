@@ -299,7 +299,7 @@ let commands: {
             },
         ],
     },
-    clash: {
+    /*clash: {
         description: 'Command, pro clashe v league of legends',
         options: [
             {
@@ -328,7 +328,7 @@ let commands: {
                 required: false,
             },
         ],
-    },
+    },*/
 }
 
 commands.help.options[0].choices = Object.keys(commands).map((command: string) => {
