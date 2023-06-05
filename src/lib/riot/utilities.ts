@@ -1,15 +1,14 @@
-import fetch, { Response } from 'node-fetch'
-import fs from 'fs'
-import dotenv from 'dotenv'
 import { Challenge, championsData, itemsData, runeData, summoners, teamMember } from '$types/riotApi'
-import Logger from '../logger'
-import sharp from 'sharp'
 import crypto from 'crypto'
-//@ts-ignore
-import isXml from 'is-xml'
+import dotenv from 'dotenv'
 import { XMLParser } from 'fast-xml-parser'
+import fs from 'fs'
+import isXml from 'is-xml'
+import fetch, { Response } from 'node-fetch'
 import path from 'path'
-import { Client } from 'discord.js'
+import sharp from 'sharp'
+import JSONdb from 'simple-json-db'
+import Logger from '../logger'
 dotenv.config()
 
 class Utilities {
@@ -416,8 +415,8 @@ class Utilities {
         return new Promise((resolve) => setTimeout(resolve, ms))
     }
 
-    mentionCommand(name: string, client: Client) {
-        let db = client.commandsDB
+    mentionCommand(name: string, commandsDB: JSONdb) {
+        let db = commandsDB
         if (db.has(name)) {
             let id = db.get(name)
             return `</${name}:${id}>`

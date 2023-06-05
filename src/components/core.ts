@@ -1,13 +1,14 @@
-import { ButtonInteraction, ChatInputCommandInteraction, User } from 'discord.js'
+import Logger from '$lib/logger'
 import linkedAccounts from '$lib/nameHistory'
 import Riot from '$lib/riot/core'
-import accountPicker from './accountPicker'
-import Logger from '$lib/logger'
-import NameHistory from '$types/nameHistoryDB'
 import utilities from '$lib/riot/utilities'
+import NameHistory from '$types/nameHistoryDB'
+import { FakeInteraction } from '$types/types'
+import { ButtonInteraction, ChatInputCommandInteraction, User } from 'discord.js'
+import accountPicker from './accountPicker'
 
 export default async function handleInteraction(
-    interaction: ButtonInteraction | ChatInputCommandInteraction,
+    interaction: ButtonInteraction | ChatInputCommandInteraction | FakeInteraction,
     username: string | null,
     region: string | null,
     mention: User | null,
@@ -39,13 +40,13 @@ export default async function handleInteraction(
                 return interaction.editReply({
                     content:
                         'Tento uživatel nemá žádný propojený účet přes příkaz ' +
-                        utilities.mentionCommand('link', interaction.client),
+                        utilities.mentionCommand('link', interaction.client.commandsDB),
                 })
             } else {
                 return interaction.editReply({
                     content:
                         'Použil jsi tento příkaz bez argumentů a nemáš propojený žády účet. Bud použij příkaz ' +
-                        utilities.mentionCommand('link', interaction.client) +
+                        utilities.mentionCommand('link', interaction.client.commandsDB) +
                         ' nebo použij tento příkaz s argumenty.',
                 })
             }

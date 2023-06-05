@@ -1,15 +1,18 @@
+import { FakeInteraction, FakeInteractionArg } from '$types/types'
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
+    CacheType,
     ChatInputCommandInteraction,
+    MessageInteraction,
 } from 'discord.js'
 import { link } from '../commands/link'
+import { matchHistory } from '../commands/matchHistory'
 import { nameHistory } from '../commands/nameHistory'
 import { generateProfile } from '../commands/profile'
 import { generateRank } from '../commands/rank'
-//import { matchHistory } from '../commands/matchHistory'
 
 class accountPicker {
     accounts: Array<{
@@ -20,7 +23,8 @@ class accountPicker {
 
     id: string = ''
     rows: Array<ActionRowBuilder<ButtonBuilder>> = []
-    interaction: ChatInputCommandInteraction | ButtonInteraction = null as unknown as ChatInputCommandInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction =
+        null as unknown as ChatInputCommandInteraction
     message: string = ''
     edit: boolean = false
 
@@ -30,15 +34,26 @@ class accountPicker {
             region: string
             level: number
         }>,
-        interaction: ChatInputCommandInteraction | ButtonInteraction,
+        interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
         edit = false,
         message = 'Zde je seznam nalezených účtů:'
     ) {
-        //generate buttons
-        let rows = []
-        let accs = []
-
         this.accounts = accounts
+
+        this.id = process.env.KEY
+
+        this.interaction = interaction
+        this.message = message
+        this.edit = edit
+        return this
+    }
+
+    bindFunction(name: string, args?: object | string) {
+        //generate buttons
+        let accs = []
+        let rows = []
+
+        let accounts = this.accounts
 
         //divide accounts to arrays by five
         while (accounts.length > 0) {
@@ -46,13 +61,16 @@ class accountPicker {
             accounts = accounts.slice(5)
         }
 
-        this.id = process.env.KEY
-
-        let acc = 0
         for (let accList of accs) {
             let row = new ActionRowBuilder<ButtonBuilder>()
 
             for (let account of accList) {
+                let id = `${this.id}@${account.name}:${account.region}@${name}`
+
+                if (args) {
+                    id += `@${typeof args == 'object' ? JSON.stringify(args) : args}`
+                }
+
                 row.addComponents(
                     new ButtonBuilder()
                         .setLabel(
@@ -61,69 +79,113 @@ class accountPicker {
                             }`
                         )
                         .setStyle(ButtonStyle.Primary)
-                        .setCustomId(this.id + '@' + acc)
+                        .setCustomId(id)
                 )
-                acc++
             }
             rows.push(row)
         }
 
         this.rows = rows
-        this.interaction = interaction
-        this.message = message
-        this.edit = edit
+
         return this
     }
 
-    bindFunction(name: string, args?: any) {
-        console.log(name)
-        let eventList = process.client.emitter.eventNames()
-        if (!eventList.includes('button')) {
-            process.client.emitter.on('button', async (interaction: ButtonInteraction) => {
-                let idData = interaction.customId.split('@')
-                if (idData.length != 2) return
-                let id = idData[0]
-                let acc = idData[1]
-                if (id != this.id) return
-                let account = this.accounts[parseInt(acc)]
+    static initHandler() {
+        process.client.emitter.on(`button`, async (interaction: ButtonInteraction) => {
+            let idData = interaction.customId.split('@')
+            if (idData.length < 3) return
+            let id = idData[0]
+            let acc = idData[1]
+            let fnc = idData[2]
+            let args = null
 
-                await interaction.reply({ content: 'Účet vybrán, nyní provádíme další akce...', ephemeral: true })
-                await this.interaction.editReply({ content: 'Načítání...', components: [] })
+            if (idData.length == 4) {
+                let arg = idData[3]
 
-                switch (name) {
-                    case 'profile': {
-                        generateProfile(account.name, account.region, null, this.interaction)
-                        break
-                    }
-                    case 'link': {
-                        link(args, account.name, account.region, this.interaction)
-                        break
-                    }
-                    case 'rank': {
-                        generateRank(account.name, account.region, null, this.interaction)
-                        break
-                    }
-                    case 'nameHistory': {
-                        nameHistory(account.name, account.region, null, this.interaction)
-                        break
-                    }
-                    /*               case 'matchHistory': {
+                try {
+                    args = JSON.parse(arg)
+                } catch (e) {
+                    args = arg
+                }
+            }
+
+            if (id != process.env.KEY) return
+
+            let accountParts = acc.split(':')
+            let account = {
+                name: accountParts[0],
+                region: accountParts[1],
+            }
+
+            await interaction.reply({ content: 'Účet vybrán, nyní provádíme další akce...', ephemeral: true })
+
+            const rawInteraction = interaction.message.interaction as MessageInteraction
+            const message = interaction.message
+
+            const inter: FakeInteraction = {
+                editReply: (content: FakeInteractionArg) => {
+                    return message.edit(content)
+                },
+                reply: (content: FakeInteractionArg) => {
+                    return message.reply(content)
+                },
+                client: {
+                    usersDB: process.client.usersDB,
+                    nameHistoryDB: process.client.nameHistoryDB,
+                    commandsDB: process.client.commandsDB,
+                    config: process.client.config,
+                    LPDB: process.client.LPDB,
+                },
+                user: {
+                    id: rawInteraction.user.id,
+                    name: rawInteraction.user.username,
+                },
+                fake: true,
+            }
+
+            //remove buttons
+            await interaction.message.edit({ content: 'Načítání...', components: [] })
+
+            switch (fnc) {
+                case 'profile': {
+                    generateProfile(account.name, account.region, null, inter)
+                    break
+                }
+                case 'link': {
+                    link(args, account.name, account.region, inter)
+                    break
+                }
+                case 'rank': {
+                    generateRank(account.name, account.region, null, inter)
+                    break
+                }
+                case 'nameHistory': {
+                    nameHistory(account.name, account.region, null, inter)
+                    break
+                }
+                case 'matchHistory': {
                     let argum = args as {
                         queue: string | null
                         limit: string | null
                     }
-                    matchHistory(account.name, account.region, this.interaction, argum.queue, argum.limit)
-                }*/
+                    matchHistory(account.name, account.region, null, inter, argum.queue, argum.limit)
                 }
-            })
-        }
-        return this
+            }
+        })
     }
+
     send() {
         if (this.edit) {
             this.interaction.editReply({ content: `${this.message}`, components: this.rows })
         } else {
-            this.interaction.reply({ content: `${this.message}`, components: this.rows })
+            if ((this.interaction as FakeInteraction).fake) {
+                ;(this.interaction as FakeInteraction).reply({ content: `${this.message}`, components: this.rows })
+            } else {
+                ;(this.interaction as ChatInputCommandInteraction<CacheType> | ButtonInteraction<CacheType>).reply({
+                    content: `${this.message}`,
+                    components: this.rows,
+                })
+            }
         }
     }
 }

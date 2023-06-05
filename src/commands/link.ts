@@ -1,7 +1,8 @@
-import { ButtonInteraction, ChatInputCommandInteraction, Client } from 'discord.js'
 import accountPicker from '$components/accountPicker'
 import linkedAccounts from '$lib/nameHistory'
 import Riot from '$lib/riot/core'
+import { FakeInteraction } from '$types/types'
+import { ButtonInteraction, ChatInputCommandInteraction, Client } from 'discord.js'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -21,7 +22,7 @@ export async function link(
     action: string,
     username: string | null,
     region: string | null,
-    interaction: ChatInputCommandInteraction | ButtonInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction
 ) {
     let userData: {
         username: string | null

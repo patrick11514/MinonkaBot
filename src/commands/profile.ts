@@ -1,9 +1,10 @@
-import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
 import handleInteraction from '$components/core'
 import Images from '$lib/images/core'
 import Riot from '$lib/riot/core'
 import { SummonerBy, UserChallenges } from '$types/riotApi'
+import { FakeInteraction } from '$types/types'
 import DBUser from '$types/usersDB'
+import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
 import fs from 'fs'
 
 export default (client: Client) => {
@@ -24,7 +25,7 @@ export async function generateProfile(
     username: string | null,
     region: string | null,
     mention: User | null,
-    interaction: ChatInputCommandInteraction | ButtonInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction
 ) {
     handleInteraction(
         interaction,
@@ -36,7 +37,7 @@ export async function generateProfile(
             username: string,
             region: string,
             data: SummonerBy,
-            interaction: ChatInputCommandInteraction | ButtonInteraction
+            interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction
         ) {
             let challenges = await Riot.getChallenges(data.puuid, region)
 

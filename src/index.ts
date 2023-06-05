@@ -1,20 +1,21 @@
 //imports
+import crypto from 'crypto'
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js'
 import EventEmitter from 'events'
 import fs from 'fs'
-import path from 'path'
-import Logger from './lib/logger'
-import config from './config'
 import fetch from 'node-fetch'
-import JSONdb from 'simple-json-db'
-import utilities from './lib/riot/utilities'
+import path from 'path'
 import sharp from 'sharp'
-import crypto from 'crypto'
+import JSONdb from 'simple-json-db'
+import config from './config'
+import Logger from './lib/logger'
+import utilities from './lib/riot/utilities'
 
 //dotenv
+import accountPicker from '$components/accountPicker'
+import { LiveRank } from '$lib/riot/workers/liveRank'
 import * as dotenv from 'dotenv'
 import { startLPChecker } from './lib/riot/workers/lpChecker'
-import { LiveRank } from '$lib/riot/workers/liveRank'
 dotenv.config()
 
 //intents
@@ -485,6 +486,9 @@ async function tasks() {
     }
 }
 tasks()
+
+//init account picker
+accountPicker.initHandler()
 
 client.on('ready', () => {
     l.log(`Logged as ${client.user?.tag}`)

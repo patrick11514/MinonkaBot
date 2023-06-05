@@ -1,12 +1,13 @@
-import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
 import handleInteraction from '$components/core'
+import Images from '$lib/images/core'
 import Logger from '$lib/logger'
 import Riot from '$lib/riot/core'
 import utilities from '$lib/riot/utilities'
-import { SummonerBy, teamMember } from '$types/riotApi'
-import fs from 'fs'
-import Images from '$lib/images/core'
 import { checkUser, getLP } from '$lib/riot/workers/lpChecker'
+import { SummonerBy, teamMember } from '$types/riotApi'
+import { FakeInteraction } from '$types/types'
+import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
+import fs from 'fs'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -29,7 +30,7 @@ export async function matchHistory(
     username: string | null,
     region: string | null,
     mention: User | null,
-    interaction: ChatInputCommandInteraction | ButtonInteraction,
+    interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
     queue: string | null,
     limit: string | null
 ) {
@@ -43,7 +44,7 @@ export async function matchHistory(
             username: string,
             region: string,
             data: SummonerBy,
-            interaction: ChatInputCommandInteraction | ButtonInteraction,
+            interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
             queue: string | null,
             limit: string | null
         ) {

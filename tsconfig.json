@@ -19,7 +19,12 @@
             "$components/*": ["./src/components/*"]
         }
     },
-    "files": ["src/types/discord.d.ts", "src/types/environment.d.ts", "src/types/process.d.ts"],
+    "files": [
+        "src/types/discord.d.ts",
+        "src/types/environment.d.ts",
+        "src/types/process.d.ts",
+        "src/types/modules.d.ts"
+    ],
     "include": ["src/**/*"],
     "exclude": ["node_modules"]
 }
