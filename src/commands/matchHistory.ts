@@ -106,6 +106,10 @@ export async function matchHistory(
                         vision: participant.visionScore,
                         level: participant.champLevel,
                         perks: participant.perks,
+                        minions: participant.totalMinionsKilled,
+                        neutralMinions: participant.neutralMinionsKilled,
+                        totalDamage: participant.totalDamageDealtToChampions,
+                        golds: participant.goldEarned,
                     })
                 })
 

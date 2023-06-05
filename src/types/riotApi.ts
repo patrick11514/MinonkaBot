@@ -508,6 +508,10 @@ export interface teamMember {
             style: number
         }>
     }
+    minions: number
+    neutralMinions: number
+    totalDamage: number
+    golds: number
 }
 
 export interface match {

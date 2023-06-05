@@ -488,7 +488,7 @@ class Images {
         })
         this.composite(killTextTeam2, 858 + 300, 45)
 
-        this.l.log('Adding champioon bans...')
+        this.l.log('Adding champion bans...')
         //bans
         //lefts
         let bans = matchData.bans.find((ban) => ban.id === matchData.teams[1][0].id)
@@ -506,7 +506,8 @@ class Images {
             } else {
                 champImage = await utils.getChampionImage(imageName)
             }
-            champImage = await utils.resizeImage(champImage, 60, 60)
+
+            champImage = await utils.resizeImage(champImage, 60, 60, true)
 
             this.composite(champImage, banX, banY)
 
@@ -529,7 +530,7 @@ class Images {
             } else {
                 champImage = await utils.getChampionImage(imageName)
             }
-            champImage = await utils.resizeImage(champImage, 60, 60)
+            champImage = await utils.resizeImage(champImage, 60, 60, true)
 
             this.composite(champImage, banX, banY)
 
@@ -611,7 +612,7 @@ class Images {
             //summoner spells
             for (let i = 0; i <= 1; i++) {
                 const summonerSpellSize = 40
-                const spellsY = y - spacing + summonerSpellSize * i
+                const spellsY = y + (spacing + summonerSpellSize) * i
 
                 let spell = champ.summoners[i]
 
@@ -623,18 +624,27 @@ class Images {
 
                 spellImage = await utils.resizeImage(spellImage, summonerSpellSize, summonerSpellSize, true)
 
-                this.composite(spellImage, x + (fromName + spacing + summonerSpellSize) * multiplier, spellsY)
+                this.composite(
+                    spellImage,
+                    x + (fromName - (multiplier == 1 ? summonerSpellSize + spacing : 0)) * multiplier,
+                    spellsY
+                )
             }
 
             //runes
             for (let i = 0; i < 2; i++) {
                 const runeSize = 40
-                const runeX = x + (fromName + (spacing + runeSize) * 2) * multiplier
-                const runeY = y - spacing + (runeSize + spacing) * i
+                const runeX = x + (fromName - (spacing + runeSize) * (multiplier == 1 ? 2 : 1)) * multiplier
+                const runeY = y + (runeSize + spacing) * i
 
                 let style = champ.perks.styles[i]
 
-                let image = await utils.getRuneById(style.style, style.selections[i].perk)
+                let image
+                if (i == 0) {
+                    image = await utils.getRuneById(style.style, style.selections[0].perk)
+                } else {
+                    image = await utils.getRuneCategoryById(style.style)
+                }
 
                 if (!image) {
                     image = await utils.downloadProfilePicture(29)
@@ -642,9 +652,9 @@ class Images {
                     image = await utils.getRuneImage(image)
                 }
 
-                image = await utils.resizeImage(image, runeSize, runeSize, true)
+                image = await utils.resizeImage(image, runeSize - 10 * i, runeSize - 10 * i, true)
 
-                this.composite(image, runeX, runeY)
+                this.composite(image, runeX + 5 * i, runeY + 5 * i)
             }
 
             const itemBackgroundSize = 60
@@ -690,6 +700,79 @@ class Images {
                     this.composite(visionScoreText, itemX + 2, itemY + 15)
                 }
             }
+
+            const dataY = y + imageWidth - spacing * 3
+            const imageSize = 25
+
+            //minions
+            const minionX = x + (fromName + spacing * 2 + (multiplier == -1 ? imageSize : 0)) * multiplier
+
+            const minionImage = await utils.resizeImage('./images/minion.png', imageSize, imageSize, true)
+            this.composite(minionImage, minionX, dataY)
+
+            const minionText = await this.createText({
+                text: (champ.minions + champ.neutralMinions).toString(),
+                textSize: 22,
+                width: 100,
+                height: 40,
+                bold: true,
+                color: '#FFFFFF',
+                font: 'Beaufort for LOL Ja',
+                center: multiplier == 1 ? false : 2,
+                outline: true,
+            })
+
+            this.composite(
+                minionText,
+                minionX + (imageSize + spacing + (multiplier == -1 ? 75 : 0)) * multiplier,
+                dataY
+            )
+
+            const intl = new Intl.NumberFormat('cs-cz')
+
+            //damage
+            const damageX = x + (fromName + spacing * 2 + 100 + (multiplier == -1 ? imageSize : 0)) * multiplier
+
+            const damageImage = await utils.resizeImage('./images/sword.png', imageSize, imageSize, true)
+            this.composite(damageImage, damageX, dataY)
+
+            const damageText = await this.createText({
+                text: intl.format(champ.totalDamage),
+                textSize: 22,
+                width: 100,
+                height: 40,
+                bold: true,
+                color: '#FFFFFF',
+                font: 'Beaufort for LOL Ja',
+                center: multiplier == 1 ? false : 2,
+                outline: true,
+            })
+
+            this.composite(
+                damageText,
+                damageX + (imageSize + spacing + (multiplier == -1 ? 75 : 0)) * multiplier,
+                dataY
+            )
+
+            //golds
+            const goldsX = x + (fromName + spacing * 2 + 230 + (multiplier == -1 ? imageSize : 0)) * multiplier
+
+            const goldsImage = await utils.resizeImage('./images/coins.png', imageSize, imageSize, true)
+            this.composite(goldsImage, goldsX, dataY)
+
+            const goldsText = await this.createText({
+                text: intl.format(champ.golds),
+                textSize: 22,
+                width: 100,
+                height: 40,
+                bold: true,
+                color: '#FFFFFF',
+                font: 'Beaufort for LOL Ja',
+                center: multiplier == 1 ? false : 2,
+                outline: true,
+            })
+
+            this.composite(goldsText, goldsX + (imageSize + spacing + (multiplier == -1 ? 75 : 0)) * multiplier, dataY)
         }
 
         const promises: Promise<void>[] = []
