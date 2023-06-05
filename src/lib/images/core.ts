@@ -1,12 +1,12 @@
-import sharp from 'sharp'
-import fs from 'fs'
-import utils from '../riot/utilities'
-import Logger from '../logger'
-import crypto from 'crypto'
 import { matchData, profilePicture, rankedProfile } from '$types/imageInputs'
-import { lowerTier, QueueTypes, RankColors, Tiers } from '$types/riotApi'
+import { QueueTypes, RankColors, Tiers, lowerTier, teamMember } from '$types/riotApi'
+import crypto from 'crypto'
+import fs from 'fs'
 import Path from 'path'
-import { queues, coopTitles } from '../../components/queues'
+import sharp from 'sharp'
+import { coopTitles, queues } from '../../components/queues'
+import Logger from '../logger'
+import utils from '../riot/utilities'
 
 class Images {
     l: Logger
@@ -340,6 +340,9 @@ class Images {
     }
 
     async generateMatch(matchData: matchData): Promise<string> {
+        const backgroundWidth = 2424
+        ///const backgroundHeight = 820
+
         let background = fs.readFileSync('./images/matchBackground.png')
 
         this.l.start('Creating background...')
@@ -486,6 +489,7 @@ class Images {
         this.composite(killTextTeam2, 858 + 300, 45)
 
         this.l.log('Adding champioon bans...')
+        //bans
         //lefts
         let bans = matchData.bans.find((ban) => ban.id === matchData.teams[1][0].id)
 
@@ -531,12 +535,14 @@ class Images {
 
             banX += 70
         }
-
-        let startY = 145
         this.l.log('Adding champions...')
-        let imageWidth = 75
-        //left team
-        for (let champ of matchData.teams[1]) {
+        const imageWidth = 75
+
+        //functions
+        const addChampion = async (champ: teamMember, x: number, y: number, multiplier: 1 | -1) => {
+            const fromName = 600
+
+            //champion image
             let imageName = await utils.championIdToImage(champ.champion)
             let champImage: string
             if (!imageName) {
@@ -546,7 +552,7 @@ class Images {
             }
             champImage = await utils.resizeImage(champImage, imageWidth, imageWidth, true)
 
-            this.composite(champImage, 50, startY)
+            this.composite(champImage, x + (50 + (multiplier == -1 ? imageWidth : 0)) * multiplier, y)
 
             //add level image
             let levelText = await this.createText({
@@ -561,8 +567,11 @@ class Images {
                 outline: true,
             })
 
-            this.composite(levelText, 50, startY + imageWidth - 40)
+            this.composite(levelText, x + (50 + (multiplier == -1 ? imageWidth : 0)) * multiplier, y + imageWidth - 40)
 
+            const offset = imageWidth + 15 * 2 + fromName
+
+            //username
             let usernameText = await this.createText({
                 text: champ.summoner,
                 textSize: 40,
@@ -571,52 +580,38 @@ class Images {
                 bold: true,
                 color: '#ffffff',
                 font: 'Beaufort for LOL Ja',
-                center: false,
+                center: multiplier == -1 ? 2 : false,
             })
-            this.composite(usernameText, 50 + imageWidth + 15, startY - 15)
+            this.composite(
+                usernameText,
+                x + (50 + imageWidth + 15 + (multiplier == -1 ? offset : 0)) * multiplier,
+                y - 15
+            )
 
-            //runes
-            {
-                let x = 600 - 45 - 45
-                let y = startY - 5
+            //kda score
+            let kdaText = await this.createText({
+                text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
+                textSize: 40,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: multiplier == -1 ? 2 : false,
+            })
 
-                //first rune
-                let style = champ.perks.styles[0]
+            this.composite(
+                kdaText,
+                x + (50 + imageWidth + 15 + (multiplier == -1 ? offset : 0)) * multiplier,
+                y + 50 - 15
+            )
 
-                let image = await utils.getRuneById(style.style, style.selections[0].perk)
-
-                if (!image) {
-                    image = await utils.downloadProfilePicture(29)
-                } else {
-                    image = await utils.getRuneImage(image)
-                }
-
-                image = await utils.resizeImage(image, 40, 40, true)
-
-                this.composite(image, x, y)
-
-                //second rune
-                y += 55
-
-                style = champ.perks.styles[1]
-
-                image = await utils.getRuneCategoryById(style.style)
-
-                if (!image) {
-                    image = await utils.downloadProfilePicture(29)
-                } else {
-                    image = await utils.getRuneImage(image)
-                }
-
-                image = await utils.resizeImage(image, 30, 30, true)
-
-                this.composite(image, x + 5, y)
-            }
+            const spacing = 5
 
             //summoner spells
             for (let i = 0; i <= 1; i++) {
-                let x = 600 - 45
-                let y = startY - 5 + 50 * i
+                const summonerSpellSize = 40
+                const spellsY = y - spacing + summonerSpellSize * i
 
                 let spell = champ.summoners[i]
 
@@ -626,28 +621,56 @@ class Images {
                     spellImage = await utils.downloadProfilePicture(29)
                 }
 
-                spellImage = await utils.resizeImage(spellImage, 40, 40, true)
+                spellImage = await utils.resizeImage(spellImage, summonerSpellSize, summonerSpellSize, true)
 
-                this.composite(spellImage, x, y)
+                this.composite(spellImage, x + (fromName + spacing + summonerSpellSize) * multiplier, spellsY)
             }
+
+            //runes
+            for (let i = 0; i < 2; i++) {
+                const runeSize = 40
+                const runeX = x + (fromName + (spacing + runeSize) * 2) * multiplier
+                const runeY = y - spacing + (runeSize + spacing) * i
+
+                let style = champ.perks.styles[i]
+
+                let image = await utils.getRuneById(style.style, style.selections[i].perk)
+
+                if (!image) {
+                    image = await utils.downloadProfilePicture(29)
+                } else {
+                    image = await utils.getRuneImage(image)
+                }
+
+                image = await utils.resizeImage(image, runeSize, runeSize, true)
+
+                this.composite(image, runeX, runeY)
+            }
+
+            const itemBackgroundSize = 60
 
             //items
             for (let i = 0; i <= 6; i++) {
-                let item = champ.items[i]
+                const itemSpacing = 3
+
+                const item = champ.items[i]
                 //background - 130*130 for item, and full is 138*138
-                let itemBackground = sharp('./images/itemBackground.png')
-                itemBackground = itemBackground.resize(60, 60)
+                const itemBackground = sharp('./images/itemBackground.png').resize(
+                    itemBackgroundSize,
+                    itemBackgroundSize
+                )
 
-                let x = 600 + i * 60 + 3 * i
-                let y = startY + 7
+                const itemX =
+                    x + (fromName + (itemBackgroundSize + itemSpacing) * (i + (multiplier == -1 ? 1 : 0))) * multiplier
+                const itemY = y - spacing
 
-                this.composite(await itemBackground.toBuffer(), x, y)
+                this.composite(await itemBackground.toBuffer(), itemX, itemY)
 
                 //item
                 if (item) {
                     let itemImage = await utils.getItemImage(item.toString() + '.png')
                     itemImage = await utils.resizeImage(itemImage, 56, 56, true)
-                    this.composite(itemImage, x + 2, y + 2)
+                    this.composite(itemImage, itemX + 2, itemY + 2)
                 }
 
                 if (i == 6) {
@@ -664,181 +687,29 @@ class Images {
                         outline: true,
                     })
 
-                    this.composite(visionScoreText, x + 2, y + 15)
+                    this.composite(visionScoreText, itemX + 2, itemY + 15)
                 }
             }
-
-            //kda score
-            let kdaText = await this.createText({
-                text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
-                textSize: 40,
-                width: 700,
-                height: 90,
-                bold: true,
-                color: '#ffffff',
-                font: 'Beaufort for LOL Ja',
-                center: false,
-            })
-
-            this.composite(kdaText, 50 + imageWidth + 15, startY + 50 - 15)
-
-            startY += imageWidth + 60
         }
 
-        startY = 145
-        //right team is mirrored and calculated from right side (2424px)
-        for (let champ of matchData.teams[2]) {
-            let imageName = await utils.championIdToImage(champ.champion)
+        const promises: Promise<void>[] = []
 
-            let champImage: string
-            if (!imageName) {
-                champImage = await utils.downloadProfilePicture(29)
-            } else {
-                champImage = await utils.getChampionImage(imageName)
+        //team
+        for (let i = 1; i <= 2; i++) {
+            for (let champId in matchData.teams[i]) {
+                let champ = matchData.teams[i][champId]
+                promises.push(
+                    addChampion(
+                        champ,
+                        i == 1 ? 0 : backgroundWidth,
+                        145 + (imageWidth + 60) * parseInt(champId),
+                        i == 1 ? 1 : -1
+                    )
+                )
             }
-
-            champImage = await utils.resizeImage(champImage, imageWidth, imageWidth, true)
-
-            this.composite(champImage, 2424 - 50 - imageWidth, startY)
-
-            //add level image
-            let levelText = await this.createText({
-                text: champ.level.toString(),
-                textSize: 32,
-                width: imageWidth,
-                height: 90,
-                bold: true,
-                color: '#ffffff',
-                font: 'Beaufort for LOL Ja',
-                center: true,
-                outline: true,
-            })
-
-            this.composite(levelText, 2424 - 50 - imageWidth, startY + imageWidth - 40)
-
-            let usernameText = await this.createText({
-                text: champ.summoner,
-                textSize: 40,
-                width: 700,
-                height: 90,
-                bold: true,
-                color: '#ffffff',
-                font: 'Beaufort for LOL Ja',
-                center: 2,
-            })
-
-            this.composite(usernameText, 2424 - 50 - imageWidth - 15 - 700, startY - 15)
-
-            //runes
-            {
-                let x = 2424 - 600 + 45
-                let y = startY - 5
-
-                //first rune
-                let style = champ.perks.styles[0]
-
-                let image = await utils.getRuneById(style.style, style.selections[0].perk)
-
-                if (!image) {
-                    image = await utils.downloadProfilePicture(29)
-                } else {
-                    image = await utils.getRuneImage(image)
-                }
-
-                image = await utils.resizeImage(image, 40, 40, true)
-
-                this.composite(image, x, y)
-
-                //second rune
-                y += 55
-
-                style = champ.perks.styles[1]
-
-                image = await utils.getRuneCategoryById(style.style)
-
-                if (!image) {
-                    image = await utils.downloadProfilePicture(29)
-                } else {
-                    image = await utils.getRuneImage(image)
-                }
-
-                image = await utils.resizeImage(image, 30, 30, true)
-
-                this.composite(image, x + 5, y)
-            }
-
-            //summoner spells
-            for (let i = 0; i <= 1; i++) {
-                let x = 2424 - 600 + 5
-                let y = startY - 5 + 50 * i
-
-                let spell = champ.summoners[i]
-
-                let spellImage = await utils.getSummonerImage(spell)
-
-                if (!spellImage) {
-                    spellImage = await utils.downloadProfilePicture(29)
-                }
-
-                spellImage = await utils.resizeImage(spellImage, 40, 40, true)
-
-                this.composite(spellImage, x, y)
-            }
-
-            //items
-            for (let i = 0; i <= 6; i++) {
-                let item = champ.items[i]
-                //background - 130*130 for item, and full is 138*138
-                let itemBackground = sharp('./images/itemBackground.png')
-                itemBackground = itemBackground.resize(60, 60)
-
-                // - 60 for item bg width
-                let x = 2424 - 600 - i * 60 - 3 * i - 60
-                let y = startY + 7
-
-                this.composite(await itemBackground.toBuffer(), x, y)
-
-                //item
-                if (item) {
-                    let itemImage = await utils.getItemImage(item.toString() + '.png')
-                    itemImage = await utils.resizeImage(itemImage, 56, 56, true)
-                    this.composite(itemImage, x + 2, y + 2)
-                }
-
-                if (i == 6) {
-                    //add vision score
-                    let visionScoreText = await this.createText({
-                        text: champ.vision.toString(),
-                        textSize: 32,
-                        width: 56,
-                        height: 56,
-                        bold: true,
-                        color: '#FFFFFF',
-                        font: 'Beaufort for LOL Ja',
-                        center: true,
-                        outline: true,
-                    })
-
-                    this.composite(visionScoreText, x + 2, y + 15)
-                }
-            }
-
-            //kda score
-            let kdaText = await this.createText({
-                text: `${champ.kills.toString()}/${champ.deaths.toString()}/${champ.asists.toString()}`,
-                textSize: 40,
-                width: 700,
-                height: 90,
-                bold: true,
-                color: '#ffffff',
-                font: 'Beaufort for LOL Ja',
-                center: 2,
-            })
-
-            this.composite(kdaText, 2424 - 50 - imageWidth - 15 - 700, startY + 50 - 15)
-
-            startY += imageWidth + 60
         }
+
+        await Promise.all(promises)
 
         this.l.log('Finishing image...')
         let buffer = await this.compositeDone(image).toBuffer()
