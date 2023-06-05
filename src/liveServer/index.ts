@@ -152,6 +152,77 @@ app.get('/image/:path', (req: Request, res: Response) => {
     res.sendFile(p)
 })
 
+app.get('/api/:region/:summonerName', async (req: Request, res: Response) => {
+    let { region, summonerName } = req.params
+
+    const config = process.client.config
+
+    if (!config.regions.includes(region)) {
+        const translate = Object.entries(config.regionTranslates).find(([_, translate]) => translate === region)
+        if (!translate) {
+            res.status(400).json({
+                status: false,
+                error: 'Invalid region',
+            })
+            return
+        }
+        region = translate[0]
+    }
+    const profile = await Riot.getSummonerByName(summonerName, region)
+    if (!profile) {
+        res.status(400).json({
+            status: false,
+            error: 'Invalid username',
+        })
+        return
+    }
+
+    const liveRank = process.client.liveRank
+    if (!liveRank.has(profile.id)) {
+        res.send({
+            status: false,
+            error: 'No rank data found',
+        })
+        return
+    }
+
+    if (liveRank.files.hasOwnProperty(profile.id)) {
+        let file = liveRank.files[profile.id]
+        if (file) {
+            res.send({
+                status: true,
+                url: path.basename(file),
+            })
+            return
+        }
+    }
+
+    const rank = liveRank.get(profile.id)
+
+    if (!rank) {
+        res.json({
+            status: false,
+            error: 'No rank data found',
+        })
+        return
+    }
+
+    let images = new Images()
+    let imagePath = await images.generateRankedProfile({
+        summonerName: profile.name,
+        level: profile.summonerLevel,
+        profileIconId: profile.profileIconId,
+        rankeds: rank.data,
+    })
+
+    liveRank.files[profile.id] = imagePath
+
+    res.send({
+        status: true,
+        url: path.basename(imagePath),
+    })
+})
+
 app.listen(process.env.PORT, () => {
     l.stop(`Server started on port ${process.env.PORT}`)
 })

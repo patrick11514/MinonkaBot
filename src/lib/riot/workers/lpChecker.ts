@@ -139,9 +139,18 @@ async function checkUser(id: string, puuid: string, region: string, db: JSONdb) 
                     }
                 }
 
-                data.lp[queueArrId].lp = currentLp
-                data.lp[queueArrId].rank = d.rank
-                data.lp[queueArrId].tier = d.tier
+                if (!data.lp[queueArrId]) {
+                    data.lp[queueArrId] = {
+                        queue: d.queueType,
+                        lp: currentLp,
+                        rank: d.rank,
+                        tier: d.tier,
+                    }
+                } else {
+                    data.lp[queueArrId].lp = currentLp
+                    data.lp[queueArrId].rank = d.rank
+                    data.lp[queueArrId].tier = d.tier
+                }
             }
 
             data.lastUpdate = Date.now()
