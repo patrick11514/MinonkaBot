@@ -61,6 +61,7 @@ export async function generateProfile(
                         tier: challenge.level,
                     }
                 }),
+                region: process.client.config.regionTranslates[region],
             }
 
             //get user language
