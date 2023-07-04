@@ -9,6 +9,7 @@ interface profilePicture {
         id: number
         tier: string
     }>
+    region: string
 }
 
 interface rankedProfile {
@@ -59,4 +60,5 @@ interface matchData {
     teams: Array<Array<teamMember>>
 }
 
-export { profilePicture, rankedProfile, matchData }
+export { matchData, profilePicture, rankedProfile }
+
