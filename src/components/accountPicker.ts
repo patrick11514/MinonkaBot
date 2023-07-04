@@ -65,7 +65,7 @@ class accountPicker {
             let row = new ActionRowBuilder<ButtonBuilder>()
 
             for (let account of accList) {
-                let id = `${this.id}@${account.name}:${account.region}@${name}`
+                let id = `${this.id}@${account.name}:${account.region}@${name}@${this.interaction.user.id}`
 
                 if (args) {
                     id += `@${typeof args == 'object' ? JSON.stringify(args) : args}`
@@ -97,10 +97,11 @@ class accountPicker {
             let id = idData[0]
             let acc = idData[1]
             let fnc = idData[2]
+            let cmdAuthor = idData[3]
             let args = null
 
-            if (idData.length == 4) {
-                let arg = idData[3]
+            if (idData.length == 5) {
+                let arg = idData[4]
 
                 try {
                     args = JSON.parse(arg)
@@ -110,6 +111,11 @@ class accountPicker {
             }
 
             if (id != process.env.KEY) return
+
+            if (interaction.user.id != cmdAuthor) {
+                await interaction.reply({ content: 'Tato interakce není pro tebe!', ephemeral: true })
+                return
+            }
 
             let accountParts = acc.split(':')
             let account = {
