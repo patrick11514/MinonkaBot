@@ -64,6 +64,19 @@ class Images {
         })
         this.composite(levelText, 239, 220)
 
+        //add server
+        this.l.log('Adding server...')
+        let serverText = await this.createText({
+            text: userData.region,
+            textSize: 60,
+            width: 700,
+            height: 90,
+            bold: true,
+            color: '#ffffff',
+            font: 'Beaufort for LOL Ja',
+        })
+        this.composite(serverText, 0, 140)
+
         if (title) {
             //add title
             this.l.log('Adding title...')
