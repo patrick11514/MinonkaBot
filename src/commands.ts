@@ -290,6 +290,7 @@ let commands: {
                 type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
+                choices: regions,
             },
             {
                 name: 'mention',
@@ -299,7 +300,7 @@ let commands: {
             },
         ],
     },
-    /*clash: {
+    clash: {
         description: 'Command, pro clashe v league of legends',
         options: [
             {
@@ -320,6 +321,7 @@ let commands: {
                 type: 'STRING',
                 description: 'Region, na kterém je tvůj účet vytvořen. (Zrychlí vyhledání účtu)',
                 required: false,
+                choices: regions,
             },
             {
                 name: 'mention',
@@ -328,7 +330,7 @@ let commands: {
                 required: false,
             },
         ],
-    },*/
+    },
 }
 
 commands.help.options[0].choices = Object.keys(commands).map((command: string) => {
