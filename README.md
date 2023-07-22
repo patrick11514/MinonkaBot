@@ -1,15 +1,18 @@
 # Miňonka
 
----
-
 #### League of Legends discord bot
 
 **Tested on:**
 
--   OS: Ubuntu 22.04.1 (Jammy Jellyfish)
--   NodeJS: v16.17.0
--   tsc: 4.5.4
--   Discord.JS: 14.5.0
+-   OS:
+    -   Ubuntu 22.04.1 (Jammy Jellyfish)
+    -   Arch Linux
+    -   Raspbian 11 (Bullseye)
+-   NodeJS:
+    -   v18.16.1
+    -   v18.14.2
+-   tsc: 4.8.2
+-   Discord.JS: 14.9.0
 
 **How to run:**
 
