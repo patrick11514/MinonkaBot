@@ -648,3 +648,16 @@ export interface Rotation {
     freeChampionIdsForNewPlayers: number[]
     freeChampionIds: number[]
 }
+
+export interface TournamentData {
+    id: string
+    themeId: number
+    nameKey: string
+    nameKeySecondary: string
+    schedule: Array<{
+        id: number
+        registrationTime: number
+        startTime: number
+        cancelled: boolean
+    }>
+}

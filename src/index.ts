@@ -15,6 +15,7 @@ import utilities from './lib/riot/utilities'
 import accountPicker from '$components/accountPicker'
 import { LiveRank } from '$lib/riot/workers/liveRank'
 import * as dotenv from 'dotenv'
+import { ClashListener } from './commands/clash'
 import { startLPChecker } from './lib/riot/workers/lpChecker'
 dotenv.config()
 
@@ -141,7 +142,7 @@ function changeStatus() {
     let option = Math.floor(Math.random() * status.length)
 
     l.log('Changing status to: ' + config.statuses[status[option].status] + ' ' + status[option].text)
-    client.user?.setActivity(status[option].text, {
+    client.user?.setActivity(status[option].text + ` (Patch ${process.client.LOL_VERSION})`, {
         type: status[option].status,
     })
     //chanmge status in 5 minutes
@@ -489,11 +490,13 @@ tasks()
 
 //init account picker
 accountPicker.initHandler()
+//init clash listener
+ClashListener()
 
-client.on('ready', () => {
+client.on('ready', async () => {
     l.log(`Logged as ${client.user?.tag}`)
-    changeStatus()
-    updateVersion()
+    await updateVersion()
+    await changeStatus()
 })
 
 client.on('interactionCreate', async (interaction) => {

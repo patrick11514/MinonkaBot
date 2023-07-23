@@ -7,6 +7,7 @@ import {
     RankedData,
     Rotation,
     SummonerBy,
+    TournamentData,
     UserChallenges,
 } from '$types/riotApi'
 import Logger from '../logger'
@@ -153,6 +154,16 @@ class Riot {
         if ((data as errorResponse).status) return null
 
         return data as Rotation | null
+    }
+
+    static async getTournament(region: string): Promise<null | TournamentData[]> {
+        let url = `https://${region}.api.riotgames.com/lol/clash/v1/tournaments`
+
+        let data = await this.r.makeRequest<TournamentData>(url)
+
+        if ((data as errorResponse).status) return null
+
+        return data as TournamentData[] | null
     }
 }
 

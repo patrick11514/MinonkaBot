@@ -123,8 +123,6 @@ class accountPicker {
                 region: accountParts[1],
             }
 
-            await interaction.reply({ content: 'Účet vybrán, nyní provádíme další akce...', ephemeral: true })
-
             const rawInteraction = interaction.message.interaction as MessageInteraction
             const message = interaction.message
 

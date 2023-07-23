@@ -14,6 +14,7 @@ export const queues = {
     1020: 'One for All',
     1300: 'Snow ARAM',
     1400: 'Nexus Blitz',
+    1700: 'Arény (Cherry)',
 }
 
 export const coopTitles = ['Intro', 'Beginner', 'Intermediate']

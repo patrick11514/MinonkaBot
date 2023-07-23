@@ -71,9 +71,16 @@ export async function matchHistory(
             //check user
             await checkUser(data.id, data.puuid, region, interaction.client.LPDB)
 
+            let cherry = false
+
             for (let match of matchIds) {
                 let matchData = await Riot.getMatch(match, route)
                 if (!matchData) continue
+
+                if (matchData.info.gameMode == 'CHERRY') {
+                    cherry = true
+                    continue
+                }
 
                 let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
 
@@ -161,6 +168,17 @@ export async function matchHistory(
 
             for (let match of matchesInfo) {
                 promises.push(new Images().generateMatch(match))
+            }
+
+            if (promises.length === 0) {
+                if (cherry) {
+                    return interaction.editReply({
+                        content: `Poslední hra byla z Arén, které aktuálně nepodporujeme, pro hry z jiného režimu použíj výběr v příkazu.`,
+                    })
+                }
+                return interaction.editReply({
+                    content: `Nepovedlo se načíst žádnou hru`,
+                })
             }
 
             Promise.all(promises).then(async (images) => {
