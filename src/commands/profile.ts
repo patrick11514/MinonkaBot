@@ -5,7 +5,7 @@ import { SummonerBy, UserChallenges } from '$types/riotApi'
 import { FakeInteraction } from '$types/types'
 import DBUser from '$types/usersDB'
 import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
-import fs from 'fs'
+import fs from 'node:fs'
 
 export default (client: Client) => {
     let e = client.emitter

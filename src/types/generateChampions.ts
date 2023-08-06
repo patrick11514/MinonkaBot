@@ -1,5 +1,5 @@
-import fs from 'fs'
 import fetch from 'node-fetch'
+import fs from 'node:fs'
 
 function fixNames(name: string) {
     return name.replaceAll("'", '').replaceAll('.', '').replaceAll('&', 'and')

@@ -1,6 +1,6 @@
 import clc from 'cli-color'
+import fs from 'node:fs'
 import strip from 'strip-color'
-import fs from 'fs'
 
 class Logger {
     name: string

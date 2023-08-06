@@ -1,7 +1,7 @@
 import { matchData, profilePicture, rankedProfile } from '$types/imageInputs'
 import { QueueTypes, RankColors, Tiers, lowerTier, teamMember } from '$types/riotApi'
 import crypto from 'crypto'
-import fs from 'fs'
+import fs from 'node:fs'
 import Path from 'path'
 import sharp from 'sharp'
 import { coopTitles, queues } from '../../components/queues'
@@ -358,6 +358,7 @@ class Images {
     }
 
     async generateMatch(matchData: matchData): Promise<string> {
+
         const backgroundWidth = 2424
         ///const backgroundHeight = 820
 
