@@ -230,6 +230,10 @@ class Images {
         }
 
         for (let queue of userData.rankeds) {
+            if (queue.queueType === QueueTypes.ARENAS) {
+                continue
+            }
+
             //add name of queue
             this.l.log(`Adding ${queue.queueType}...`)
             let queueText = await this.createText({
@@ -246,6 +250,7 @@ class Images {
 
             //add rank icon
             this.l.log('Adding rank icon...')
+
             let rankIcon = fs.readFileSync(Path.join('./images/ranks', queue.tier.toLowerCase() + '_resized_rank.png'))
             this.composite(rankIcon, x + 225, y + 40)
 
