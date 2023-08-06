@@ -110,8 +110,9 @@ async function schedule(
     }
 
     let data = await Riot.getTournament(region)
-    if (!data) {
-        interaction.editReply('Nejsou naplánovány žádné clash turnaje.')
+
+    if (!data || data.length == 0) {
+        interaction.editReply('Nejsou naplánovány žádné clash turnaje. :cry: ')
         return
     }
 
