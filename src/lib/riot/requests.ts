@@ -1,5 +1,5 @@
-import fetch from 'node-fetch'
 import { errorResponse } from '$types/riotApi'
+import fetch from 'node-fetch'
 import Logger from '../logger'
 
 class Requests {
@@ -17,7 +17,7 @@ class Requests {
                 },
             })
 
-            let json = await request.json()
+            let json = (await request.json()) as T | errorResponse
 
             return json
         } catch (e) {

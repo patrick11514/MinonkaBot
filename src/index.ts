@@ -154,7 +154,7 @@ async function updateVersion() {
     let l = new Logger('Update version', 'blue')
     l.start('Checking for new version...')
     let response = await fetch(process.env.DDRAGON_URL + '/api/versions.json')
-    let json = await response.json()
+    let json = (await response.json()) as string[]
 
     let prevVersion = client.LOL_VERSION
     let currentVer = json[0]

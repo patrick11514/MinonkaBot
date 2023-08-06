@@ -1,5 +1,5 @@
-import fetch from 'node-fetch'
 import fs from 'fs'
+import fetch from 'node-fetch'
 
 function fixNames(name: string) {
     return name.replaceAll("'", '').replaceAll('.', '').replaceAll('&', 'and')
@@ -9,14 +9,20 @@ function fixNames(name: string) {
 ;(async () => {
     let request = await fetch('https://ddragon.leagueoflegends.com/api/versions.json')
 
-    let json = await request.json()
+    const json = (await request.json()) as string[]
 
     let version = json[0]
 
     request = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`)
-    json = await request.json()
+    const json2 = (await request.json()) as {
+        data: {
+            [key: string]: {
+                name: string
+            }
+        }
+    }
 
-    let champions = json.data
+    let champions = json2.data
 
     //create champ types
     let enumString = 'enum Champions {\n'

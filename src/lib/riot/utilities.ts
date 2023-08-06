@@ -138,7 +138,7 @@ class Utilities {
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/challenges.json'
         )
 
-        let data: Array<Challenge> = await response.json()
+        let data = (await response.json()) as Array<Challenge>
 
         //id is number of length 8
         //first 6 digits are challenge id
@@ -256,7 +256,7 @@ class Utilities {
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/champion.json'
         )
 
-        let data = await response.json()
+        let data = (await response.json()) as championsData
 
         fs.writeFileSync(path, JSON.stringify(data))
 
@@ -283,7 +283,7 @@ class Utilities {
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/item.json'
         )
 
-        let data = await response.json()
+        let data = (await response.json()) as itemsData
 
         fs.writeFileSync(path, JSON.stringify(data))
 
@@ -301,7 +301,7 @@ class Utilities {
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/summoner.json'
         )
 
-        let data = await response.json()
+        let data = (await response.json()) as summoners
 
         fs.writeFileSync(path, JSON.stringify(data))
 
@@ -338,7 +338,7 @@ class Utilities {
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/runesReforged.json'
         )
 
-        let data = await response.json()
+        let data = (await response.json()) as runeData[]
 
         fs.writeFileSync(path, JSON.stringify(data))
 
