@@ -9,7 +9,7 @@ import {
     Rotation,
     SummonerBy,
     TournamentData,
-    UserChallenges
+    UserChallenges,
 } from '$types/riotApi'
 import Logger from '../logger'
 import Requests from './requests'
@@ -123,10 +123,11 @@ class Riot {
         id: EncryptedPuuid,
         route: string,
         count?: string | null,
-        queue?: string | null
+        queue?: string | null,
+        offset: number | null = 0,
     ): Promise<Array<string>> {
         let url =
-            `https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=0&count=${
+            `https://${route}.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=${offset ?? 0}&count=${
                 count ? count : 1
             }` + (queue ? `&queue=${queue}` : '')
 

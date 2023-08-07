@@ -21,8 +21,9 @@ export default (client: Client) => {
             let username = interaction.options.getString('username', false)
             let region = interaction.options.getString('region', false)
             let mention = interaction.options.getUser('mention', false)
+            let offset = interaction.options.getInteger('offset', false)
 
-            matchHistory(username, region, mention, interaction, queue, limit)
+            matchHistory(username, region, mention, interaction, queue, limit, offset)
         }
     })
 }
@@ -34,6 +35,7 @@ export async function matchHistory(
     interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
     queue: string | null,
     limit: string | null,
+    offset: number | null,
 ) {
     handleInteraction(
         interaction,
@@ -48,6 +50,7 @@ export async function matchHistory(
             interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
             queue: string | null,
             limit: string | null,
+            offset: number | null,
         ) {
             //Get route
             let route = utilities.getRoutingValue(region)
@@ -58,7 +61,7 @@ export async function matchHistory(
                 })
             }
 
-            let matchIds = await Riot.getMatches(data.puuid, route, limit, queue)
+            let matchIds = await Riot.getMatches(data.puuid, route, limit, queue, offset)
 
             if (matchIds.length == 0) {
                 return interaction.editReply({
@@ -227,7 +230,7 @@ export async function matchHistory(
             })
         },
         matchHistory,
-        [queue, limit],
-        [queue, limit],
+        [queue, limit, offset],
+        [queue, limit, offset],
     )
 }

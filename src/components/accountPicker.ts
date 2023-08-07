@@ -36,7 +36,7 @@ class accountPicker {
         }>,
         interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
         edit = false,
-        message = 'Zde je seznam nalezených účtů:'
+        message = 'Zde je seznam nalezených účtů:',
     ) {
         this.accounts = accounts
 
@@ -76,10 +76,10 @@ class accountPicker {
                         .setLabel(
                             `${account.name} (${process.client.config.regionTranslates[account.region]}) ${
                                 account.level > -1 ? `- ${account.level}` : ''
-                            }`
+                            }`,
                         )
                         .setStyle(ButtonStyle.Primary)
-                        .setCustomId(id)
+                        .setCustomId(id),
                 )
             }
             rows.push(row)
@@ -171,8 +171,9 @@ class accountPicker {
                     let argum = args as {
                         queue: string | null
                         limit: string | null
+                        offset: number | null
                     }
-                    matchHistory(account.name, account.region, null, inter, argum.queue, argum.limit)
+                    matchHistory(account.name, account.region, null, inter, argum.queue, argum.limit, argum.offset)
                 }
             }
         })

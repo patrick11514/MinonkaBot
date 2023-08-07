@@ -247,6 +247,12 @@ let commands: {
                 choices: regions,
             },
             {
+                name: 'offset',
+                type: 'INTEGER',
+                description: 'Nastaví od jakého zápasu se má začít zobrazovat historie',
+                required: false,
+            },
+            {
                 name: 'mention',
                 type: 'USER',
                 description: 'Označ uživatele s propojeným účtem',
