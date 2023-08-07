@@ -1,4 +1,4 @@
-import { matchData, profilePicture, rankedProfile } from '$types/imageInputs'
+import { cherryMatchData, matchData, profilePicture, rankedProfile } from '$types/imageInputs'
 import { QueueTypes, RankColors, Tiers, lowerTier, teamMember } from '$types/riotApi'
 import crypto from 'crypto'
 import fs from 'node:fs'
@@ -358,7 +358,6 @@ class Images {
     }
 
     async generateMatch(matchData: matchData): Promise<string> {
-
         const backgroundWidth = 2424
         ///const backgroundHeight = 820
 
@@ -373,13 +372,13 @@ class Images {
             text: matchData.ff15 && matchData.length <= 195 ? 'Remake' : win ? 'Victory' : 'Defeat',
             textSize: 100,
             width: 700,
-            height: 135,
+            height: 165,
             bold: true,
             color: matchData.ff15 && matchData.length <= 195 ? '#7e857f' : win ? '#1fed18' : '#ff0000',
             font: 'Beaufort for LOL Ja',
             center: true,
         })
-        this.composite(winOrLoseText, 858, 45)
+        this.composite(winOrLoseText, 858, 35)
 
         //add queue type under win or lose text
         this.l.log('Adding queue type...')
@@ -487,25 +486,25 @@ class Images {
             text: matchData.teams[1].reduce((prev, curr) => prev + curr.kills, 0).toString(),
             textSize: 100,
             width: 700,
-            height: 135,
+            height: 165,
             bold: true,
             color: '#ffffff',
             font: 'Beaufort for LOL Ja',
             center: true,
         })
-        this.composite(killTextTeam1, 858 - 300, 45)
+        this.composite(killTextTeam1, 858 - 300, 35)
 
         let killTextTeam2 = await this.createText({
             text: matchData.teams[2].reduce((prev, curr) => prev + curr.kills, 0).toString(),
             textSize: 100,
             width: 700,
-            height: 135,
+            height: 165,
             bold: true,
             color: '#ffffff',
             font: 'Beaufort for LOL Ja',
             center: true,
         })
-        this.composite(killTextTeam2, 858 + 300, 45)
+        this.composite(killTextTeam2, 858 + 300, 35)
 
         this.l.log('Adding champion bans...')
         //bans
@@ -598,14 +597,14 @@ class Images {
                 width: 700,
                 height: 90,
                 bold: true,
-                color: '#ffffff',
+                color: champ.summonerId === matchData.userId ? '#fff000' : '#ffffff',
                 font: 'Beaufort for LOL Ja',
                 center: multiplier == -1 ? 2 : false,
             })
             this.composite(
                 usernameText,
                 x + (50 + imageWidth + 15 + (multiplier == -1 ? offset : 0)) * multiplier,
-                y - 15
+                y - 15,
             )
 
             //kda score
@@ -623,7 +622,7 @@ class Images {
             this.composite(
                 kdaText,
                 x + (50 + imageWidth + 15 + (multiplier == -1 ? offset : 0)) * multiplier,
-                y + 50 - 15
+                y + 50 - 15,
             )
 
             const spacing = 5
@@ -646,7 +645,7 @@ class Images {
                 this.composite(
                     spellImage,
                     x + (fromName - (multiplier == 1 ? summonerSpellSize + spacing : 0)) * multiplier,
-                    spellsY
+                    spellsY,
                 )
             }
 
@@ -686,7 +685,7 @@ class Images {
                 //background - 130*130 for item, and full is 138*138
                 const itemBackground = sharp('./images/itemBackground.png').resize(
                     itemBackgroundSize,
-                    itemBackgroundSize
+                    itemBackgroundSize,
                 )
 
                 const itemX =
@@ -744,7 +743,7 @@ class Images {
             this.composite(
                 minionText,
                 minionX + (imageSize + spacing + (multiplier == -1 ? 75 : 0)) * multiplier,
-                dataY
+                dataY,
             )
 
             const intl = new Intl.NumberFormat('cs-cz')
@@ -770,7 +769,7 @@ class Images {
             this.composite(
                 damageText,
                 damageX + (imageSize + spacing + (multiplier == -1 ? 75 : 0)) * multiplier,
-                dataY
+                dataY,
             )
 
             //golds
@@ -805,13 +804,234 @@ class Images {
                         champ,
                         i == 1 ? 0 : backgroundWidth,
                         145 + (imageWidth + 60) * parseInt(champId),
-                        i == 1 ? 1 : -1
-                    )
+                        i == 1 ? 1 : -1,
+                    ),
                 )
             }
         }
 
         await Promise.all(promises)
+
+        this.l.log('Finishing image...')
+        let buffer = await this.compositeDone(image).toBuffer()
+        let name = crypto.randomBytes(10).toString('hex') + '.png'
+
+        this.l.log('Saving image...')
+        fs.writeFileSync(`./temp/${name}`, buffer)
+        this.l.stop('Done')
+
+        return `./temp/${name}`
+    }
+
+    async generateMatchCherry(data: cherryMatchData): Promise<string> {
+        const backgroundWidth = 2424
+        ///const backgroundHeight = 820
+
+        let background = fs.readFileSync('./images/matchBackground.png')
+
+        this.l.start('Creating background...')
+        let image = sharp(background)
+
+        this.l.log('Adding bans...')
+        const bans = data.bans[0].bans
+
+        const banY = 35
+        for (const banId in bans) {
+            const id = parseInt(banId)
+            const ban = bans[banId]
+            const fileName = await utils.championIdToImage(ban.champion)
+            let image: string
+            if (!fileName) {
+                image = await utils.downloadProfilePicture(29)
+            } else {
+                image = await utils.getChampionImage(fileName)
+            }
+
+            image = await utils.resizeImage(image, 70, 70, true)
+
+            // <-----> 2424px // (70 + 10) * 8
+            this.composite(image, 892 + id * (70 + 10), banY)
+        }
+
+        this.l.log('Adding teams')
+        for (const teamId in data.teams) {
+            const id = parseInt(teamId)
+            const team = data.teams[teamId]
+
+            const teamName = team[0].team
+            const player = team.find((p) => p.summonerId === data.userId)
+            const inTeam = player ? true : false
+
+            console.log(id, team)
+            const startY = id % 2 == 0 ? 120 + 330 : 120
+            const startX = id < 3 ? 80 : backgroundWidth / 2 + 40
+            //team icon
+            const path = `./images/arenas/${teamName}.png`
+            const icon = await utils.resizeImage(path, 75, 75, true)
+            this.composite(icon, startX, startY)
+
+            //team name + position
+            const teamNameText = await this.createText({
+                text: `${id}. - ${teamName}`,
+                textSize: 40,
+                width: 700,
+                height: 90,
+                bold: true,
+                color: inTeam ? '#fff000' : '#ffffff',
+                font: 'Beaufort for LOL Ja',
+                center: false,
+            })
+            this.composite(teamNameText, startX + 75 + 10, startY + 10)
+
+            const iconOffset = startY + 75
+
+            //players
+            for (const playerId in team) {
+                const data = team[playerId]
+
+                //champion icon
+                const fileName = await utils.championIdToImage(data.champion)
+                let image: string
+                if (!fileName) {
+                    image = await utils.downloadProfilePicture(29)
+                } else {
+                    image = await utils.getChampionImage(fileName)
+                }
+
+                image = await utils.resizeImage(image, 75, 75, true)
+
+                this.composite(image, startX, iconOffset + parseInt(playerId) * 120 + 15 /*15 - offset to match text */)
+
+                //level
+                const levelText = await this.createText({
+                    text: data.level.toString(),
+                    textSize: 32,
+                    width: 75,
+                    height: 90,
+                    bold: true,
+                    color: '#ffffff',
+                    font: 'Beaufort for LOL Ja',
+                    center: true,
+                    outline: true,
+                })
+                this.composite(levelText, startX, iconOffset + parseInt(playerId) * 120 + 15 + 75 - 40)
+
+                //username
+                const usernameText = await this.createText({
+                    text: data.summoner,
+                    textSize: 40,
+                    width: 700,
+                    height: 90,
+                    bold: true,
+                    color: data.summonerId === player?.summonerId ? '#fff000' : '#ffffff',
+                    font: 'Beaufort for LOL Ja',
+                    center: false,
+                })
+                this.composite(usernameText, startX + 75 + 10, iconOffset + parseInt(playerId) * 120)
+
+                //kda
+                const kdaText = await this.createText({
+                    text: `${data.kills.toString()}/${data.deaths.toString()}/${data.asists.toString()}`,
+                    textSize: 40,
+                    width: 700,
+                    height: 90,
+                    bold: true,
+                    color: '#ffffff',
+                    font: 'Beaufort for LOL Ja',
+                    center: false,
+                })
+                this.composite(kdaText, startX + 75 + 10, iconOffset + parseInt(playerId) * 120 + 50)
+
+                const fromText = 600
+
+                const spellStartX = startX + fromText
+
+                //summoner spells
+                for (let i = 0; i <= 1; i++) {
+                    const summonerSpellSize = 40
+                    const spellsY = iconOffset + parseInt(playerId) * 120 + (summonerSpellSize + 5) * i + 10
+
+                    let spell = data.summoners[i]
+
+                    let spellImage = await utils.getSummonerImage(spell)
+
+                    if (!spellImage) {
+                        spellImage = await utils.downloadProfilePicture(29)
+                    }
+
+                    spellImage = await utils.resizeImage(spellImage, summonerSpellSize, summonerSpellSize, true)
+
+                    this.composite(spellImage, spellStartX, spellsY)
+                }
+
+                const itemStartX = spellStartX + 40 + 10
+
+                //items
+                for (let i = 0; i <= 6; i++) {
+                    const itemSpacing = 3
+
+                    const item = data.items[i]
+                    //background - 130*130 for item, and full is 138*138
+                    const itemBackground = sharp('./images/itemBackground.png').resize(60, 60)
+
+                    const itemX = itemStartX + (itemSpacing + 60) * i
+                    const itemY = iconOffset + parseInt(playerId) * 120 + 10
+
+                    this.composite(await itemBackground.toBuffer(), itemX, itemY)
+
+                    //item
+                    if (item) {
+                        let itemImage = await utils.getItemImage(item.toString() + '.png')
+                        itemImage = await utils.resizeImage(itemImage, 56, 56, true)
+                        this.composite(itemImage, itemX + 2, itemY + 2)
+                    }
+                }
+
+                const intl = new Intl.NumberFormat('cs-cz')
+
+                //damage
+                const damageX = spellStartX + 40 + 10 + 55 /*55 - +-center under items, not ward */
+                const damageY = iconOffset + parseInt(playerId) * 120 + 60 + 10
+
+                const damageImage = await utils.resizeImage('./images/sword.png', 25, 25, true)
+                this.composite(damageImage, damageX, damageY)
+
+                const damageText = await this.createText({
+                    text: intl.format(data.totalDamage),
+                    textSize: 22,
+                    width: 100,
+                    height: 40,
+                    bold: true,
+                    color: '#FFFFFF',
+                    font: 'Beaufort for LOL Ja',
+                    center: false,
+                    outline: true,
+                })
+
+                this.composite(damageText, damageX + 25 + 10, damageY)
+
+                //golds
+                const goldsX = damageX + 150
+                const goldsY = iconOffset + parseInt(playerId) * 120 + 60 + 10
+
+                const goldsImage = await utils.resizeImage('./images/coins.png', 25, 25, true)
+                this.composite(goldsImage, goldsX, goldsY)
+
+                const goldsText = await this.createText({
+                    text: intl.format(data.golds),
+                    textSize: 22,
+                    width: 100,
+                    height: 40,
+                    bold: true,
+                    color: '#FFFFFF',
+                    font: 'Beaufort for LOL Ja',
+                    center: false,
+                    outline: true,
+                })
+
+                this.composite(goldsText, goldsX + 25 + 10, goldsY)
+            }
+        }
 
         this.l.log('Finishing image...')
         let buffer = await this.compositeDone(image).toBuffer()
@@ -892,7 +1112,7 @@ class Images {
         string: string,
         center: number,
         y: number,
-        images = ['seriesWin_resized.png', 'seriesLose_resized.png', 'seriesEmpty_resized.png']
+        images = ['seriesWin_resized.png', 'seriesLose_resized.png', 'seriesEmpty_resized.png'],
     ) {
         let progress = string.split('') as Array<'W' | 'L' | 'N'>
 

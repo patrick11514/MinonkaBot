@@ -71,7 +71,7 @@ export interface SummonerBy {
 export enum QueueTypes {
     RANKED_SOLO = 'RANKED_SOLO_5x5',
     RANKED_FLEX = 'RANKED_FLEX_SR',
-    ARENAS = "CHERRY"
+    ARENAS = 'CHERRY',
 }
 
 export enum Tiers {
@@ -479,18 +479,36 @@ export interface participant {
     win: boolean
 }
 
-export interface teamMember {
+export interface cherryParticipant extends participant {
+    placement: 1 | 2 | 3 | 4
+    playerSubteamId: 1 | 2 | 3 | 4
+    subteamPlacement: 1 | 2 | 3 | 4
+}
+
+export interface baseTeamMember {
     id: number
     champion: number
     summoner: string
-    role: string
+    summonerId: string
     summoners: number[]
     items: number[]
     kills: number
     asists: number
     deaths: number
-    vision: number
     level: number
+    totalDamage: number
+    golds: number
+}
+
+export interface cherryTeamMember extends baseTeamMember {
+    team: 'Poro' | 'Minion' | 'Scuttle' | 'Krug'
+    position: 1 | 2 | 3 | 4
+    subteamPlacement: 1 | 2 | 3 | 4
+}
+
+export interface teamMember extends baseTeamMember {
+    role: string
+    vision: number
     perks: {
         statPerks: {
             defense: number
@@ -511,66 +529,83 @@ export interface teamMember {
     }
     minions: number
     neutralMinions: number
-    totalDamage: number
-    golds: number
 }
 
-export interface match {
-    metadata: {
-        dataVersion: string
-        matchId: string
-        participants: Array<EncryptedPuuid>
-    }
-    info: {
-        gameCreation: number
-        gameDuration: number
-        gameStartTimestamp: number
-        gameEndTimestamp: number
-        gameId: number
-        gameMode: string
-        gameName: string
-        gameType: string
-        gameVersion: string
-        mapId: number
-        participants: Array<participant>
-        platformId: string
-        queueId: queues
-        teams: Array<{
-            bans: Array<{
-                championId: number
-                pickTurn: number
-            }>
-            objectives: {
-                baron: {
-                    first: boolean
-                    kills: number
-                }
-                champion: {
-                    first: boolean
-                    kills: number
-                }
-                dragon: {
-                    first: boolean
-                    kills: number
-                }
-                inhibitor: {
-                    first: boolean
-                    kills: number
-                }
-                riftHerald: {
-                    first: boolean
-                    kills: number
-                }
-                tower: {
-                    first: boolean
-                    kills: number
-                }
-            }
-            teamId: number
-            win: boolean
+type matchMetadata = {
+    dataVersion: string
+    matchId: string
+    participants: Array<EncryptedPuuid>
+}
+
+interface baseMatchInfo {
+    gameCreation: number
+    gameDuration: number
+    gameStartTimestamp: number
+    gameEndTimestamp: number
+    gameId: number
+    gameName: string
+    gameType: string
+    gameVersion: string
+    mapId: number
+    platformId: string
+    queueId: queues
+    teams: Array<{
+        bans: Array<{
+            championId: number
+            pickTurn: number
         }>
-        tournamentCode: string
-    }
+        objectives: {
+            baron: {
+                first: boolean
+                kills: number
+            }
+            champion: {
+                first: boolean
+                kills: number
+            }
+            dragon: {
+                first: boolean
+                kills: number
+            }
+            inhibitor: {
+                first: boolean
+                kills: number
+            }
+            riftHerald: {
+                first: boolean
+                kills: number
+            }
+            tower: {
+                first: boolean
+                kills: number
+            }
+        }
+        teamId: number
+        win: boolean
+    }>
+    tournamentCode: string
+}
+
+interface normalMatchInfo extends baseMatchInfo {
+    gameMode: 'CLASIC' | 'ARAM'
+    participants: Array<participant>
+}
+
+interface cherryMatchInfo extends baseMatchInfo {
+    gameMode: 'CHERRY'
+    participants: Array<cherryParticipant>
+}
+
+interface baseMatch {
+    metadata: matchMetadata
+}
+
+export interface normalMatch extends baseMatch {
+    info: normalMatchInfo
+}
+
+export interface cherryMatch extends baseMatch {
+    info: cherryMatchInfo
 }
 
 export enum queues {
@@ -589,6 +624,7 @@ export enum queues {
     'One for All' = 1020,
     'Snow ARAM' = 1300,
     'Nexus Blitz' = 1400,
+    'Cherry' = 1700,
 }
 
 export interface summoners extends JSONRiotFiles {

@@ -1,6 +1,6 @@
-import { EncryptedSummonerId, queues, QueueTypes, Ranks, teamMember, Tiers } from './riotApi'
+import { cherryTeamMember, EncryptedSummonerId, queues, QueueTypes, Ranks, teamMember, Tiers } from './riotApi'
 
-interface profilePicture {
+export interface profilePicture {
     username: string
     level: number
     iconId: number
@@ -12,7 +12,7 @@ interface profilePicture {
     region: string
 }
 
-interface rankedProfile {
+export interface rankedProfile {
     profileIconId: number
     summonerName: string
     level: number
@@ -39,7 +39,8 @@ interface rankedProfile {
     }>
 }
 
-interface matchData {
+interface baseMatchData {
+    userId: string
     length: number
     ff15: boolean
     queue: queues
@@ -57,8 +58,12 @@ interface matchData {
         id: number
         win: boolean
     }>
+}
+
+export interface matchData extends baseMatchData {
     teams: Array<Array<teamMember>>
 }
 
-export { matchData, profilePicture, rankedProfile }
-
+export interface cherryMatchData extends baseMatchData {
+    teams: Array<Array<cherryTeamMember>>
+}

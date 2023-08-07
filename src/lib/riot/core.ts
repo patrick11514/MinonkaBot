@@ -1,14 +1,15 @@
 import {
+    cherryMatch,
     EncryptedAccountId,
     EncryptedPuuid,
     EncryptedSummonerId,
     errorResponse,
-    match,
+    normalMatch,
     RankedData,
     Rotation,
     SummonerBy,
     TournamentData,
-    UserChallenges,
+    UserChallenges
 } from '$types/riotApi'
 import Logger from '../logger'
 import Requests from './requests'
@@ -136,14 +137,14 @@ class Riot {
         return data as Array<string>
     }
 
-    static async getMatch(id: string, route: string): Promise<null | match> {
+    static async getMatch(id: string, route: string): Promise<null | normalMatch | cherryMatch> {
         let url = `https://${route}.api.riotgames.com/lol/match/v5/matches/${id}`
 
-        let data = await this.r.makeRequest<match>(url)
+        let data = await this.r.makeRequest<normalMatch | cherryMatch>(url)
 
         if ((data as errorResponse)?.status) return null
 
-        return data as match | null
+        return data as normalMatch | cherryMatch
     }
 
     static async getRotation(region: string): Promise<Rotation | null> {

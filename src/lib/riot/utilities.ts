@@ -1,4 +1,4 @@
-import { Challenge, championsData, itemsData, runeData, summoners, teamMember } from '$types/riotApi'
+import { Challenge, championsData, cherryTeamMember, itemsData, runeData, summoners, teamMember } from '$types/riotApi'
 import crypto from 'crypto'
 import dotenv from 'dotenv'
 import { XMLParser } from 'fast-xml-parser'
@@ -135,7 +135,7 @@ class Utilities {
         let newId = parseInt(id)
 
         let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/challenges.json'
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/challenges.json',
         )
 
         let data = (await response.json()) as Array<Challenge>
@@ -168,7 +168,7 @@ class Utilities {
         return title
     }
     tierIdToString(
-        tierId: number
+        tierId: number,
     ): 'IRON' | 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND' | 'MASTER' | 'GRANDMASTER' | 'CHALLENGER' {
         let tiers: Array<string> = [
             'IRON',
@@ -201,7 +201,7 @@ class Utilities {
     async getChampionImage(filename: string) {
         let path = await this.downloadImage(
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/champion/' + filename,
-            false
+            false,
         )
 
         return path
@@ -253,7 +253,7 @@ class Utilities {
         }
 
         let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/champion.json'
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/champion.json',
         )
 
         let data = (await response.json()) as championsData
@@ -266,7 +266,7 @@ class Utilities {
     async getItemImage(filename: string) {
         let path = await this.downloadImage(
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/item/' + filename,
-            false
+            false,
         )
 
         return path
@@ -280,7 +280,7 @@ class Utilities {
         }
 
         let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/item.json'
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/item.json',
         )
 
         let data = (await response.json()) as itemsData
@@ -298,7 +298,7 @@ class Utilities {
         }
 
         let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/summoner.json'
+            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/summoner.json',
         )
 
         let data = (await response.json()) as summoners
@@ -319,7 +319,7 @@ class Utilities {
 
         let path = await this.downloadImage(
             process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/img/spell/' + find.image.full,
-            false
+            false,
         )
 
         return path
@@ -335,7 +335,12 @@ class Utilities {
         }
 
         let response = await fetch(
-            process.env.DDRAGON_URL + '/cdn/' + process.client.LOL_VERSION + '/data/' + language + '/runesReforged.json'
+            process.env.DDRAGON_URL +
+                '/cdn/' +
+                process.client.LOL_VERSION +
+                '/data/' +
+                language +
+                '/runesReforged.json',
         )
 
         let data = (await response.json()) as runeData[]
@@ -440,6 +445,17 @@ class Utilities {
 
         if (sorted.length == 0) {
             return team
+        }
+
+        return sorted
+    }
+
+    sortCherryTeam(teams: cherryTeamMember[][]): cherryTeamMember[][] {
+        const sorted: cherryTeamMember[][] = []
+
+        for (const teamId in teams) {
+            const team = teams[teamId]
+            sorted[team[0].subteamPlacement] = team
         }
 
         return sorted

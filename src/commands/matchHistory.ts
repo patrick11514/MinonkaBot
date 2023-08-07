@@ -4,10 +4,11 @@ import Logger from '$lib/logger'
 import Riot from '$lib/riot/core'
 import utilities from '$lib/riot/utilities'
 import { checkUser, getLP } from '$lib/riot/workers/lpChecker'
-import { SummonerBy, teamMember } from '$types/riotApi'
+import { cherryMatchData, matchData } from '$types/imageInputs'
+import { SummonerBy, cherryTeamMember, queues, teamMember } from '$types/riotApi'
 import { FakeInteraction } from '$types/types'
 import { ButtonInteraction, ChatInputCommandInteraction, Client, User } from 'discord.js'
-import fs from 'fs'
+import fs from 'node:fs'
 
 export default (client: Client) => {
     let e = client.emitter
@@ -32,7 +33,7 @@ export async function matchHistory(
     mention: User | null,
     interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
     queue: string | null,
-    limit: string | null
+    limit: string | null,
 ) {
     handleInteraction(
         interaction,
@@ -46,7 +47,7 @@ export async function matchHistory(
             data: SummonerBy,
             interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
             queue: string | null,
-            limit: string | null
+            limit: string | null,
         ) {
             //Get route
             let route = utilities.getRoutingValue(region)
@@ -66,64 +67,96 @@ export async function matchHistory(
             }
 
             //get match info
-            let matchesInfo = []
+            let matchesInfo: (matchData | cherryMatchData)[] = []
 
             //check user
             await checkUser(data.id, data.puuid, region, interaction.client.LPDB)
 
-            let cherry = false
+            const cherryTeams: ('Poro' | 'Minion' | 'Scuttle' | 'Krug')[] = ['Poro', 'Minion', 'Scuttle', 'Krug']
 
             for (let match of matchIds) {
-                let matchData = await Riot.getMatch(match, route)
+                const matchData = await Riot.getMatch(match, route)
                 if (!matchData) continue
 
-                if (matchData.info.gameMode == 'CHERRY') {
-                    cherry = true
-                    continue
+                const userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
+
+                const ff15 = matchData.info.participants.find((p) => p.puuid == data.puuid)?.gameEndedInEarlySurrender
+
+                let teams: (teamMember | cherryTeamMember)[][] = []
+
+                if (matchData.info.gameMode === 'CHERRY') {
+                    matchData.info.participants.forEach((participant) => {
+                        if (!teams[participant.playerSubteamId]) {
+                            teams[participant.playerSubteamId] = []
+                        }
+
+                        teams[participant.playerSubteamId].push({
+                            id: participant.teamId,
+                            champion: participant.championId,
+                            summoner: participant.summonerName,
+                            summonerId: participant.summonerId,
+                            kills: participant.kills,
+                            asists: participant.assists,
+                            deaths: participant.deaths,
+                            level: participant.champLevel,
+                            totalDamage: participant.totalDamageDealtToChampions,
+                            golds: participant.goldEarned,
+                            team: cherryTeams[participant.playerSubteamId - 1],
+                            position: participant.playerSubteamId,
+                            summoners: [...Array(2).keys()].map((i) => {
+                                let summoner = `summoner${i + 1}Id` as keyof typeof participant
+                                return participant[summoner] as number
+                            }),
+                            items: [...Array(7).keys()].map((i) => {
+                                let item = `item${i}` as keyof typeof participant
+                                return participant[item] as number
+                            }),
+                            subteamPlacement: participant.subteamPlacement,
+                        })
+                    })
+                } else {
+                    matchData.info.participants.forEach((participant) => {
+                        let teamId = participant.teamId / 100
+                        if (!teams[teamId]) {
+                            teams[teamId] = []
+                        }
+
+                        teams[teamId].push({
+                            id: participant.teamId,
+                            champion: participant.championId,
+                            summoner: participant.summonerName,
+                            summonerId: participant.summonerId,
+                            role: participant.teamPosition,
+                            summoners: [...Array(2).keys()].map((i) => {
+                                let summoner = `summoner${i + 1}Id` as keyof typeof participant
+                                return participant[summoner] as number
+                            }),
+                            items: [...Array(7).keys()].map((i) => {
+                                let item = `item${i}` as keyof typeof participant
+                                return participant[item] as number
+                            }),
+                            kills: participant.kills,
+                            asists: participant.assists,
+                            deaths: participant.deaths,
+                            vision: participant.visionScore,
+                            level: participant.champLevel,
+                            perks: participant.perks,
+                            minions: participant.totalMinionsKilled,
+                            neutralMinions: participant.neutralMinionsKilled,
+                            totalDamage: participant.totalDamageDealtToChampions,
+                            golds: participant.goldEarned,
+                        })
+                    })
                 }
 
-                let userTeam = matchData.info.participants.find((p) => p.puuid == data.puuid)?.teamId
-
-                let ff15 = matchData.info.participants.find((p) => p.puuid == data.puuid)?.gameEndedInEarlySurrender
-
-                let teams: Array<Array<teamMember>> = []
-
-                matchData.info.participants.forEach((participant) => {
-                    let teamId = participant.teamId / 100
-                    if (!teams[teamId]) {
-                        teams[teamId] = []
-                    }
-
-                    teams[teamId].push({
-                        id: participant.teamId,
-                        champion: participant.championId,
-                        summoner: participant.summonerName,
-                        role: participant.teamPosition,
-                        summoners: [...Array(2).keys()].map((i) => {
-                            let summoner = `summoner${i + 1}Id` as keyof typeof participant
-                            return participant[summoner] as number
-                        }),
-                        items: [...Array(7).keys()].map((i) => {
-                            let item = `item${i}` as keyof typeof participant
-                            return participant[item] as number
-                        }),
-                        kills: participant.kills,
-                        asists: participant.assists,
-                        deaths: participant.deaths,
-                        vision: participant.visionScore,
-                        level: participant.champLevel,
-                        perks: participant.perks,
-                        minions: participant.totalMinionsKilled,
-                        neutralMinions: participant.neutralMinionsKilled,
-                        totalDamage: participant.totalDamageDealtToChampions,
-                        golds: participant.goldEarned,
-                    })
-                })
-
                 //sort team mebers
-                teams = teams.map((team) => {
-                    return utilities.sortTeam(team)
-                })
+                if (matchData.info.gameMode === 'CHERRY') {
+                    teams = utilities.sortCherryTeam(teams as cherryTeamMember[][])
+                } else {
+                    teams = teams.map((team) => {
+                        return utilities.sortTeam(team as teamMember[])
+                    })
+                }
 
                 let lp = undefined
 
@@ -132,11 +165,12 @@ export async function matchHistory(
                         data.id,
                         matchData.info.queueId,
                         matchData.metadata.matchId,
-                        interaction.client.LPDB
+                        interaction.client.LPDB,
                     )
                 }
 
                 matchesInfo.push({
+                    userId: data.id,
                     length: matchData.info.gameDuration,
                     ff15: ff15 as boolean,
                     queue: matchData.info.queueId,
@@ -160,22 +194,21 @@ export async function matchHistory(
                             win: team.win,
                         }
                     }),
-                    teams: teams,
+                    teams: teams as Array<Array<teamMember>>,
                 })
             }
 
             let promises: Promise<string>[] = []
 
             for (let match of matchesInfo) {
-                promises.push(new Images().generateMatch(match))
+                if (match.queue === queues.Cherry) {
+                    promises.push(new Images().generateMatchCherry(match as cherryMatchData))
+                } else {
+                    promises.push(new Images().generateMatch(match as matchData))
+                }
             }
 
             if (promises.length === 0) {
-                if (cherry) {
-                    return interaction.editReply({
-                        content: `Poslední hra byla z Arén, které aktuálně nepodporujeme, pro hry z jiného režimu použíj výběr v příkazu.`,
-                    })
-                }
                 return interaction.editReply({
                     content: `Nepovedlo se načíst žádnou hru`,
                 })
@@ -195,6 +228,6 @@ export async function matchHistory(
         },
         matchHistory,
         [queue, limit],
-        [queue, limit]
+        [queue, limit],
     )
 }
