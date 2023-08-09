@@ -15,7 +15,7 @@
     "author": "Patrik Mintěl",
     "license": "ISC",
     "dependencies": {
-        "@discordjs/builders": "~1.2.0",
+        "@discordjs/builders": "~1.6.3",
         "@discordjs/rest": "~1.2.0",
         "cli-color": "^2.0.3",
         "discord-api-types": "~0.37.11",
