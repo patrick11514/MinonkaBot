@@ -37,39 +37,50 @@
     -   WEB_PATH is path to web server, which serves live rank and bot will use it in command
     -   KEY will be used in buttons, to check if the buttons are from this specific bot
 -   **Building bot**
+
     Install node modules:
+
     ```SHELL
     #npm
     $ npm i
     #pnpm
     $ pnpm i
     ```
+
     Build discord bot:
+
     ```SHELL
     #npm
     $ npm build
     #pnpm
     $ pnpm build
     ```
+
     Register slash commands on server:
+
     ```SHELL
     #npm
     $ npm startCommands
     #pnpm
     $ pnpm startCommands
     ```
+
     Run setup script, to copy fonts:
+
     ```SHELL
     $ chmod +x setup.sh
     $ ./setup.sh
     ```
+
     Run discord bot:
+
     ```SHELL
     #npm
     $ npm start
     #pnpm
     $ pnpm start
     ```
+
 -   **Run bot in dev mode:**
     ```SHELL
     #npm
