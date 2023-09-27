@@ -26,6 +26,7 @@
     PORT=3000
     WEB_PATH=http://localhost:3000
     KEY=RANDOM_KEY
+    ERROR_REPORT_CHANNEL=123456789012345678
     ```
     -   https://discord.com/devlopers
         -   Create new app and new bot in it

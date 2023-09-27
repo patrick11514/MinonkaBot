@@ -22,6 +22,11 @@ class Utilities {
         //check if file named url without process.env.DDRAGON_URL and removed first / in folder cache exists and replace all other / with _
         //if exists, return its path if not download it and return its path
         let path = url.replace(process.env.DDRAGON_URL, '').substring(1).replace(/\//g, '_')
+
+        if (!fs.existsSync('./cache')) {
+            fs.mkdirSync('./cache')
+        }
+
         if (fs.existsSync(`./cache/${path}`)) {
             //write to console using cached file
             this.l.log('Using cached file.')
