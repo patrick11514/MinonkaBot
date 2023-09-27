@@ -1,9 +1,9 @@
 #!/bin/bash
 pnpm i
 #if folder .fonts in ~ doesn't exist, create it
-if [ ! -d ~/.fonts ]; then
-    mkdir ~/.fonts
+if [ ! -d ~/.local/share/fonts ]; then
+    mkdir -p ~/.local/share/fonts
 fi
 
 #copy all fonts to ~/.fonts
-cp -r ./fonts/* ~/.fonts
+cp -r ./fonts/* ~/.local/share/fonts
