@@ -1,4 +1,6 @@
 //imports
+import accountPicker from '$components/accountPicker'
+import { LiveRank } from '$lib/riot/workers/liveRank'
 import crypto from 'crypto'
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js'
 import EventEmitter from 'events'
@@ -7,17 +9,34 @@ import fs from 'node:fs'
 import path from 'path'
 import sharp from 'sharp'
 import JSONdb from 'simple-json-db'
+import z from 'zod'
+import { ClashListener } from './commands/clash'
 import config from './config'
 import Logger from './lib/logger'
 import utilities from './lib/riot/utilities'
-
-//dotenv
-import accountPicker from '$components/accountPicker'
-import { LiveRank } from '$lib/riot/workers/liveRank'
-import * as dotenv from 'dotenv'
-import { ClashListener } from './commands/clash'
 import { startLPChecker } from './lib/riot/workers/lpChecker'
+//dotenv
+import * as dotenv from 'dotenv'
 dotenv.config()
+
+const Environment = z.object({
+    DISCORD_ID: z.number(),
+    DISCORD_TOKEN: z.string(),
+    RIOT_TOKEN: z.string(),
+    DDRAGON_URL: z.string(),
+    PORT: z.number(),
+    WEB_PATH: z.string(),
+    KEY: z.string(),
+    ERROR_REPORT_CHANNEL: z.number(),
+})
+
+declare global {
+    namespace NodeJS {
+        interface ProcessEnv extends z.infer<typeof Environment> {}
+    }
+}
+
+Environment.parse(process.env)
 
 //intents
 const intents = []
@@ -45,6 +64,10 @@ for (let file of files) {
     let filePath = path.join(dir, 'commands', file)
     //give client to command
     require(filePath).default(client)
+}
+
+if (!fs.existsSync('./databases')) {
+    fs.mkdirSync('./databases')
 }
 
 const usersDB = new JSONdb('databases/users.json', {
@@ -160,6 +183,10 @@ async function updateVersion() {
     let currentVer = json[0]
 
     if (!prevVersion) {
+        if (!fs.existsSync('./cache')) {
+            fs.mkdirSync('./cache')
+        }
+
         if (fs.existsSync('./cache/lolver')) {
             prevVersion = fs.readFileSync('./cache/lolver').toString()
         }
@@ -219,7 +246,7 @@ async function checkEmotes(version: string, l: Logger) {
 
         if (championDiscords.length < emotes / 50) {
             l.stopError(
-                'Not enough servers for emotes of champions. You need at least ' + Math.ceil(emotes / 50) + ' servers.'
+                'Not enough servers for emotes of champions. You need at least ' + Math.ceil(emotes / 50) + ' servers.',
             )
         } else {
             let i = 1
@@ -332,7 +359,7 @@ async function checkEmotes(version: string, l: Logger) {
 
         if (itemDiscords.length < emotes / 50) {
             l.stopError(
-                'Not enough servers for emotes of items. You need at least ' + Math.ceil(emotes / 50) + ' servers.'
+                'Not enough servers for emotes of items. You need at least ' + Math.ceil(emotes / 50) + ' servers.',
             )
         } else {
             let i = 1
@@ -434,6 +461,9 @@ async function tasks() {
     {
         let l = new Logger('Clear TEMP', 'red')
         l.start('Clearing temp folder...')
+        if (!fs.existsSync('./temp')) {
+            fs.mkdirSync('./temp')
+        }
         let files = fs.readdirSync('./temp')
         files.forEach((f) => {
             l.log(`Deleting ${f}...`)
