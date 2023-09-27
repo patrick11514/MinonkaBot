@@ -20,14 +20,14 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 const Environment = z.object({
-    DISCORD_ID: z.number(),
+    DISCORD_ID: z.string().transform(Number),
     DISCORD_TOKEN: z.string(),
     RIOT_TOKEN: z.string(),
     DDRAGON_URL: z.string(),
-    PORT: z.number(),
-    WEB_PATH: z.string(),
+    PORT: z.string().transform(Number),
+    WEB_PATH: z.string().url(),
     KEY: z.string(),
-    ERROR_REPORT_CHANNEL: z.number(),
+    ERROR_REPORT_CHANNEL: z.string().transform(Number),
 })
 
 declare global {
