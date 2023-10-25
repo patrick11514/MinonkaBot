@@ -159,7 +159,7 @@ class Images {
 
         //add profileicon
         this.l.log('Adding profileicon...')
-        this.composite(profileImage, 125, 185)
+        this.composite(profileImage, 165, 185)
 
         //add username
         this.l.log('Adding username...')
@@ -172,12 +172,12 @@ class Images {
             color: '#eae1cf',
             font: 'Beaufort for LOL Ja',
         })
-        this.composite(nameText, 0, 185 + 480)
+        this.composite(nameText, 40, 185 + 480)
 
         //Add level
         this.l.log('Adding level...')
         //add background
-        this.composite(levelBackground, 239, 49)
+        this.composite(levelBackground, 279, 49)
         //add number
         let levelText = await this.createText({
             text: userData.level.toString(),
@@ -186,7 +186,7 @@ class Images {
             height: 88 + 40,
             bold: true,
         })
-        this.composite(levelText, 239, 49)
+        this.composite(levelText, 279, 49)
 
         //add ranks
         this.l.log('Adding ranks...')

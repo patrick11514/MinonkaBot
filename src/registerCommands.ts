@@ -1,8 +1,8 @@
-import { REST, SlashCommandBuilder, Routes } from 'discord.js'
+import { REST, Routes, SlashCommandBuilder } from 'discord.js'
 import * as dotenv from 'dotenv'
+import JSONdb from 'simple-json-db'
 import commands from './commands'
 dotenv.config()
-import JSONdb from 'simple-json-db'
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN)
 
@@ -11,25 +11,29 @@ const guildsIds = ['713520402315608148']
 
 ;(async () => {
     if (removeCommands) {
-        let data = (await rest.get(Routes.applicationCommands(process.env.DISCORD_ID))) as Array<{
+        let data = (await rest.get(Routes.applicationCommands(process.env.DISCORD_ID.toString()))) as Array<{
             id: string
             name: string
         }>
 
         for (let command of data) {
             console.log(`Deleting command: ${command.name}`)
-            await rest.delete(Routes.applicationCommand(process.env.DISCORD_ID, command.id))
+            await rest.delete(Routes.applicationCommand(process.env.DISCORD_ID.toString(), command.id))
         }
 
         for (let guildId of guildsIds) {
-            let data = (await rest.get(Routes.applicationGuildCommands(process.env.DISCORD_ID, guildId))) as Array<{
+            let data = (await rest.get(
+                Routes.applicationGuildCommands(process.env.DISCORD_ID.toString(), guildId),
+            )) as Array<{
                 id: string
                 name: string
             }>
 
             for (let command of data) {
                 console.log(`Deleting command: ${command.name}`)
-                await rest.delete(`${Routes.applicationGuildCommand(process.env.DISCORD_ID, guildId, command.id)}`)
+                await rest.delete(
+                    `${Routes.applicationGuildCommand(process.env.DISCORD_ID.toString(), guildId, command.id)}`,
+                )
             }
         }
     } else {
@@ -55,7 +59,7 @@ const guildsIds = ['713520402315608148']
                                                 name: choice.name,
                                                 value: (choice.value as string) || choice.name,
                                             }
-                                        })
+                                        }),
                                     )
                                 }
                                 return opt
@@ -75,7 +79,7 @@ const guildsIds = ['713520402315608148']
                                                 name: choice.name,
                                                 value: (choice.value as number) || parseInt(choice.name),
                                             }
-                                        })
+                                        }),
                                     )
                                 }
                                 return opt
@@ -144,7 +148,7 @@ const guildsIds = ['713520402315608148']
         const commandsJson = rawCommands.map((command) => command.toJSON())
 
         try {
-            let cmds = (await rest.put(Routes.applicationCommands(process.env.DISCORD_ID), {
+            let cmds = (await rest.put(Routes.applicationCommands(process.env.DISCORD_ID.toString()), {
                 body: commandsJson,
             })) as Array<{
                 id: string

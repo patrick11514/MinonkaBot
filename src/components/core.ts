@@ -4,7 +4,7 @@ import Riot from '$lib/riot/core'
 import utilities from '$lib/riot/utilities'
 import NameHistory from '$types/nameHistoryDB'
 import { FakeInteraction } from '$types/types'
-import { ButtonInteraction, ChatInputCommandInteraction, User } from 'discord.js'
+import { ButtonInteraction, ChatInputCommandInteraction, TextChannel, User } from 'discord.js'
 import accountPicker from './accountPicker'
 
 export default async function handleInteraction(
@@ -16,7 +16,7 @@ export default async function handleInteraction(
     calledFunction: Function,
     selfFunction: Function,
     otherArguments: Array<any>,
-    argumentsForBindFunction: Array<any>
+    argumentsForBindFunction: Array<any>,
 ) {
     let l = new Logger('CORE', 'white')
 
@@ -32,7 +32,7 @@ export default async function handleInteraction(
         let link = new linkedAccounts(
             mention?.id ? mention.id : interaction.user.id,
             interaction.client.usersDB,
-            interaction.client.nameHistoryDB
+            interaction.client.nameHistoryDB,
         )
         let accounts = await link.getAccounts()
         if (accounts?.length == 0) {
@@ -64,7 +64,7 @@ export default async function handleInteraction(
                     }
                 }),
                 interaction,
-                true
+                true,
             )
                 .bindFunction(bindFunction, argumentsForBindFunction)
                 .send()
@@ -90,7 +90,7 @@ export default async function handleInteraction(
             let accounts = new linkedAccounts(
                 mention?.id ? mention.id : interaction.user.id,
                 interaction.client.usersDB,
-                interaction.client.nameHistoryDB
+                interaction.client.nameHistoryDB,
             )
 
             if (interaction.client.nameHistoryDB.has(data.id)) {
@@ -124,6 +124,8 @@ export default async function handleInteraction(
                       expected: string
                   }
                 | any) {
+                let error: any
+
                 if (typeof e == 'object') {
                     let trace = e as {
                         errors: Array<{
@@ -143,11 +145,19 @@ export default async function handleInteraction(
                             i++
                         }
                     } else {
-                        l.stopError(`Error while running calledFunction (${trace})`)
+                        error = trace
                     }
                 } else {
-                    l.stopError(`Error while running calledFunction (${e})!`)
+                    error = e
                 }
+
+                const channel = await process.client.channels.fetch(process.env.ERROR_REPORT_CHANNEL.toString())
+
+                if (channel) {
+                    ;(channel as TextChannel).send(`Error while running calledFunction (${error})`)
+                }
+
+                l.stopError(`Error while running calledFunction (${error})`)
                 return
             }
             l.stop('calledFunction ran successfully!')
