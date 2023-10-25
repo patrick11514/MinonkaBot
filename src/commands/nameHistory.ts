@@ -22,7 +22,7 @@ export async function nameHistory(
     username: string | null,
     region: string | null,
     mention: User | null,
-    interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction | FakeInteraction,
 ) {
     let userData: {
         username: string | null
@@ -36,7 +36,7 @@ export async function nameHistory(
         let link = new linkedAccounts(
             mention?.id ? mention.id : interaction.user.id,
             interaction.client.usersDB,
-            interaction.client.nameHistoryDB
+            interaction.client.nameHistoryDB,
         )
         let accounts = await link.getAccounts()
         if (accounts?.length == 0) {
@@ -58,7 +58,7 @@ export async function nameHistory(
                     }
                 }),
                 interaction,
-                true
+                true,
             )
                 .bindFunction('profile')
                 .send()
@@ -86,12 +86,12 @@ export async function nameHistory(
             let link = new linkedAccounts(
                 interaction.user.id,
                 interaction.client.usersDB,
-                interaction.client.nameHistoryDB
+                interaction.client.nameHistoryDB,
             )
 
             let accounts = await link.getAccountHistory(data.id, data.name, region)
 
-            content += ['', `**${accounts.pop()}** (aktuální)`, ...accounts.reverse()].join('\n * ')
+            content += ['', `**${accounts.pop()}** (aktuální)`, ...accounts.reverse()].join('\n* ')
 
             interaction.editReply({ content: content })
         } else {
