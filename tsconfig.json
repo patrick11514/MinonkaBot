@@ -11,8 +11,10 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "paths": {
+            "$/*": ["./src/*"],
             "$types/*": ["./src/types/*"],
-            "$lib/*": ["./src/lib/*"]
+            "$lib/*": ["./src/lib/*"],
+            "$data/*": ["./src/data/*"]
         }
     },
     "files": ["src/types/process.d.ts"],

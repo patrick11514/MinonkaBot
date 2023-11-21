@@ -1,4 +1,5 @@
 import Logger from '$lib/logger'
+import { MemoryStorage } from '$lib/memStorage'
 import { env } from '$types/env'
 import { Awaitable } from '$types/types'
 import clc from 'cli-color'
@@ -29,6 +30,7 @@ const client = new Client({
     partials,
 })
 process.client = client
+process.memory = new MemoryStorage<string, string>()
 
 //event handlers
 const starts: (() => Awaitable<void>)[] = []

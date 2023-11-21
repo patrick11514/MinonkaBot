@@ -9,8 +9,9 @@
         "discord.js": "^14.14.1",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
-        "mariadb": "^3.2.2",
+        "kysely": "^0.26.3",
         "module-alias": "^2.2.3",
+        "mysql2": "^3.6.4",
         "node-fetch": "^3.3.2",
         "prettier": "^3.1.0",
         "strip-color": "^0.1.0",
@@ -23,6 +24,7 @@
         "@types/node": "^20.9.2",
         "@types/node-fetch": "^2.6.9",
         "@types/strip-color": "^0.1.2",
+        "kysely-codegen": "^0.11.0",
         "tsconfig-paths": "^4.2.0"
     },
     "scripts": {
@@ -33,7 +35,8 @@
         "clear": "rm -rf build",
         "format": "prettier --write .",
         "registerCommandsDev": "ts-node-dev  -r tsconfig-paths/register ./src/registerCommands.ts",
-        "registerCommands": "npm build && node -r module-alias/register ./build/registerCommands.js"
+        "registerCommands": "npm build && node -r module-alias/register ./build/registerCommands.js",
+        "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts"
     },
     "repository": {
         "type": "git",
@@ -54,7 +57,9 @@
     },
     "homepage": "https://github.com/patrick11514/MinonkaBot#readme",
     "_moduleAliases": {
+        "$": "./build",
         "$types": "./build/types",
-        "$lib": "./build/lib"
+        "$lib": "./build/lib",
+        "$data": "./build/data"
     }
 }
