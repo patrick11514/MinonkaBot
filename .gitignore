@@ -1,23 +1,9 @@
-#Node modules
-node_modules/
-
-#env files
+node_modules
+build
 .env
-
-#build files
-build/
-
-#folders
-temp/
-databases/
-cache/
-logs/
-
+.env.*
+!.env.example
 #lock files
 pnpm-lock.yaml
-
-#example files
-*.ts.txt
-
-#other files
-*_resized*.png
+package-lock.json
+yarn.lock

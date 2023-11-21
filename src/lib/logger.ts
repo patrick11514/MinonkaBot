@@ -1,6 +1,6 @@
 import clc from 'cli-color'
-import fs from 'node:fs'
 import strip from 'strip-color'
+import fs from 'fs'
 
 class Logger {
     name: string
@@ -36,9 +36,9 @@ class Logger {
 
         this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.blue(
-                'INFO',
+                'INFO'
                 //@ts-ignore
-            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${message}`,
+            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${message}`
         )
     }
 
@@ -50,9 +50,9 @@ class Logger {
         this.time = Date.now()
         this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.blue(
-                'INFO',
+                'INFO'
                 //@ts-ignore
-            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${message}`,
+            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${message}`
         )
     }
 
@@ -66,11 +66,11 @@ class Logger {
 
         this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.blue(
-                'INFO',
+                'INFO'
                 //@ts-ignore
             )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${message} ${clc.white(
-                `(${ms} ms)`,
-            )}`,
+                `(${ms} ms)`
+            )}`
         )
     }
 
@@ -84,11 +84,11 @@ class Logger {
 
         this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.red(
-                'ERROR',
+                'ERROR'
                 //@ts-ignore
             )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${clc.red(
-                message,
-            )} ${clc.white(`(${ms} ms)`)}`,
+                message
+            )} ${clc.white(`(${ms} ms)`)}`
         )
     }
 
@@ -99,9 +99,9 @@ class Logger {
 
         this.logToFile(
             `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${clc.red(
-                'ERROR',
+                'ERROR'
                 //@ts-ignore
-            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${clc.red(message)}`,
+            )}${clc.white(']')} ${clc.white('[')}${clc[this.color](this.name)}${clc.white(']')} ${clc.red(message)}`
         )
     }
 
@@ -119,9 +119,6 @@ class Logger {
         let message = strip(formattedMessage)
 
         //add it to new line of file
-        if (!fs.existsSync('./logs')) {
-            fs.mkdirSync('./logs')
-        }
         fs.appendFileSync(`./logs/${filename}`, message + '\n')
 
         //log formatted message

@@ -1,51 +1,60 @@
 {
-    "name": "Miňonka",
-    "version": "1.0.12",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "dev": "ts-node-dev -r tsconfig-paths/register --respawn ./src/index.ts",
-        "build": "tsc && mkdir -p temp databases cache logs && cp src/liveServer/index.html build/liveServer",
-        "start": "node -r module-alias/register build/index.js",
-        "startCommands": "tsc -p tsconfigCommands.json && node build/registerCommands.js",
-        "genChampTypes": "tsc -p tsconfigChampTypes.json && node build/types/generateChampions.js",
-        "clearCache": "rm -r cache/*"
-    },
-    "keywords": [],
-    "author": "Patrik Mintěl",
-    "license": "ISC",
+    "name": "minonka",
+    "version": "1.1.0",
+    "description": "Discordbot for League of Legends",
+    "main": "build/index.js",
     "dependencies": {
-        "@discordjs/builders": "~1.2.0",
-        "@discordjs/rest": "~1.2.0",
+        "@patrick115/endpoints": "^1.1.1",
         "cli-color": "^2.0.3",
-        "discord-api-types": "~0.37.11",
-        "discord.js": "~14.10.2",
+        "discord.js": "^14.14.1",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
-        "fast-xml-parser": "^4.2.7",
-        "fs": "0.0.1-security",
-        "is-xml": "^0.1.0",
+        "mariadb": "^3.2.2",
         "module-alias": "^2.2.3",
-        "node-fetch": "^2.6.12",
-        "prettier": "^3.0.1",
-        "sharp": "^0.32.4",
-        "simple-json-db": "^2.0.0",
+        "node-fetch": "^3.3.2",
+        "prettier": "^3.1.0",
         "strip-color": "^0.1.0",
-        "tsconfig-paths": "^4.2.0",
-        "zod": "^3.22.2"
+        "ts-node-dev": "^2.0.0",
+        "typescript": "^5.2.2",
+        "zod": "^3.22.4"
     },
     "devDependencies": {
-        "@types/cli-color": "^2.0.2",
-        "@types/express": "^4.17.17",
-        "@types/node": "^20.4.8",
-        "@types/node-fetch": "^2.6.4",
-        "@types/strip-color": "^0.1.0",
-        "ts-node-dev": "^2.0.0",
-        "typescript": "^5.1.6"
+        "@types/cli-color": "^2.0.5",
+        "@types/node": "^20.9.2",
+        "@types/node-fetch": "^2.6.9",
+        "@types/strip-color": "^0.1.2",
+        "tsconfig-paths": "^4.2.0"
     },
+    "scripts": {
+        "folders": "mkdir -p ./logs",
+        "dev": "npm run folders && ts-node-dev -r tsconfig-paths/register --respawn --rs ./src/index.ts",
+        "build": "mkdir -p build && npm run folders && tsc",
+        "start": "node -r module-alias/register ./build/index.js",
+        "clear": "rm -rf build",
+        "format": "prettier --write .",
+        "registerCommandsDev": "ts-node-dev  -r tsconfig-paths/register ./src/registerCommands.ts",
+        "registerCommands": "npm build && node -r module-alias/register ./build/registerCommands.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/patrick11514/MinonkaBot.git"
+    },
+    "keywords": [
+        "DiscordJS",
+        "LeagueOfLegends",
+        "LOL",
+        "Discord",
+        "TS",
+        "JS"
+    ],
+    "author": "Patrik Mintěl",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/patrick11514/MinonkaBot/issues"
+    },
+    "homepage": "https://github.com/patrick11514/MinonkaBot#readme",
     "_moduleAliases": {
-        "$types": "build/types",
-        "$lib": "build/lib",
-        "$components": "build/components"
+        "$types": "./build/types",
+        "$lib": "./build/lib"
     }
 }

@@ -11,15 +11,11 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "paths": {
-            "$types": ["./src/types"],
             "$types/*": ["./src/types/*"],
-            "$lib": ["./src/lib"],
-            "$lib/*": ["./src/lib/*"],
-            "$components": ["./src/components"],
-            "$components/*": ["./src/components/*"]
+            "$lib/*": ["./src/lib/*"]
         }
     },
-    "files": ["src/types/discord.d.ts", "src/types/process.d.ts", "src/types/modules.d.ts"],
+    "files": ["src/types/process.d.ts"],
     "include": ["src/**/*"],
     "exclude": ["node_modules"]
 }
