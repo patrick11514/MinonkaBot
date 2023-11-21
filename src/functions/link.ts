@@ -1,4 +1,4 @@
-import { routingValues } from '$lib/RiotAPI'
+import { RiotAPI, region, regions, routingValue, routingValues } from '$lib/RiotAPI'
 import { MemoryStorage } from '$lib/memStorage'
 import { getLanguageData } from '$lib/utils'
 import {
@@ -101,20 +101,20 @@ export default {
             if (!interaction.isModalSubmit()) return
             if (!interaction.customId.startsWith('#LOL_LINK_MODAL_')) return
 
-            const select = new StringSelectMenuBuilder().setCustomId('#LOL_LINK_ADDITIONAL')
             const language = await getLanguageData(interaction.user.id)
-            let message = ''
+            const select = new StringSelectMenuBuilder()
+                .setCustomId('#LOL_LINK_ADDITIONAL')
+                .setPlaceholder(language.link.regionOrServer.placeholder)
+
+            let message = language.link.regionOrServer.message
 
             if (interaction.customId == '#LOL_LINK_MODAL_RIOT') {
                 //select with routing values
-                select.setPlaceholder(language.link.regionOrServer.placeholder)
-                message = language.link.regionOrServer.message
-
                 select.addOptions(
                     routingValues.map((value) => {
                         return new StringSelectMenuOptionBuilder()
                             .setValue(value)
-                            .setLabel(language.global.routingValues[value])
+                            .setLabel(language.global.routingValues[value] as string)
                     }),
                 )
 
@@ -124,6 +124,17 @@ export default {
                 })
             } else {
                 //select with regions
+                select.addOptions(
+                    regions.map((value) => {
+                        return new StringSelectMenuOptionBuilder()
+                            .setValue(value)
+                            .setLabel(language.global.regions[value] as string)
+                    }),
+                )
+
+                tempStorage.add(interaction.user.id, {
+                    tempUsername: interaction.fields.getTextInputValue('#LOL_LINK_USERNAME'),
+                })
             }
 
             const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select)
@@ -133,6 +144,34 @@ export default {
                 content: message,
                 components: [row],
             })
+        }),
+
+        /**
+         *
+         * Select region
+         *
+         */
+        new DiscordEvent('interactionCreate', async (interaction) => {
+            if (!interaction.isStringSelectMenu()) return
+            if (interaction.customId != '#LOL_LINK_ADDITIONAL') return
+
+            const savedData = tempStorage.get(interaction.user.id)
+            if ('tempUsername' in savedData) {
+                const region = interaction.values[0] as region
+
+                if (!regions.includes(region)) return
+            } else {
+                const routingValue = interaction.values[0] as routingValue
+
+                if (!routingValues.includes(routingValue)) return
+
+                const endpoint = RiotAPI.getAccountByRiotId(
+                    routingValue,
+                    savedData.tempRiotUsername,
+                    savedData.tempRiotTag,
+                )
+                console.log(await endpoint.fetchSafe())
+            }
         }),
     ],
 }

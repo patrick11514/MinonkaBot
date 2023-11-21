@@ -1,3 +1,4 @@
+import { env } from '$types/env'
 import { Endpoint } from '@patrick115/endpoints'
 import { z } from 'zod'
 
@@ -38,13 +39,16 @@ const BASE_URL = 'api.riotgames.com'
 export class RiotAPI {
     public static getAccountByRiotId(routingValue: routingValue, gameName: string, tagLine: string) {
         return new Endpoint(
-            `${routingValue}.${BASE_URL}/riot/account/by-riot-id/${gameName}/${tagLine}`,
+            `https://${routingValue}.${BASE_URL}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
             'GET',
             z.object({
                 puuid: z.string().min(78).max(78),
                 gameName: z.string().min(gameName.length).max(gameName.length),
                 tagLine: z.string().min(tagLine.length).max(tagLine.length),
             }),
+            {
+                'X-Riot-Token': env.RIOT_TOKEN,
+            },
         )
     }
 }
