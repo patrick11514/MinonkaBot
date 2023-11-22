@@ -46,6 +46,7 @@ export class RiotAPI {
                 gameName: z.string().min(gameName.length).max(gameName.length),
                 tagLine: z.string().min(tagLine.length).max(tagLine.length),
             }),
+            z.undefined(),
             {
                 'X-Riot-Token': env.RIOT_TOKEN,
             },

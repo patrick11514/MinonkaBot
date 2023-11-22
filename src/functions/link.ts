@@ -170,7 +170,16 @@ export default {
                     savedData.tempRiotUsername,
                     savedData.tempRiotTag,
                 )
-                console.log(await endpoint.fetchSafe())
+
+                const data = await endpoint.fetchSafe()
+
+                if (data.status) {
+                    console.log(data)
+                } else {
+                    if (!data.errorSchema) {
+                        data.error
+                    }
+                }
             }
         }),
     ],
