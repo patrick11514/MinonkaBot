@@ -1,3 +1,4 @@
+import { db } from '$/types/connection'
 import { RiotAPI, region, regions, routingValue, routingValues } from '$lib/RiotAPI'
 import { MemoryStorage } from '$lib/memStorage'
 import { getLanguageData } from '$lib/utils'
@@ -155,6 +156,8 @@ export default {
             if (!interaction.isStringSelectMenu()) return
             if (interaction.customId != '#LOL_LINK_ADDITIONAL') return
 
+            const language = await getLanguageData(interaction.user.id)
+
             const savedData = tempStorage.get(interaction.user.id)
             if ('tempUsername' in savedData) {
                 const region = interaction.values[0] as region
@@ -170,7 +173,51 @@ export default {
                     savedData.tempRiotUsername,
                     savedData.tempRiotTag,
                 )
-                console.log(await endpoint.fetchSafe())
+
+                const data = await endpoint.fetchSafe()
+
+                if (!data.status) {
+                    if (!data.errorSchema) {
+                        interaction.reply({
+                            ephemeral: true,
+                            content: language.link.process.error,
+                        })
+                        return
+                    } else {
+                        const { status_code } = data.data.status
+
+                        if (status_code === 400) {
+                            interaction.reply({
+                                ephemeral: true,
+                                content: language.link.process.unknownUser,
+                            })
+                            return
+                        } else {
+                            interaction.reply({
+                                ephemeral: true,
+                                content: language.link.process.adminError,
+                            })
+                            return
+                        }
+                    }
+                }
+
+                const { puuid, gameName, tagLine } = data.data
+
+                await db
+                    .insertInto('riot_link')
+                    .values({
+                        user_id: interaction.user.id,
+                        gameName,
+                        tagLine,
+                        puuid,
+                    })
+                    .executeTakeFirst()
+
+                interaction.reply({
+                    ephemeral: true,
+                    content: language.link.process.success,
+                })
             }
         }),
     ],

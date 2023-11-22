@@ -1,5 +1,5 @@
 import { env } from '$types/env'
-import { Endpoint } from '@patrick115/endpoints'
+import { Endpoint, EndpointMethod } from '@patrick115/endpoints'
 import { z } from 'zod'
 
 export const regions = [
@@ -36,9 +36,28 @@ export const routingValuesToRegions = {
 
 const BASE_URL = 'api.riotgames.com'
 
+const errorSchema = z.object({
+    status: z.object({
+        message: z.string().optional(),
+        status_code: z.number(),
+    }),
+})
+
+const getEndpoint = <T>(endpoint: string, method: EndpointMethod, schema: z.ZodType<T>) => {
+    return new Endpoint({
+        endpoint,
+        method,
+        schema,
+        headers: {
+            'X-Riot-Token': env.RIOT_TOKEN,
+        },
+        errorSchema,
+    })
+}
+
 export class RiotAPI {
     public static getAccountByRiotId(routingValue: routingValue, gameName: string, tagLine: string) {
-        return new Endpoint(
+        return getEndpoint(
             `https://${routingValue}.${BASE_URL}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
             'GET',
             z.object({
@@ -46,9 +65,6 @@ export class RiotAPI {
                 gameName: z.string().min(gameName.length).max(gameName.length),
                 tagLine: z.string().min(tagLine.length).max(tagLine.length),
             }),
-            {
-                'X-Riot-Token': env.RIOT_TOKEN,
-            },
         )
     }
 }

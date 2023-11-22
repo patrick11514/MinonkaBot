@@ -32,6 +32,12 @@ const phrasesSchema = z.object({
             message: z.string(),
             placeholder: z.string(),
         }),
+        process: z.object({
+            error: z.string(),
+            unknownUser: z.string(),
+            adminError: z.string(),
+            success: z.string(),
+        }),
     }),
     global: z.object({
         regions: z.record(regionIndex, z.string()),
@@ -105,6 +111,12 @@ export const translate: z.infer<typeof schema> = {
                 message: 'Vyber si region, ve kterém byl tvůj účet vytvořen (Rychlejší vyhledávání)',
                 placeholder: 'Vyber region',
             },
+            process: {
+                error: 'Něco se pokazilo, zkus to prosím později.',
+                unknownUser: 'Zadal jsi neplatné jméno, nebo tag, zkus to prosím znovu.',
+                adminError: 'Nastala chyba, kontaktuj prosím administrátora.',
+                success: 'Účet byl úspěšně propojen.',
+            },
         },
         global: {
             regions: regionTranslates,
@@ -135,6 +147,12 @@ export const translate: z.infer<typeof schema> = {
             regionOrServer: {
                 message: 'Select region where your account was created (Faster search)',
                 placeholder: 'Select region',
+            },
+            process: {
+                error: 'Something went wrong, please try again later.',
+                unknownUser: 'You entered invalid name or tag, please try again.',
+                adminError: 'An error has occurred, please contact the administrator.',
+                success: 'Account was successfully linked.',
             },
         },
         global: {
