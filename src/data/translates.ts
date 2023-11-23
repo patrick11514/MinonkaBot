@@ -37,6 +37,7 @@ const phrasesSchema = z.object({
             unknownUser: z.string(),
             adminError: z.string(),
             success: z.string(),
+            alreadyLinked: z.string(),
         }),
     }),
     global: z.object({
@@ -116,6 +117,7 @@ export const translate: z.infer<typeof schema> = {
                 unknownUser: 'Zadal jsi neplatné jméno, nebo tag, zkus to prosím znovu.',
                 adminError: 'Nastala chyba, kontaktuj prosím administrátora.',
                 success: 'Účet byl úspěšně propojen.',
+                alreadyLinked: 'Tento účet již je s někým propojen.',
             },
         },
         global: {
@@ -153,6 +155,7 @@ export const translate: z.infer<typeof schema> = {
                 unknownUser: 'You entered invalid name or tag, please try again.',
                 adminError: 'An error has occurred, please contact the administrator.',
                 success: 'Account was successfully linked.',
+                alreadyLinked: 'This account is already linked with someone.',
             },
         },
         global: {

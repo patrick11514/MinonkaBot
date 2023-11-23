@@ -159,6 +159,9 @@ export default {
             const language = await getLanguageData(interaction.user.id)
 
             const savedData = tempStorage.get(interaction.user.id)
+
+            const checkError = ()
+
             if ('tempUsername' in savedData) {
                 const region = interaction.values[0] as region
 
@@ -203,6 +206,28 @@ export default {
                 }
 
                 const { puuid, gameName, tagLine } = data.data
+
+                //check if user already linked
+
+                const alreadyLinkedRiot = await db
+                    .selectFrom('riot_link')
+                    .select('id')
+                    .where('puuid', '=', puuid)
+                    .executeTakeFirst()
+
+                const alreadyLinkedUsername = await db
+                    .selectFrom('user_link')
+                    .select('id')
+                    .where('puuid', '=', puuid)
+                    .executeTakeFirst()
+
+                if (alreadyLinkedRiot !== null || alreadyLinkedUsername !== null) {
+                    interaction.reply({
+                        ephemeral: true,
+                        content: language.link.process.alreadyLinked,
+                    })
+                    return
+                }
 
                 await db
                     .insertInto('riot_link')

@@ -17,7 +17,15 @@ export interface RiotLink {
   user_id: string;
 }
 
+export interface UserLink {
+  id: Generated<number>;
+  name: string;
+  puuid: string;
+  user_id: string;
+}
+
 export interface DB {
   languages: Languages;
   riot_link: RiotLink;
+  user_link: UserLink;
 }
