@@ -39,6 +39,21 @@ const phrasesSchema = z.object({
             success: z.string(),
             alreadyLinked: z.string(),
         }),
+        manage: z.object({
+            noAccounts: z.string(),
+            title: z.string(),
+            riotIdAccounts: z.string(),
+            userRegAccounts: z.string(),
+            manage: z.string(),
+            add: z.string(),
+            remove: z.string(),
+        }),
+        remove: z.object({
+            title: z.string(),
+            noAccounts: z.string(),
+            error: z.string(),
+            success: z.string(),
+        }),
     }),
     global: z.object({
         regions: z.record(regionIndex, z.string()),
@@ -52,7 +67,7 @@ const schema = z.object({
     en: phrasesSchema,
 })
 
-const regionTranslates: Record<region, string> = {
+export const regionTranslates: Record<region, string> = {
     BR1: 'BR',
     EUN1: 'EUNE',
     EUW1: 'EUW',
@@ -71,7 +86,7 @@ const regionTranslates: Record<region, string> = {
     VN2: 'VN',
 }
 
-const regionTranslatesFull: Record<region, string> = {
+export const regionTranslatesFull: Record<region, string> = {
     BR1: 'Brazil',
     EUN1: 'Europe Nordic & East',
     EUW1: 'Europe West',
@@ -91,6 +106,8 @@ const regionTranslatesFull: Record<region, string> = {
 }
 
 export type language = keyof z.infer<typeof schema>
+
+export type languageData = (typeof translate)[language]
 
 export const translate: z.infer<typeof schema> = {
     cs: {
@@ -118,6 +135,21 @@ export const translate: z.infer<typeof schema> = {
                 adminError: 'Nastala chyba, kontaktuj prosím administrátora.',
                 success: 'Účet byl úspěšně propojen.',
                 alreadyLinked: 'Tento účet již je s někým propojen.',
+            },
+            manage: {
+                noAccounts: 'Nemáš žádný propojený účet.',
+                title: 'Propojené účty',
+                riotIdAccounts: 'Riot ID účty',
+                userRegAccounts: 'Summoner name účty',
+                manage: 'Spravovat účty',
+                add: 'Přidat účet',
+                remove: 'Odebrat účet',
+            },
+            remove: {
+                title: 'Vyber si účet, který chceš odebrat',
+                noAccounts: 'Nemáš žádný propojený účet.',
+                error: 'Nepovedlo se odebrat účet, zkus to prosím později.',
+                success: 'Účet byl úspěšně odebrán.',
             },
         },
         global: {
@@ -156,6 +188,21 @@ export const translate: z.infer<typeof schema> = {
                 adminError: 'An error has occurred, please contact the administrator.',
                 success: 'Account was successfully linked.',
                 alreadyLinked: 'This account is already linked with someone.',
+            },
+            manage: {
+                noAccounts: "You don't have any linked accounts.",
+                title: 'Linked accounts',
+                riotIdAccounts: 'Riot ID accounts',
+                userRegAccounts: 'Summoner name accounts',
+                manage: 'Manage accounts',
+                add: 'Add account',
+                remove: 'Remove account',
+            },
+            remove: {
+                title: 'Select account you want to remove',
+                noAccounts: "You don't have linked any accounts.",
+                error: "Couldn't remove account, please try again later.",
+                success: 'Account was successfully removed.',
             },
         },
         global: {

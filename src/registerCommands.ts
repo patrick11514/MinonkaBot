@@ -8,9 +8,25 @@ const rest = new REST({ version: '10' }).setToken(env.BOT_SECRET)
 const rawCommands = [
     new SlashCommandBuilder()
         .setName('link')
+        .setNameLocalization('cs', 'propojit')
         .setDescription('Links your league of legends account with your discord account.')
         .setDescriptionLocalizations({
             cs: 'Propojí tvůj league of legends účet s discord účtem.',
+        })
+        .addStringOption((option) => {
+            return option
+                .setName('action')
+                .setNameLocalization('cs', 'akce')
+                .setDescription('What do you want to do with your account? (manage)')
+                .setDescriptionLocalization('cs', 'Co chceš udělat se svým účtem? (spravovat)')
+                .addChoices({
+                    name: 'manage',
+                    value: 'manage',
+                    name_localizations: {
+                        cs: 'spravovat',
+                    },
+                })
+                .setRequired(false)
         }),
 ] as SlashCommandBuilder[]
 

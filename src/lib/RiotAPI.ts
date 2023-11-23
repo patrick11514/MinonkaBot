@@ -36,7 +36,7 @@ export const routingValuesToRegions = {
 
 const BASE_URL = 'api.riotgames.com'
 
-const errorSchema = z.object({
+export const errorSchema = z.object({
     status: z.object({
         message: z.string().optional(),
         status_code: z.number(),
@@ -64,6 +64,22 @@ export class RiotAPI {
                 puuid: z.string().min(78).max(78),
                 gameName: z.string().min(gameName.length).max(gameName.length),
                 tagLine: z.string().min(tagLine.length).max(tagLine.length),
+            }),
+        )
+    }
+
+    public static getAccountByUsername(region: region, username: string) {
+        return getEndpoint(
+            `https://${region}.${BASE_URL}/lol/summoner/v4/summoners/by-name/${username}`,
+            'GET',
+            z.object({
+                id: z.string(),
+                accountId: z.string(),
+                puuid: z.string().min(78).max(78),
+                name: z.string().min(username.length).max(username.length),
+                profileIconId: z.number(),
+                revisionDate: z.number(),
+                summonerLevel: z.number(),
             }),
         )
     }

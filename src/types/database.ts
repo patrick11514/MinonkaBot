@@ -21,6 +21,7 @@ export interface UserLink {
   id: Generated<number>;
   name: string;
   puuid: string;
+  region: string;
   user_id: string;
 }
 
