@@ -21,3 +21,7 @@ export const getLanguageData = async (id: string) => {
 
     return translate[language]
 }
+
+export const getLanguageDataFromLang = (language: language) => {
+    return translate[language]
+}
