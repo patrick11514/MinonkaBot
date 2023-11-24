@@ -49,6 +49,7 @@ const rawCommands = [
                     }),
                 )
         }),
+    new SlashCommandBuilder().setName('profile'),
 ] as SlashCommandBuilder[]
 
 const json = rawCommands.map((command) => command.toJSON())
