@@ -1,3 +1,4 @@
+import { langaugeList, languageTranslations } from '$data/translates'
 import Logger from '$lib/logger'
 import { env } from '$types/env'
 import { REST, Routes, SlashCommandBuilder } from 'discord.js'
@@ -27,6 +28,26 @@ const rawCommands = [
                     },
                 })
                 .setRequired(false)
+        }),
+    new SlashCommandBuilder()
+        .setName('language')
+        .setNameLocalization('cs', 'jazyk')
+        .setDescription('Changes your language')
+        .setDescriptionLocalization('cs', 'Nastaví tvůj jazyk')
+        .addStringOption((option) => {
+            return option
+                .setName('language')
+                .setNameLocalization('cs', 'jazyk')
+                .setDescription('Select your language')
+                .setDescriptionLocalization('cs', 'Nastav si jazyk')
+                .addChoices(
+                    ...langaugeList.map((lang) => {
+                        return {
+                            name: languageTranslations[lang],
+                            value: lang,
+                        }
+                    }),
+                )
         }),
 ] as SlashCommandBuilder[]
 

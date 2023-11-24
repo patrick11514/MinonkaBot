@@ -60,6 +60,10 @@ const phrasesSchema = z.object({
         regionsFull: z.record(regionIndex, z.string()),
         routingValues: z.record(routingIndex, z.string()),
     }),
+    language: z.object({
+        info: z.string(),
+        success: z.string(),
+    }),
 })
 
 const schema = z.object({
@@ -162,6 +166,10 @@ export const translate: z.infer<typeof schema> = {
                 SEA: 'Jihovýchodní Asie',
             },
         },
+        language: {
+            info: 'Tvůj aktuální jazyk je:',
+            success: 'Tvůj jazyk byl změněn na:',
+        },
     },
     en: {
         link: {
@@ -215,5 +223,16 @@ export const translate: z.infer<typeof schema> = {
                 SEA: 'South East Asia',
             },
         },
+        language: {
+            info: 'Your current language is:',
+            success: 'Your language has been changed to:',
+        },
     },
+}
+
+export const langaugeList = Object.keys(translate) as language[]
+
+export const languageTranslations: Record<language, string> = {
+    cs: 'Čeština',
+    en: 'English',
 }
