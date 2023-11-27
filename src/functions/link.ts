@@ -1,5 +1,5 @@
+import { DiscordEvent } from '$/hooks'
 import { Link } from '$/lib/Link'
-import { DiscordEvent } from '../hooks'
 
 const events: DiscordEvent<any>[] = []
 const link = new Link()
