@@ -1,9 +1,14 @@
+#node things
 node_modules
 build
 .env
 .env.*
 !.env.example
+
+#custom folders
 logs
+cache
+
 #lock files
 pnpm-lock.yaml
 package-lock.json
