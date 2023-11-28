@@ -1,4 +1,4 @@
-import { Awaitable } from '$types/types'
+import { Awaitable } from '$/types/types'
 import { ClientEvents } from 'discord.js'
 
 export class DiscordEvent<T extends keyof ClientEvents> {
