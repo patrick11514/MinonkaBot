@@ -1,4 +1,4 @@
-import { env } from '$types/env'
+import { env } from '$/types/env'
 import { Endpoint, EndpointMethod } from '@patrick115/endpoints'
 import { z } from 'zod'
 
@@ -77,6 +77,22 @@ export class RiotAPI {
                 accountId: z.string(),
                 puuid: z.string().min(78).max(78),
                 name: z.string().min(username.length).max(username.length),
+                profileIconId: z.number(),
+                revisionDate: z.number(),
+                summonerLevel: z.number(),
+            }),
+        )
+    }
+
+    public static getAccountByPuuid(region: region, puuid: string) {
+        return getEndpoint(
+            `https://${region}.${BASE_URL}/lol/summoner/v4/summoners/by-puuid/${puuid}`,
+            'GET',
+            z.object({
+                id: z.string(),
+                accountId: z.string(),
+                puuid: z.string().min(78).max(78),
+                name: z.string(),
                 profileIconId: z.number(),
                 revisionDate: z.number(),
                 summonerLevel: z.number(),

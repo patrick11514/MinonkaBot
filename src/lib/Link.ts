@@ -1,5 +1,5 @@
+import { languageData, regionTranslates } from '$/data/translates'
 import { db } from '$/types/connection'
-import { languageData, regionTranslates } from '$data/translates'
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -15,9 +15,9 @@ import {
     TextInputStyle,
 } from 'discord.js'
 import { z } from 'zod'
-import { RiotAPI, errorSchema, regions, routingValues, type region, type routingValue } from './RiotAPI'
+import { RiotAPI, errorSchema, regions, type region } from './RiotAPI'
 import { MemoryStorage } from './memStorage'
-import { getLanguageData } from './utils'
+import { getLanguageData, getRoutingValue } from './utils'
 
 export class Link {
     /**
@@ -124,28 +124,7 @@ export class Link {
         const select = new StringSelectMenuBuilder()
             .setCustomId('#LOL_LINK_ADDITIONAL')
             .setPlaceholder(language.link.regionOrServer.placeholder)
-
-        let message = language.link.regionOrServer.message
-
-        if (interaction.customId == '#LOL_LINK_MODAL_RIOT') {
-            //select with routing values
-            select.addOptions(
-                routingValues
-                    .filter((r) => r != 'SEA')
-                    .map((value) => {
-                        return new StringSelectMenuOptionBuilder()
-                            .setValue(value)
-                            .setLabel(language.global.routingValues[value] as string)
-                    }),
-            )
-
-            this.tempStorage.add(interaction.user.id, {
-                tempRiotUsername: interaction.fields.getTextInputValue('#LOL_LINK_USERNAME'),
-                tempRiotTag: interaction.fields.getTextInputValue('#LOL_LINK_TAG'),
-            })
-        } else {
-            //select with regions
-            select.addOptions(
+            .addOptions(
                 regions.map((value) => {
                     return new StringSelectMenuOptionBuilder()
                         .setValue(value)
@@ -153,6 +132,14 @@ export class Link {
                 }),
             )
 
+        let message = language.link.regionOrServer.message
+
+        if (interaction.customId == '#LOL_LINK_MODAL_RIOT') {
+            this.tempStorage.add(interaction.user.id, {
+                tempRiotUsername: interaction.fields.getTextInputValue('#LOL_LINK_USERNAME'),
+                tempRiotTag: interaction.fields.getTextInputValue('#LOL_LINK_TAG'),
+            })
+        } else {
             this.tempStorage.add(interaction.user.id, {
                 tempUsername: interaction.fields.getTextInputValue('#LOL_LINK_USERNAME'),
             })
@@ -238,15 +225,17 @@ export class Link {
         interaction: StringSelectMenuInteraction,
         language: languageData,
     ) {
+        console.log(data)
+
         if (!data.errorSchema) {
-            return this.sendError(interaction, language.link.process.error)
+            return this.sendError(interaction, language.global.error)
         } else {
             const { status_code } = data.data.status
 
             if (status_code === 404) {
-                return this.sendError(interaction, language.link.process.unknownUser)
+                return this.sendError(interaction, language.global.unknownUser)
             } else {
-                return this.sendError(interaction, language.link.process.adminError)
+                return this.sendError(interaction, language.global.adminError)
             }
         }
     }
@@ -267,11 +256,10 @@ export class Link {
          * @todo get random pfp and promt user to change his profile picture to it and then check it
          */
 
+        const region = interaction.values[0] as region
+        if (!regions.includes(region)) return
+
         if ('tempUsername' in savedData) {
-            const region = interaction.values[0] as region
-
-            if (!regions.includes(region)) return
-
             const endpoint = RiotAPI.getAccountByUsername(region, savedData.tempUsername)
 
             const data = await endpoint.fetchSafe()
@@ -303,9 +291,7 @@ export class Link {
                 })
             }
         } else {
-            const routingValue = interaction.values[0] as routingValue
-
-            if (!routingValues.includes(routingValue)) return
+            const routingValue = getRoutingValue(region)
 
             const endpoint = RiotAPI.getAccountByRiotId(routingValue, savedData.tempRiotUsername, savedData.tempRiotTag)
 
@@ -330,6 +316,7 @@ export class Link {
                         gameName,
                         tagLine,
                         puuid,
+                        region,
                     })
                     .executeTakeFirst()
 

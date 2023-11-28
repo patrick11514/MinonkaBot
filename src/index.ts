@@ -1,12 +1,13 @@
-import Logger from '$lib/logger'
-import { MemoryStorage } from '$lib/memStorage'
-import { env } from '$types/env'
-import { Awaitable } from '$types/types'
+import Logger from '$/lib/logger'
+import { env } from '$/types/env'
+import { Awaitable } from '$/types/types'
 import clc from 'cli-color'
 import { Client, GatewayIntentBits, Partials } from 'discord.js'
+import * as microjob from 'microjob'
 import fs from 'node:fs'
 import path from 'path'
 import { DiscordEvent } from './hooks'
+import { MemoryStorage } from './lib/memStorage'
 
 //Intends
 const intents: GatewayIntentBits[] = [
@@ -30,7 +31,10 @@ const client = new Client({
     partials,
 })
 process.client = client
-process.memory = new MemoryStorage<string, string>()
+process.memory = new MemoryStorage()
+microjob.start({
+    maxWorkers: parseInt(env.THREADS),
+})
 
 //event handlers
 const starts: (() => Awaitable<void>)[] = []
@@ -44,7 +48,7 @@ client.on('ready', () => {
     })
 })
 
-//load events frol files
+//load events from files
 const files = fs
     .readdirSync(path.join(__dirname, 'functions'))
     .filter((file) => file.endsWith('.ts') || file.endsWith('.js'))

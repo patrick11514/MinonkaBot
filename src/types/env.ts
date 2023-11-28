@@ -10,6 +10,7 @@ const schema = z.object({
     MYSQL_USERNAME: z.string(),
     MYSQL_PASSWORD: z.string(),
     MYSQL_DATABASE: z.string(),
+    THREADS: z.string(),
 })
 
 export const env = schema.parse(process.env)

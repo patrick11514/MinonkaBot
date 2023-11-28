@@ -1,4 +1,4 @@
-import { region, regions, routingValue, routingValues } from '$lib/RiotAPI'
+import { region, regions, routingValue, routingValues } from '$/lib/RiotAPI'
 import { z } from 'zod'
 
 const regionIndex = z.custom<region>((val) => {
@@ -33,9 +33,6 @@ const phrasesSchema = z.object({
             placeholder: z.string(),
         }),
         process: z.object({
-            error: z.string(),
-            unknownUser: z.string(),
-            adminError: z.string(),
             success: z.string(),
             alreadyLinked: z.string(),
         }),
@@ -59,12 +56,22 @@ const phrasesSchema = z.object({
         regions: z.record(regionIndex, z.string()),
         regionsFull: z.record(regionIndex, z.string()),
         routingValues: z.record(routingIndex, z.string()),
+        error: z.string(),
+        unknownUser: z.string(),
+        adminError: z.string(),
     }),
     language: z.object({
         info: z.string(),
         success: z.string(),
     }),
+    account: z.object({
+        riot: z.string(),
+        username: z.string(),
+        title: z.string(),
+    }),
 })
+
+export type phrases = z.infer<typeof phrasesSchema>
 
 const schema = z.object({
     cs: phrasesSchema,
@@ -134,9 +141,6 @@ export const translate: z.infer<typeof schema> = {
                 placeholder: 'Vyber region',
             },
             process: {
-                error: 'Něco se pokazilo, zkus to prosím později.',
-                unknownUser: 'Zadal jsi neplatné jméno, nebo tag, zkus to prosím znovu.',
-                adminError: 'Nastala chyba, kontaktuj prosím administrátora.',
                 success: 'Účet byl úspěšně propojen.',
                 alreadyLinked: 'Tento účet již je s někým propojen.',
             },
@@ -165,10 +169,18 @@ export const translate: z.infer<typeof schema> = {
                 EUROPE: 'Evropa',
                 SEA: 'Jihovýchodní Asie',
             },
+            error: 'Něco se pokazilo, zkus to prosím později.',
+            unknownUser: 'Zadal jsi neplatné jméno, nebo tag, zkus to prosím znovu.',
+            adminError: 'Nastala chyba, kontaktuj prosím administrátora.',
         },
         language: {
             info: 'Tvůj aktuální jazyk je:',
             success: 'Tvůj jazyk byl změněn na:',
+        },
+        account: {
+            riot: 'Riot',
+            username: 'Summoner jméno',
+            title: 'Vyber si účet, který chceš použít',
         },
     },
     en: {
@@ -191,9 +203,6 @@ export const translate: z.infer<typeof schema> = {
                 placeholder: 'Select region',
             },
             process: {
-                error: 'Something went wrong, please try again later.',
-                unknownUser: 'You entered invalid name or tag, please try again.',
-                adminError: 'An error has occurred, please contact the administrator.',
                 success: 'Account was successfully linked.',
                 alreadyLinked: 'This account is already linked with someone.',
             },
@@ -222,10 +231,18 @@ export const translate: z.infer<typeof schema> = {
                 EUROPE: 'Europe',
                 SEA: 'South East Asia',
             },
+            error: 'Something went wrong, please try again later.',
+            unknownUser: 'You entered invalid name or tag, please try again.',
+            adminError: 'An error has occurred, please contact the administrator.',
         },
         language: {
             info: 'Your current language is:',
             success: 'Your language has been changed to:',
+        },
+        account: {
+            riot: 'Riot',
+            username: 'Summoner name',
+            title: 'Select account you want to use',
         },
     },
 }

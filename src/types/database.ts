@@ -13,6 +13,7 @@ export interface RiotLink {
   gameName: string;
   id: Generated<number>;
   puuid: string;
+  region: string;
   tagLine: string;
   user_id: string;
 }
