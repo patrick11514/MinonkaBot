@@ -1,7 +1,6 @@
 import fetch from 'node-fetch'
-import fs from 'node:fs'
-import path from 'node:path'
 import Sharp from 'sharp'
+import { checkCache, getCachePath, saveToCache, toFileName } from '../cache'
 import { position } from './main'
 
 export class Layer {
@@ -28,26 +27,17 @@ export class Layer {
         }
 
         if (cache) {
-            const parts = url.split('.')
+            const path = toFileName(url)
 
-            const extension = parts.pop()
-            const urlWithoutExtension = parts.join('.')
-
-            const cacheName = urlWithoutExtension.replace(/[^a-zA-Z0-9]/g, '_')
-            //extension is now _png, _jpg or _jpeg
-            const fullFilePath = path.join('cache', `${cacheName}.${extension}`)
-
-            if (fs.existsSync(fullFilePath)) {
-                return new Layer(fullFilePath, position)
+            if (checkCache(path)) {
+                return new Layer(getCachePath(path), position)
             }
 
             const request = await fetch(url)
-
             const data = await request.arrayBuffer()
+            saveToCache(path, Buffer.from(data))
 
-            fs.writeFileSync(fullFilePath, Buffer.from(data))
-
-            return new Layer(fullFilePath, position)
+            return new Layer(getCachePath(path), position)
         }
 
         return new Layer(url, position)
