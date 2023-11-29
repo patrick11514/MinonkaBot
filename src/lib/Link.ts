@@ -225,8 +225,6 @@ export class Link {
         interaction: StringSelectMenuInteraction,
         language: languageData,
     ) {
-        console.log(data)
-
         if (!data.errorSchema) {
             return this.sendError(interaction, language.global.error)
         } else {
