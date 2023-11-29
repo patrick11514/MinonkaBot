@@ -10,6 +10,7 @@ declare global {
             client: Client
             database: typeof db
             memory: MemoryStorage<string, string>
+            LOL_VERSION: string
         }
     }
 }

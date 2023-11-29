@@ -1,4 +1,5 @@
 import { env } from '$/types/env'
+import { challenge, challengeCategory, challengeLevel } from '$/types/riotTypes'
 import { Endpoint, EndpointMethod } from '@patrick115/endpoints'
 import { z } from 'zod'
 
@@ -56,6 +57,13 @@ const getEndpoint = <T>(endpoint: string, method: EndpointMethod, schema: z.ZodT
 }
 
 export class RiotAPI {
+    /**
+     * Get account by RiotId (name + tag)
+     * @param routingValue routingValue for the api where to search the account
+     * @param gameName name part of RiotId
+     * @param tagLine tag part of RiotId
+     * @returns Generated endpoint to fetch the account
+     */
     public static getAccountByRiotId(routingValue: routingValue, gameName: string, tagLine: string) {
         return getEndpoint(
             `https://${routingValue}.${BASE_URL}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
@@ -68,6 +76,13 @@ export class RiotAPI {
         )
     }
 
+    /**
+     * Get account by username and region
+     * @deprecated Use getAccountByRiotId instead
+     * @param region Region in which the account is located
+     * @param username Summoner name
+     * @returns Generated endpoint to fetch the account
+     */
     public static getAccountByUsername(region: region, username: string) {
         return getEndpoint(
             `https://${region}.${BASE_URL}/lol/summoner/v4/summoners/by-name/${username}`,
@@ -84,6 +99,12 @@ export class RiotAPI {
         )
     }
 
+    /**
+     * Get account by puuid
+     * @param region Region in which the account is located
+     * @param puuid Encrypted PUUID of the account
+     * @returns Generated endpoint to fetch the account
+     */
     public static getAccountByPuuid(region: region, puuid: string) {
         return getEndpoint(
             `https://${region}.${BASE_URL}/lol/summoner/v4/summoners/by-puuid/${puuid}`,
@@ -96,6 +117,38 @@ export class RiotAPI {
                 profileIconId: z.number(),
                 revisionDate: z.number(),
                 summonerLevel: z.number(),
+            }),
+        )
+    }
+
+    public static getAccountChallenges(region: region, puuid: string) {
+        return getEndpoint(
+            `https://${region}.${BASE_URL}/lol/challenges/v1/player-data/${puuid}`,
+            'GET',
+            z.object({
+                totalPoints: z.object({
+                    level: challengeLevel.optional(),
+                    current: z.number(),
+                    max: z.number(),
+                    percentile: z.number(),
+                }),
+                categoryPoints: z.record(
+                    challengeCategory,
+                    z.object({
+                        level: challengeLevel,
+                        current: z.number(),
+                        max: z.number(),
+                        percentile: z.number(),
+                    }),
+                ),
+                challenges: z.array(challenge),
+                preferences: z.object({
+                    bannerAccent: z.string(),
+                    title: z.string(),
+                    challengeIds: z.array(z.number()),
+                    crestBorder: z.string(),
+                    prestigeCrestBorderLevel: z.number(),
+                }),
             }),
         )
     }

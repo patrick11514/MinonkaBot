@@ -4,7 +4,7 @@
     "description": "Discordbot for League of Legends",
     "main": "build/index.js",
     "dependencies": {
-        "@patrick115/endpoints": "1.1.2-d",
+        "@patrick115/endpoints": "1.1.2-e",
         "cli-color": "^2.0.3",
         "discord.js": "^14.14.1",
         "dotenv": "^16.3.1",

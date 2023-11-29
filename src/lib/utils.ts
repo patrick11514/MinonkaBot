@@ -1,6 +1,9 @@
 import { language, phrases, translate } from '$/data/translates'
 import { db } from '$/types/connection'
+import { RiotAPILanguages } from '$/types/types'
+import fetch from 'node-fetch'
 import { region, routingValue, routingValuesToRegions } from './RiotAPI'
+import { checkCache, getCache, saveToCache, toFileName } from './cache'
 
 const memory = process.memory
 
@@ -40,4 +43,64 @@ export const getRoutingValue = (region: region): routingValue => {
     if (routingValue === undefined) throw new Error('Invalid region')
 
     return routingValue
+}
+
+export const getDataFile = (file: string, language: 'cs_CZ' | 'en_US') => {
+    return `https://ddragon.leagueoflegends.com/cdn/${process.LOL_VERSION}/data/${language}/${file}`
+}
+
+export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
+    const url = getDataFile('challenges.json', language)
+    const name = toFileName(url)
+
+    const fullId = parseInt(titleId)
+    const id = Math.floor(fullId / 100)
+    const level = fullId % 100
+
+    type dataType = {
+        id: number
+        thresholds: Record<
+            string,
+            {
+                rewards?: {
+                    category: 'TITLE'
+                    quantity: number
+                    title: string
+                }[]
+            }
+        >
+    }[]
+
+    let data: dataType
+
+    if (checkCache(name)) {
+        const buffer = getCache(name)
+        data = JSON.parse(buffer.toString()) as dataType
+    } else {
+        const request = await fetch(url)
+        data = await request.json()
+
+        saveToCache(name, Buffer.from(JSON.stringify(data)))
+    }
+
+    const challenge = data.find((d) => d.id === id)
+
+    if (!challenge || !challenge.thresholds) {
+        return ''
+    }
+
+    const values = Object.values(challenge.thresholds)
+    const currentLevel = values[level]
+
+    if (!currentLevel || !currentLevel.rewards) {
+        return ''
+    }
+
+    const titleReward = currentLevel.rewards.find((reward) => reward.category == 'TITLE')
+
+    if (!titleReward) {
+        return ''
+    }
+
+    return titleReward.title
 }

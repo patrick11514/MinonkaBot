@@ -4,6 +4,8 @@ import { z } from 'zod'
 
 export type Awaitable<T> = Promise<T> | T
 
+export type RiotAPILanguages = 'en_US' | 'cs_CZ'
+
 export type RiotError = {
     status: {
         status_code: number

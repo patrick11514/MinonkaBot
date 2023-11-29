@@ -32,6 +32,8 @@ const client = new Client({
 })
 process.client = client
 process.memory = new MemoryStorage()
+process.LOL_VERSION = '13.23.1'
+//@TODO: add fetching the lol version from riot api and updating it
 microjob.start({
     maxWorkers: parseInt(env.THREADS),
 })
