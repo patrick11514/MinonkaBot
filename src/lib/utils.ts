@@ -2,6 +2,8 @@ import { language, phrases, translate } from '$/data/translates'
 import { db } from '$/types/connection'
 import { RiotAPILanguages } from '$/types/types'
 import fetch from 'node-fetch'
+import path from 'node:path'
+import { Worker } from 'node:worker_threads'
 import { region, routingValue, routingValuesToRegions } from './RiotAPI'
 import { checkCache, getCache, saveToCache, toFileName } from './cache'
 
@@ -47,6 +49,10 @@ export const getRoutingValue = (region: region): routingValue => {
 
 export const getDataFile = (file: string, language: 'cs_CZ' | 'en_US') => {
     return `https://ddragon.leagueoflegends.com/cdn/${process.LOL_VERSION}/data/${language}/${file}`
+}
+
+export const getImageFile = (file: string) => {
+    return `https://ddragon.leagueoflegends.com/cdn/${process.LOL_VERSION}/img/${file}`
 }
 
 export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
@@ -103,4 +109,28 @@ export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
     }
 
     return titleReward.title
+}
+
+export const makeThread = async (customFile: string, data: any) => {
+    return new Promise<Buffer>((resolve, reject) => {
+        const worker = new Worker('./' + path.join('src/lib/drawing/customFiles', customFile), {
+            workerData: data,
+        })
+
+        worker.on('message', (data: Uint8Array) => {
+            const buffer = Buffer.from(data as Uint8Array)
+
+            resolve(buffer)
+        })
+
+        worker.on('error', (err) => {
+            reject(err)
+        })
+
+        worker.on('exit', (code) => {
+            if (code !== 0) {
+                reject(code)
+            }
+        })
+    })
 }

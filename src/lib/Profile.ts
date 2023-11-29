@@ -1,10 +1,9 @@
 import { language } from '$/data/translates'
 import { RiotAPILanguages } from '$/types/types'
 import { ChatInputCommandInteraction, RepliableInteraction } from 'discord.js'
-import { job } from 'microjob'
 import { Accounts } from './Accounts'
 import { RiotAPI, region } from './RiotAPI'
-import { getLanguage, getLanguageData, getLanguageDataFromLang, getTitle } from './utils'
+import { getLanguage, getLanguageData, getLanguageDataFromLang, getTitle, makeThread } from './utils'
 
 export type userData = {
     username: string
@@ -27,14 +26,8 @@ export class Profile {
         }
     }
 
-    private static async generateImage(interaction: RepliableInteraction, data: userData) /*: Promise<Buffer> */ {
-        const buffer = await job(async (userData: userData) => {}, {
-            data,
-        })
-
-        interaction.reply({
-            files: [buffer],
-        })
+    private static async generateImage(data: userData): Promise<Buffer> {
+        return makeThread('profile', data)
     }
 
     static async getUserProfileByPuuid(interaction: RepliableInteraction, puuid: string, region: region) {
@@ -61,8 +54,6 @@ export class Profile {
 
         const challengeEndpoint = RiotAPI.getAccountChallenges(region, puuid)
         const rawChallengeData = await challengeEndpoint.fetchSafe()
-
-        console.log(rawChallengeData)
 
         if (!rawChallengeData.status) {
             const error = account.getError(rawChallengeData)
@@ -93,6 +84,15 @@ export class Profile {
             pfp: accountData.profileIconId,
         }
 
-        Profile.generateImage(interaction, userData)
+        const data = await Profile.generateImage(userData)
+
+        interaction.reply({
+            files: [
+                {
+                    attachment: data,
+                    name: `LOLprofile.png`,
+                },
+            ],
+        })
     }
 }
