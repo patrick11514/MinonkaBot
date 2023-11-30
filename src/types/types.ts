@@ -22,3 +22,8 @@ export type errorResponse =
           status: false
           errorSchema: false
       }
+
+export type WorkerLolData<T> = {
+    data: T
+    version: string
+}

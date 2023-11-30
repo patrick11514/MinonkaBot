@@ -1,6 +1,6 @@
 import Sharp from 'sharp'
+import { checkCache, getCachePath, saveToCache, toFileName } from '../cache'
 import { Layer } from './layer'
-import { Text } from './text'
 
 export type position = {
     x: number
@@ -10,80 +10,48 @@ export type position = {
 /**
  * Drawing class for creating images with Layers
  */
-export class Drawing {
-    /**
-     * The background
-     */
-    private canvas: Sharp.Sharp
-    /**
-     * Layers over the canvas
-     */
-    private layers: (Layer | Text)[] = []
-    /**
-     * Metadata of image
-     */
-    private metadata: Sharp.Metadata | undefined
-
+export class Drawing extends Layer {
     /**
      * Constructor
      * @param background path to file or Sharp object
      */
     constructor(background: string | Sharp.Sharp) {
-        if (typeof background === 'string') {
-            this.canvas = Sharp(background)
-        } else {
-            this.canvas = background
-        }
+        super(background, {
+            x: 0,
+            y: 0,
+        })
     }
 
     /**
-     * Get metadata from image
+     * Generate Drawing from url
+     * @param url Url to image
+     * @param position Can be ignored
+     * @param cache Cache file?
+     * @returns Drawing object
      */
-    async getMetadata() {
-        this.metadata = await this.canvas.metadata()
-    }
-
-    /**
-     * Get width of image
-     * @returns undefined if getMetadata was never called and number always after the getMetadata was called
-     */
-    get width(): number | undefined {
-        return this.metadata?.width
-    }
-
-    /**
-     * Get height of image
-     * @returns undefined if getMetadata was never called and number always after the getMetadata was called
-     */
-    get height(): number | undefined {
-        return this.metadata?.height
-    }
-
-    /**
-     * Add layer to image
-     * @param layer Layer or Text
-     * @returns this
-     */
-    addLayer(layer: Layer | Text): Drawing {
-        this.layers.push(layer)
-        return this
-    }
-
-    /**
-     * Turn current image with layers to buffer
-     * @returns Final image as buffer
-     */
-    async toBuffer(): Promise<Buffer> {
-        for (const layer of this.layers) {
-            this.canvas.composite([
-                {
-                    left: layer.position.x,
-                    top: layer.position.y,
-                    input: await layer.toBuffer(),
-                },
-            ])
+    static override async fromURL(url: string, position?: position, cache = true): Promise<Drawing> {
+        if (!url.endsWith('.png') && !url.endsWith('.jpg') && !url.endsWith('.jpeg')) {
+            throw new Error('Invalid image format')
         }
 
-        return this.canvas.toBuffer()
+        if (!url.startsWith('http') && !url.startsWith('https')) {
+            throw new Error('Invalid URL')
+        }
+
+        if (cache) {
+            const path = toFileName(url)
+
+            if (checkCache(path)) {
+                return new Drawing(getCachePath(path))
+            }
+
+            const request = await fetch(url)
+            const data = await request.arrayBuffer()
+            saveToCache(path, Buffer.from(data))
+
+            return new Drawing(getCachePath(path))
+        }
+
+        return new Drawing(url)
     }
 }

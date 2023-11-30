@@ -32,7 +32,7 @@
     },
     "scripts": {
         "folders": "mkdir -p ./logs ./cache",
-        "dev": "npm run folders && ts-node-dev -r tsconfig-paths/register --watch ./src/lib/drawing/customFiles/*.ts --respawn --rs ./src/index.ts",
+        "dev": "npm run folders && ts-node-dev -r tsconfig-paths/register --watch ./src/lib/drawing --respawn --rs ./src/index.ts",
         "build": "mkdir -p build && npm run folders && tsc",
         "start": "node -r module-alias/register ./build/index.js",
         "clear": "rm -rf build",

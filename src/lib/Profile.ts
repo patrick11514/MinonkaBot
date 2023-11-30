@@ -23,6 +23,9 @@ export class Profile {
 
         if (accounts.length > 1) {
             account.selectAccount(interaction, Profile.getUserProfileByPuuid)
+        } else {
+            const account = accounts[0]
+            Profile.getUserProfileByPuuid(interaction, account.puuid, account.region)
         }
     }
 
@@ -66,6 +69,8 @@ export class Profile {
             return
         }
 
+        await interaction.deferReply()
+
         const challengeData = rawChallengeData.data
 
         const translates: Record<language, RiotAPILanguages> = {
@@ -86,7 +91,11 @@ export class Profile {
 
         const data = await Profile.generateImage(userData)
 
-        interaction.reply({
+        console.log('DATA:')
+        console.log(data)
+        console.log('=============')
+
+        interaction.editReply({
             files: [
                 {
                     attachment: data,

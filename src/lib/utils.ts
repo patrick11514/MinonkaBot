@@ -52,7 +52,7 @@ export const getDataFile = (file: string, language: 'cs_CZ' | 'en_US') => {
 }
 
 export const getImageFile = (file: string) => {
-    return `https://ddragon.leagueoflegends.com/cdn/${process.LOL_VERSION}/img/${file}`
+    return `https://ddragon.leagueoflegends.com/cdn/${process.LOL_VERSION}/img/${file}.png`
 }
 
 export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
@@ -114,7 +114,10 @@ export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
 export const makeThread = async (customFile: string, data: any) => {
     return new Promise<Buffer>((resolve, reject) => {
         const worker = new Worker('./' + path.join('src/lib/drawing/customFiles', customFile), {
-            workerData: data,
+            workerData: {
+                data: data,
+                version: process.LOL_VERSION,
+            },
         })
 
         worker.on('message', (data: Uint8Array) => {

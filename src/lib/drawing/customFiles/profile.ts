@@ -1,18 +1,35 @@
 import { userData } from '$/lib/Profile'
-import { parentPort, workerData } from 'worker_threads'
+import { getImageFile } from '$/lib/utils'
+import { WorkerLolData } from '$/types/types'
+import { isMainThread, parentPort, workerData } from 'worker_threads'
+import { Layer } from '../layer'
 import { Drawing } from '../main'
 
 const main = async () => {
-    const data = workerData as userData
+    const { data, version } = workerData as WorkerLolData<userData>
+    process.LOL_VERSION = version
 
+    console.log('a')
+
+    //background
     const drawing = new Drawing('images/profile/background.png')
+    await drawing.getMetadata()
 
-    /*drawing.addLayer(
-        await Layer.fromURL(getImageFile('profileicon/' + data.pfp), {
-            x: 20,
-            y: 20,
-        }),
-    )*/
+    //profile image
+    const profileImage = await Layer.fromURL(getImageFile('profileicon/' + data.pfp), {
+        x: 120,
+        y: 400,
+    })
+    profileImage.resize((drawing.width as number) - 2 * 120)
+    drawing.addLayer(profileImage)
+
+    //level
+    const level = new Layer('images/profile/level.png', {
+        x: ((drawing.width as number) - 222) / 2,
+        y: 40,
+    })
+    await level.getMetadata()
+    drawing.addLayer(level)
 
     //make buffer
     const parent = parentPort
@@ -25,6 +42,8 @@ const main = async () => {
     parent.postMessage(await drawing.toBuffer())
 }
 
-main().catch((err) => {
-    console.log(err)
-})
+if (!isMainThread) {
+    main().catch((err) => {
+        throw err
+    })
+}

@@ -2,6 +2,7 @@ import fetch from 'node-fetch'
 import Sharp from 'sharp'
 import { checkCache, getCachePath, saveToCache, toFileName } from '../cache'
 import { position } from './main'
+import { Text } from './text'
 
 /**
  * Layer
@@ -12,9 +13,17 @@ export class Layer {
      */
     private canvas: Sharp.Sharp
     /**
+     * Layers over the canvas
+     */
+    private layers: (Layer | Text)[] = []
+    /**
      * Position in parent Canvas
      */
     public position: position
+    /**
+     * Metadata of image
+     */
+    private metadata: Sharp.Metadata | undefined
 
     /**
      * Constructor
@@ -29,6 +38,29 @@ export class Layer {
         }
 
         this.position = position
+    }
+
+    /**
+     * Get metadata from image
+     */
+    async getMetadata() {
+        this.metadata = await this.canvas.metadata()
+    }
+
+    /**
+     * Get width of image
+     * @returns undefined if getMetadata was never called and number always after the getMetadata was called
+     */
+    get width(): number | undefined {
+        return this.metadata?.width
+    }
+
+    /**
+     * Get height of image
+     * @returns undefined if getMetadata was never called and number always after the getMetadata was called
+     */
+    get height(): number | undefined {
+        return this.metadata?.height
     }
 
     /**
@@ -65,6 +97,16 @@ export class Layer {
     }
 
     /**
+     * Add layer to image
+     * @param layer Layer or Text
+     * @returns this
+     */
+    addLayer(layer: Layer | Text): this {
+        this.layers.push(layer)
+        return this
+    }
+
+    /**
      * Resize layer
      * @param width New width
      * @param height New height
@@ -77,10 +119,28 @@ export class Layer {
     }
 
     /**
-     * Turn current Layer into Buffer
+     * Turn current layer with layers to buffer
      * @returns Image as Buffer
      */
     public async toBuffer(): Promise<Buffer> {
+        const compositeList: {
+            left: number
+            top: number
+            input: Buffer
+        }[] = []
+
+        for (const layer of this.layers) {
+            compositeList.push({
+                left: layer.position.x,
+                top: layer.position.y,
+                input: await layer.toBuffer(),
+            })
+        }
+
+        if (compositeList.length > 0) {
+            this.canvas.composite(compositeList)
+        }
+
         return this.canvas.toBuffer()
     }
 }

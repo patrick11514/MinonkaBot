@@ -9,6 +9,11 @@ import path from 'path'
 import { DiscordEvent } from './hooks'
 import { MemoryStorage } from './lib/memStorage'
 
+//If using Worker Threads we need to keep sharp loaded
+//https://github.com/lovell/sharp/issues/2263#issuecomment-645523303
+import _ from 'sharp'
+_
+
 //Intends
 const intents: GatewayIntentBits[] = [
     GatewayIntentBits.Guilds,
