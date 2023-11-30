@@ -1,4 +1,3 @@
-import Sharp from 'sharp'
 import { position } from './main'
 
 type size = {
@@ -7,7 +6,6 @@ type size = {
 }
 
 export class Text {
-    private canvas: Sharp.Sharp
     public size: size
     public position: position
 
@@ -15,7 +13,7 @@ export class Text {
     private font: string
     private fontSize: number
     private color: `#${string}`
-    private center: boolean
+    private align: 'center' | 'left' | 'right'
     private bold: boolean
     private outline: boolean
 
@@ -26,34 +24,58 @@ export class Text {
         size,
         position,
         color = '#ffffff',
-        center = true,
-        bold = false,
+        align = 'center',
+        bold = true,
         outline = false,
     }: {
         text: string
-        font: string
+        font?: string
         fontSize: number
         size: size
         position: position
-        color: `#${string}`
-        center: boolean
-        bold: boolean
-        outline: boolean
+        color?: `#${string}`
+        align?: 'center' | 'left' | 'right'
+        bold?: boolean
+        outline?: boolean
     }) {
-        this.canvas = Sharp()
         this.text = text
         this.font = font
         this.fontSize = fontSize
         this.color = color
-        this.center = center
+        this.align = align
         this.bold = bold
         this.outline = outline
-
         this.size = size
         this.position = position
     }
 
     public async toBuffer(): Promise<Buffer> {
-        return this.canvas.toBuffer()
+        return Buffer.from(`<svg width="${this.size.width}" height="${this.size.height}">
+        <style>
+            .text {
+                font-family: '${this.font}';
+                font-size: ${this.fontSize}px;
+                fill: ${this.color};
+                font-weight: ${this.bold ? 'bold' : 'normal'};
+            }
+            .outline {
+                paint-order: stroke;
+                stroke: #000000;
+                stroke-width: 6px;
+                stroke-linecap: butt;
+                stroke-linejoin: miter;
+            }
+            svg {
+                background: #fff;
+            }
+        </style>
+        <text dy=".3em" y="50%" ${
+            this.align === 'center'
+                ? 'x="50%" text-anchor="middle"'
+                : this.align === 'right'
+                  ? 'x="100%" text-anchor="end"'
+                  : ''
+        } class="text${this.outline ? ' outline' : ''}">${this.text}</text>
+    </svg>`)
     }
 }

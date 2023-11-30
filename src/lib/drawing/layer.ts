@@ -30,14 +30,17 @@ export class Layer {
      * @param source path to file or Sharp object
      * @param position position of layer in parent Canvas
      */
-    constructor(source: string | Sharp.Sharp, position: position) {
+    constructor(source: string | Sharp.Sharp, position?: position) {
         if (typeof source === 'string') {
             this.canvas = Sharp(source)
         } else {
             this.canvas = source
         }
 
-        this.position = position
+        this.position = position ?? {
+            x: 0,
+            y: 0,
+        }
     }
 
     /**
@@ -49,18 +52,40 @@ export class Layer {
 
     /**
      * Get width of image
-     * @returns undefined if getMetadata was never called and number always after the getMetadata was called
+     * Can throw errors:
+     * Metadata is not loaded, if you don't call getMetadata
+     * Cannot determinate the width, if error occured
+     * @returns width of image
      */
-    get width(): number | undefined {
-        return this.metadata?.width
+    get width(): number {
+        if (this.metadata === undefined) throw 'Metadata is not loaded'
+        if (this.metadata.width === undefined) throw 'Cannot determinate the width'
+
+        return this.metadata.width
     }
 
     /**
      * Get height of image
-     * @returns undefined if getMetadata was never called and number always after the getMetadata was called
+     * Can throw errors:
+     * Metadata is not loaded, if you don't call getMetadata
+     * Cannot determinate the width, if error occured
+     * @returns height of image
      */
-    get height(): number | undefined {
-        return this.metadata?.height
+    get height(): number {
+        if (this.metadata === undefined) throw 'Metadata is not loaded'
+        if (this.metadata.height === undefined) throw 'Cannot determinate the height'
+
+        return this.metadata.height
+    }
+
+    /**
+     * Set new position
+     * @param newPosition
+     * @returns this to chain operations
+     */
+    setPosition(newPosition: position) {
+        this.position = newPosition
+        return this
     }
 
     /**
@@ -70,7 +95,7 @@ export class Layer {
      * @param cache Cache file?
      * @returns Layer object
      */
-    static async fromURL(url: string, position: position, cache = true): Promise<Layer> {
+    static async fromURL(url: string, position?: position, cache = true): Promise<Layer> {
         if (!url.endsWith('.png') && !url.endsWith('.jpg') && !url.endsWith('.jpeg')) {
             throw new Error('Invalid image format')
         }
@@ -99,7 +124,7 @@ export class Layer {
     /**
      * Add layer to image
      * @param layer Layer or Text
-     * @returns this
+     * @returns this to chain operations
      */
     addLayer(layer: Layer | Text): this {
         this.layers.push(layer)
@@ -108,12 +133,20 @@ export class Layer {
 
     /**
      * Resize layer
+     * Updates metadata if getMetadata was called before this function
      * @param width New width
      * @param height New height
-     * @returns this
+     * @returns this to chain operations
      */
-    resize(width?: number, height?: number): Layer {
+    async resize(width?: number, height?: number): Promise<Layer> {
         this.canvas.resize(width, height)
+
+        if (this.metadata !== undefined) {
+            const { info } = await this.canvas.toBuffer({ resolveWithObject: true })
+
+            this.metadata.width = info.width
+            this.metadata.height = info.height
+        }
 
         return this
     }
