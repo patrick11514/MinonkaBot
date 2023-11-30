@@ -11,8 +11,7 @@ import { MemoryStorage } from './lib/memStorage'
 
 //If using Worker Threads we need to keep sharp loaded
 //https://github.com/lovell/sharp/issues/2263#issuecomment-645523303
-import _ from 'sharp'
-_
+require('sharp')
 
 //Intends
 const intents: GatewayIntentBits[] = [

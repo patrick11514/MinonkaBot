@@ -7,6 +7,9 @@ import { Worker } from 'node:worker_threads'
 import { region, routingValue, routingValuesToRegions } from './RiotAPI'
 import { checkCache, getCache, saveToCache, toFileName } from './cache'
 
+////COMPILE DRAWING, BEACUSE IT IS ONLY USED IN WORKERS (customFiles) FOLDER
+require('./drawing/main')
+
 const memory = process.memory
 
 export const getLanguage = async (id: string) => {
@@ -113,7 +116,9 @@ export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
 
 export const makeThread = async (customFile: string, data: any) => {
     return new Promise<Buffer>((resolve, reject) => {
-        const worker = new Worker('./' + path.join('src/lib/drawing/customFiles', customFile), {
+        const resolved = require.resolve(path.join(__dirname, 'drawing/customFiles', customFile))
+
+        const worker = new Worker(resolved, {
             workerData: {
                 data: data,
                 version: process.LOL_VERSION,
