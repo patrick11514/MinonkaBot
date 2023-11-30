@@ -2,13 +2,21 @@ import { language, phrases, translate } from '$/data/translates'
 import { db } from '$/types/connection'
 import { RiotAPILanguages } from '$/types/types'
 import fetch from 'node-fetch'
+import fs from 'node:fs'
 import path from 'node:path'
 import { Worker } from 'node:worker_threads'
 import { region, routingValue, routingValuesToRegions } from './RiotAPI'
 import { checkCache, getCache, saveToCache, toFileName } from './cache'
 
-////COMPILE DRAWING, BEACUSE IT IS ONLY USED IN WORKERS (customFiles) FOLDER
-require('./drawing/main')
+if (process.env.TS_NODE_DEV) {
+    ////COMPILE DRAWING FILES, BEACUSE IT IS ONLY USED IN WORKERS (customFiles) FOLDER
+    fs.readdirSync(path.join(__dirname, 'drawing'))
+        .map((file) => path.join(__dirname, 'drawing', file))
+        .filter((file) => file.endsWith('.ts') || file.endsWith('.js'))
+        .forEach((file) => {
+            require(file)
+        })
+}
 
 const memory = process.memory
 
@@ -56,6 +64,10 @@ export const getDataFile = (file: string, language: 'cs_CZ' | 'en_US') => {
 
 export const getImageFile = (file: string) => {
     return `https://ddragon.leagueoflegends.com/cdn/${process.LOL_VERSION}/img/${file}.png`
+}
+
+export const getStaticImageFile = (file: string) => {
+    return `https://ddragon.leagueoflegends.com/cdn/img/${file}.png`
 }
 
 export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
