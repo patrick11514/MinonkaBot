@@ -12,6 +12,8 @@ export const challengeLevel = z
     .or(z.literal('GRANDMASTER'))
     .or(z.literal('CHALLENGER'))
 
+export type challengeLevel = z.infer<typeof challengeLevel>
+
 export const challengeCategory = z
     .literal('COLLECTION')
     .or(z.literal('TEAMWORK'))
