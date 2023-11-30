@@ -69,6 +69,14 @@ const phrasesSchema = z.object({
         username: z.string(),
         title: z.string(),
     }),
+    profile: z.object({
+        roleMention: z.string(),
+        missing: z.string(),
+        noAccounts: z.string(),
+        invalidAccount: z.string(),
+        badArguments: z.string(),
+        invalidRiotId: z.string(),
+    }),
 })
 
 export type phrases = z.infer<typeof phrasesSchema>
@@ -182,6 +190,14 @@ export const translate: z.infer<typeof schema> = {
             username: 'Summoner jméno',
             title: 'Vyber si účet, který chceš použít',
         },
+        profile: {
+            roleMention: 'Označ prosím nějakého uživatele.',
+            missing: 'Nepovedlo se získat data od uživatele, zkus to prosím znova později.',
+            noAccounts: 'Tento uživatel nemá propojený žádný účet.',
+            badArguments: 'Zadal jsi neplatnou kombinaci argumentů.',
+            invalidAccount: 'Zadaný účet je neplatný.',
+            invalidRiotId: 'Zadal jsi neplatné RiotId. (Jméno#Tag)',
+        },
     },
     en: {
         link: {
@@ -243,6 +259,14 @@ export const translate: z.infer<typeof schema> = {
             riot: 'Riot',
             username: 'Summoner name',
             title: 'Select account you want to use',
+        },
+        profile: {
+            roleMention: 'Plese select user.',
+            missing: 'Unable to get data from user, please try again later.',
+            noAccounts: "This user doesn't have linked any account.",
+            badArguments: "You've entered an invalid combination of arguments.",
+            invalidAccount: "You've entered an invalid account.",
+            invalidRiotId: "You've entered an invalid RiotId. (Name#Tag)",
         },
     },
 }

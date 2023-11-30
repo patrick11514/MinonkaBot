@@ -67,8 +67,8 @@ const rawCommands = [
             return option
                 .setName('riot_id')
                 .setNameLocalization('cs', 'riot_id')
-                .setDescription('Shows profile of someone by their riot id (Name#Tag)')
-                .setDescriptionLocalization('cs', 'Zobrazí profil někoho podle jeho riot id (Jméno#Tag)')
+                .setDescription('Shows profile of someone by their riot id (Name#Tag) + region')
+                .setDescriptionLocalization('cs', 'Zobrazí profil někoho podle jeho riot id (Jméno#Tag) + regionu')
                 .setRequired(false)
         })
         .addStringOption((option) => {
@@ -83,8 +83,8 @@ const rawCommands = [
             return option
                 .setName('region')
                 .setNameLocalization('cs', 'region')
-                .setDescription('Shows profile of someone by their region + summoner name')
-                .setDescriptionLocalization('cs', 'Zobrazí profil někoho podle jeho regionu + summoner name')
+                .setDescription('Shows profile of someone by their region + summoner name/RiotId')
+                .setDescriptionLocalization('cs', 'Zobrazí profil někoho podle jeho regionu + summoner name/riotId')
                 .setChoices(
                     ...regions.map((region) => {
                         return {

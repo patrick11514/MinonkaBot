@@ -18,19 +18,27 @@ export type userData = {
     pfp: number
 }
 export class Profile {
-    static async getUserProfile(interaction: ChatInputCommandInteraction) {
+    static async getProfileById(interaction: RepliableInteraction, userId: string) {
         const language = await getLanguageData(interaction.user.id)
-
-        const account = new Accounts(interaction.user.id, language)
+        const account = new Accounts(userId, language)
 
         const accounts = await account.getAllAccounts()
 
-        if (accounts.length > 1) {
+        if (accounts.length == 0) {
+            interaction.reply({
+                ephemeral: true,
+                content: language.profile.noAccounts,
+            })
+        } else if (accounts.length > 1) {
             account.selectAccount(interaction, Profile.getUserProfileByPuuid)
         } else {
             const account = accounts[0]
             Profile.getUserProfileByPuuid(interaction, account.puuid, account.region)
         }
+    }
+
+    static async getUserProfile(interaction: ChatInputCommandInteraction) {
+        Profile.getProfileById(interaction, interaction.user.id)
     }
 
     private static async generateImage(data: userData): Promise<Buffer> {
