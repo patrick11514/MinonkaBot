@@ -1,4 +1,5 @@
 import { language } from '$/data/translates'
+import { challengeLevel } from '$/types/riotTypes'
 import { RiotAPILanguages } from '$/types/types'
 import { ChatInputCommandInteraction, RepliableInteraction } from 'discord.js'
 import { Accounts } from './Accounts'
@@ -9,7 +10,10 @@ export type userData = {
     username: string
     region: region
     level: number
-    challenges: number[]
+    challenges: {
+        id: number
+        tier: challengeLevel
+    }[]
     title: string
     pfp: number
 }
@@ -84,7 +88,23 @@ export class Profile {
             username: accountData.name,
             region,
             level: accountData.summonerLevel,
-            challenges: challengeData.preferences.challengeIds,
+            challenges: challengeData.preferences.challengeIds
+                .map((challengeId) => {
+                    const challenge = challengeData.challenges.find((challenge) => {
+                        return challenge.challengeId === challengeId
+                    })
+
+                    if (!challenge) return undefined
+
+                    return {
+                        id: challengeId,
+                        tier: challenge.level,
+                    }
+                })
+                .filter((c) => c !== undefined) as {
+                id: number
+                tier: challengeLevel
+            }[],
             title,
             pfp: accountData.profileIconId,
         }
