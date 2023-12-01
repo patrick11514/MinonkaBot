@@ -232,7 +232,7 @@ export class Link {
             const { status_code } = data.data.status
 
             if (status_code === 404) {
-                return this.sendError(interaction, language.global.unknownUser)
+                return this.sendError(interaction, language.global.unknownUserRiot)
             } else {
                 return this.sendError(interaction, language.global.adminError)
             }

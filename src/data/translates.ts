@@ -58,6 +58,7 @@ const phrasesSchema = z.object({
         routingValues: z.record(routingIndex, z.string()),
         error: z.string(),
         unknownUser: z.string(),
+        unknownUserRiot: z.string(),
         adminError: z.string(),
     }),
     language: z.object({
@@ -178,7 +179,8 @@ export const translate: z.infer<typeof schema> = {
                 SEA: 'Jihovýchodní Asie',
             },
             error: 'Něco se pokazilo, zkus to prosím později.',
-            unknownUser: 'Zadal jsi neplatné jméno, nebo tag, zkus to prosím znovu.',
+            unknownUser: 'Zadaný uživatle neexistuje, zkontroluj si prosím jméno a region.',
+            unknownUserRiot: 'Zadal jsi neplatné jméno, nebo tag, zkus to prosím znovu.',
             adminError: 'Nastala chyba, kontaktuj prosím administrátora.',
         },
         language: {
@@ -248,7 +250,8 @@ export const translate: z.infer<typeof schema> = {
                 SEA: 'South East Asia',
             },
             error: 'Something went wrong, please try again later.',
-            unknownUser: 'You entered invalid name or tag, please try again.',
+            unknownUser: "You've entered an invalid username or region, please try again.",
+            unknownUserRiot: 'You entered invalid name or tag, please try again.',
             adminError: 'An error has occurred, please contact the administrator.',
         },
         language: {

@@ -119,10 +119,6 @@ export class Profile {
 
         const data = await Profile.generateImage(userData)
 
-        console.log('DATA:')
-        console.log(data)
-        console.log('=============')
-
         interaction.editReply({
             files: [
                 {
