@@ -8,6 +8,7 @@ import {
     ChatInputCommandInteraction,
     ModalBuilder,
     ModalSubmitInteraction,
+    RepliableInteraction,
     StringSelectMenuBuilder,
     StringSelectMenuInteraction,
     StringSelectMenuOptionBuilder,
@@ -192,10 +193,10 @@ export class Link {
 
     /**
      * Send error base of data from RiotAPI
-     * @param interaction Interaction from select menu with region or routing value
+     * @param interaction Replaiable Interaction
      * @param message Message to be send
      */
-    private sendError(interaction: StringSelectMenuInteraction, message: string) {
+    private sendError(interaction: RepliableInteraction, message: string) {
         this.tempStorage.delete(interaction.user.id)
 
         interaction.reply({
@@ -207,11 +208,11 @@ export class Link {
     /**
      * Check which error will be sent to user
      * @param data Data from RiotAPI
-     * @param interaction Interaction from select menu with region or routing value
+     * @param interaction Replaiable Interaction
      * @param language Users language data
      * @returns void
      */
-    private checkError(
+    public checkError(
         data:
             | {
                   status: false
@@ -222,7 +223,7 @@ export class Link {
                   status: false
                   errorSchema: false
               },
-        interaction: StringSelectMenuInteraction,
+        interaction: RepliableInteraction,
         language: languageData,
     ) {
         if (!data.errorSchema) {
