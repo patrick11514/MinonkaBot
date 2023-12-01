@@ -122,7 +122,7 @@ export class Accounts {
 
         const { status } = data.data
 
-        if (status.status_code === 400) {
+        if (status.status_code === 404) {
             return this.phrases.global.unknownUser
         } else {
             return this.phrases.global.error
