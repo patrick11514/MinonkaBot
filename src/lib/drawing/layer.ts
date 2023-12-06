@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
-import Sharp from 'sharp'
+import { default as Sharp, default as sharp } from 'sharp'
 import { checkCache, getCachePath, saveToCache, toFileName } from '../cache'
+import { validateImage } from '../utils'
 import { position } from './main'
 import { Text } from './text'
 
@@ -23,7 +24,13 @@ export class Layer {
     /**
      * Metadata of image
      */
-    private metadata: Sharp.Metadata | undefined
+    private metadata:
+        | Sharp.Metadata
+        | {
+              width: number
+              height: number
+          }
+        | undefined
 
     /**
      * Constructor
@@ -112,13 +119,40 @@ export class Layer {
             }
 
             const request = await fetch(url)
-            const data = await request.arrayBuffer()
-            saveToCache(path, Buffer.from(data))
+            //Check if valid image
+            const data = await validateImage(await request.buffer())
 
+            saveToCache(path, Buffer.from(data))
             return new Layer(getCachePath(path), position)
         }
+        const request = await fetch(url)
+        const data = await validateImage(await request.buffer())
 
-        return new Layer(url, position)
+        return new Layer(sharp(data), position)
+    }
+
+    static createEmpty(
+        resolution: {
+            width: number
+            height: number
+        },
+        position: position,
+    ): Layer {
+        const image = Sharp({
+            create: {
+                width: resolution.width,
+                height: resolution.height,
+                channels: 4,
+                background: {
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    alpha: 50,
+                },
+            },
+        }).png()
+
+        return new Layer(image, position)
     }
 
     /**

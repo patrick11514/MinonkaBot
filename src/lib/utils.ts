@@ -7,6 +7,7 @@ import fetch from 'node-fetch'
 import fs from 'node:fs'
 import path from 'node:path'
 import { Worker } from 'node:worker_threads'
+import sharp from 'sharp'
 import { Accounts } from './Accounts'
 import { Link } from './Link'
 import { RiotAPI, region, routingValue, routingValuesToRegions } from './RiotAPI'
@@ -128,6 +129,19 @@ export const getTitle = async (titleId: string, language: RiotAPILanguages) => {
     }
 
     return titleReward.title
+}
+
+export const DEFAULT_IMAGE = 'profileicon/29'
+
+export const validateImage = async (data: Buffer) => {
+    try {
+        await sharp(data).toBuffer()
+    } catch (_) {
+        const request = await fetch(getImageFile(DEFAULT_IMAGE))
+        const data = await request.buffer()
+        return data
+    }
+    return data
 }
 
 export const makeThread = async (customFile: string, data: any) => {
