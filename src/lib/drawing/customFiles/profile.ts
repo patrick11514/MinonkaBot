@@ -104,23 +104,25 @@ const main = async () => {
     }
 
     const boxWidth = challSize * 3 + challSpacing * 2
-    const chCount = data.challenges.length
+    const chCount = data.challenges?.length
     let lastX = boxStart.x + (boxWidth - (chCount * challSize + (chCount - 1) * challSpacing)) / 2
 
-    for (const challengeData of data.challenges) {
-        const challenge = await Layer.fromURL(
-            getStaticImageFile(`challenges-images/${challengeData.id}-${challengeData.tier}`),
-        )
+    if (chCount > 0) {
+        for (const challengeData of data.challenges) {
+            const challenge = await Layer.fromURL(
+                getStaticImageFile(`challenges-images/${challengeData.id}-${challengeData.tier}`),
+            )
 
-        challenge
-            .setPosition({
-                x: lastX,
-                y: boxStart.y,
-            })
-            .resize(challSize)
+            challenge
+                .setPosition({
+                    x: lastX,
+                    y: boxStart.y,
+                })
+                .resize(challSize)
 
-        lastX += challSize + challSpacing
-        drawing.addLayer(challenge)
+            lastX += challSize + challSpacing
+            drawing.addLayer(challenge)
+        }
     }
 
     //make buffer

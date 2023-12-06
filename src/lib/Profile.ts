@@ -67,14 +67,19 @@ export class Profile {
             cs: 'cs_CZ',
         }
 
-        const title = await getTitle(challengeData.preferences.title, translates[languageId])
+        let title: string
+        if (challengeData.preferences.title === undefined) {
+            title = ''
+        } else {
+            title = await getTitle(challengeData.preferences.title, translates[languageId])
+        }
 
         const userData: userData = {
             username: accountData.name,
             region,
             level: accountData.summonerLevel,
             challenges: challengeData.preferences.challengeIds
-                .map((challengeId) => {
+                ?.map((challengeId) => {
                     const challenge = challengeData.challenges.find((challenge) => {
                         return challenge.challengeId === challengeId
                     })
