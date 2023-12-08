@@ -32,3 +32,32 @@ export const challenge = z.object({
 })
 
 export type challengeType = z.infer<typeof challenge>
+
+export const tier = z
+    .literal('IRON')
+    .or(z.literal('BRONZE'))
+    .or(z.literal('SILVER'))
+    .or(z.literal('GOLD'))
+    .or(z.literal('PLATINUM'))
+    .or(z.literal('EMERALD'))
+    .or(z.literal('DIAMOND'))
+    .or(z.literal('MASTER'))
+    .or(z.literal('GRANDMASTER'))
+    .or(z.literal('CHALLENGER'))
+export const rank = z.literal('I').or(z.literal('II')).or(z.literal('III')).or(z.literal('IV')).or(z.literal('V'))
+
+export const RankedData = z.object({
+    leagueId: z.string(),
+    queueType: z.literal('RANKED_FLEX_SR').or(z.literal('RANKED_SOLO_5x5')),
+    tier,
+    rank,
+    leaguePoints: z.number(),
+    wins: z.number(),
+    losses: z.number(),
+    veteran: z.boolean(),
+    inactive: z.boolean(),
+    freshBlood: z.boolean(),
+    hotStreak: z.boolean(),
+})
+
+export type RankedData = z.infer<typeof RankedData>

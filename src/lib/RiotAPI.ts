@@ -1,5 +1,5 @@
 import { env } from '$/types/env'
-import { challenge, challengeCategory, challengeLevel } from '$/types/riotTypes'
+import { RankedData, challenge, challengeCategory, challengeLevel } from '$/types/riotTypes'
 import { Endpoint, EndpointMethod } from '@patrick115/endpoints'
 import { z } from 'zod'
 
@@ -130,7 +130,7 @@ export class RiotAPI {
                     level: challengeLevel.optional(),
                     current: z.number(),
                     max: z.number(),
-                    percentile: z.number(),
+                    percentile: z.number().optional(),
                 }),
                 categoryPoints: z.record(
                     challengeCategory,
@@ -138,18 +138,26 @@ export class RiotAPI {
                         level: challengeLevel,
                         current: z.number(),
                         max: z.number(),
-                        percentile: z.number(),
+                        percentile: z.number().optional(),
                     }),
                 ),
                 challenges: z.array(challenge),
                 preferences: z.object({
-                    bannerAccent: z.string(),
-                    title: z.string(),
-                    challengeIds: z.array(z.number()),
-                    crestBorder: z.string(),
-                    prestigeCrestBorderLevel: z.number(),
+                    bannerAccent: z.string().optional(),
+                    title: z.string().optional(),
+                    challengeIds: z.array(z.number()).optional(),
+                    crestBorder: z.string().optional(),
+                    prestigeCrestBorderLevel: z.number().optional(),
                 }),
             }),
+        )
+    }
+
+    public static getAccountRanks(region: region, summonerId: string) {
+        return getEndpoint(
+            `https://${region}.${BASE_URL}/lol/league/v4/entries/by-summoner/${summonerId}`,
+            'GET',
+            z.array(RankedData),
         )
     }
 }
