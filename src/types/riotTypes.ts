@@ -44,13 +44,14 @@ export const tier = z
     .or(z.literal('MASTER'))
     .or(z.literal('GRANDMASTER'))
     .or(z.literal('CHALLENGER'))
+export type tier = z.infer<typeof tier>
 export const rank = z.literal('I').or(z.literal('II')).or(z.literal('III')).or(z.literal('IV')).or(z.literal('V'))
 
 export const RankedData = z.object({
-    leagueId: z.string(),
-    queueType: z.literal('RANKED_FLEX_SR').or(z.literal('RANKED_SOLO_5x5')),
-    tier,
-    rank,
+    leagueId: z.string().optional(),
+    queueType: z.literal('RANKED_FLEX_SR').or(z.literal('RANKED_SOLO_5x5')).or(z.literal('CHERRY')),
+    tier: tier.optional(),
+    rank: rank.optional(),
     leaguePoints: z.number(),
     wins: z.number(),
     losses: z.number(),
@@ -58,6 +59,8 @@ export const RankedData = z.object({
     inactive: z.boolean(),
     freshBlood: z.boolean(),
     hotStreak: z.boolean(),
+    summonerId: z.string(),
+    summonerName: z.string(),
 })
 
 export type RankedData = z.infer<typeof RankedData>

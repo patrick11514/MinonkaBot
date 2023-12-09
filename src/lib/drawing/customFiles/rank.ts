@@ -1,5 +1,5 @@
 import { userData } from '$/lib/Rank'
-import { getImageFile } from '$/lib/utils'
+import { colorList, getImageFile, tierColors } from '$/lib/utils'
 import { WorkerLolData } from '$/types/types'
 import { isMainThread, parentPort, workerData } from 'node:worker_threads'
 import { Layer } from '../layer'
@@ -10,15 +10,13 @@ const main = async () => {
     const { data, version } = workerData as WorkerLolData<userData>
     process.LOL_VERSION = version
 
-    console.log(data)
-
     //background
     const drawing = new Drawing('images/rank/background.png')
     await drawing.getMetadata()
 
     //left side
     const profileSpacing = 200
-    const leftSpacing = 120
+    const leftSpacing = 250
     const imageWidth = drawing.height - 2 * profileSpacing
 
     const leftSide = Layer.createEmpty(
@@ -48,7 +46,7 @@ const main = async () => {
     const levelBackground = new Layer('images/profile/level.png')
     await levelBackground.getMetadata()
     levelBackground.setPosition({
-        x: leftSpacing + (profileImage.width - levelBackground.width) / 2,
+        x: (profileImage.width - levelBackground.width) / 2,
         y: profileImage.position.y - levelBackground.height - spacing,
     })
 
@@ -67,14 +65,14 @@ const main = async () => {
     })
 
     levelBackground.addLayer(levelText)
-    drawing.addLayer(levelBackground)
+    leftSide.addLayer(levelBackground)
 
     //region
     const region = new Text({
         text: data.region,
         fontSize: 50,
         position: {
-            x: leftSpacing,
+            x: 0,
             y: levelBackground.position.y - 60 - spacing,
         },
         size: {
@@ -82,19 +80,19 @@ const main = async () => {
             width: profileImage.width,
         },
     })
-    drawing.addLayer(region)
+    leftSide.addLayer(region)
 
     //username
     const username = new Text({
         text: data.username,
         fontSize: 80,
         position: {
-            x: leftSpacing,
+            x: 0,
             y: profileImage.position.y + profileImage.height + spacing,
         },
         size: {
             height: 80,
-            width: profileImage.width,
+            width: leftSpacing * 2 + profileImage.width,
         },
         color: '#eae1cf',
     })
@@ -102,28 +100,168 @@ const main = async () => {
     drawing.addLayer(leftSide)
 
     let rankY = 0
-    const rankPercentage = 70
+    const rankPercentage = 50
     //ranks
-    data.ranks
-        .sort((a, _) => {
-            return a.queueType == 'RANKED_SOLO_5x5' ? -1 : 1
-        })
-        .forEach((rank) => {
-            const rankLayer = Layer.createEmpty(
-                {
-                    width: Math.round((drawing.width * rankPercentage) / 100),
-                    height: Math.round(drawing.height / 2),
-                },
-                {
-                    x: drawing.width - Math.round((drawing.width * rankPercentage) / 100),
-                    y: rankY,
-                },
-            )
+    data.ranks.sort((a, _) => {
+        return a.queueType == 'RANKED_SOLO_5x5' ? -1 : 1
+    })
 
-            rankY += drawing.height / 2
+    const layerSpacingX = 60
+    const layerSpacingY = 50
 
-            drawing.addLayer(rankLayer)
+    for (const rank of data.ranks) {
+        if (rank.tier === undefined || rank.rank === undefined) continue
+
+        const rankLayer = Layer.createEmpty(
+            {
+                width: Math.round((drawing.width * rankPercentage) / 100) - layerSpacingX * 2,
+                height: Math.round(drawing.height / 2) - layerSpacingY * 2,
+            },
+            {
+                x: drawing.width - Math.round((drawing.width * rankPercentage) / 100) - layerSpacingX,
+                y: rankY + layerSpacingY,
+            },
+        )
+
+        await rankLayer.getMetadata()
+
+        //queue name
+        const queueTextHeight = 70
+        const queueName = new Text({
+            text: rank.queueType === 'RANKED_SOLO_5x5' ? 'Solo/Duo' : 'Flex',
+            fontSize: 55,
+            position: {
+                x: 0,
+                y: 0,
+            },
+            size: {
+                height: queueTextHeight,
+                width: rankLayer.width,
+            },
         })
+        rankLayer.addLayer(queueName)
+        const downLayer = Layer.createEmpty(
+            {
+                width: rankLayer.width,
+                height: rankLayer.height - queueTextHeight,
+            },
+            {
+                x: 0,
+                y: queueTextHeight,
+            },
+        )
+        await downLayer.getMetadata()
+
+        //tier icon
+        const tierIcon = new Layer('images/ranks/' + rank.tier.toLowerCase() + '.png')
+        await tierIcon.getMetadata()
+        await tierIcon.resize(rankLayer.height - queueTextHeight)
+        tierIcon.setPosition({
+            x: 0,
+            y: 0,
+        })
+
+        downLayer.addLayer(tierIcon)
+
+        const textSpacing = 50
+
+        //tier name
+        const tierName = new Text({
+            text:
+                rank.tier
+                    .split('')
+                    .map((c, i) => (i != 0 ? c.toLowerCase() : c))
+                    .join('') + //all lowercase except first letter
+                ' ' +
+                rank.rank,
+            fontSize: 60,
+            position: {
+                x: tierIcon.width,
+                y: textSpacing,
+            },
+            align: 'left',
+            size: {
+                height: 60,
+                width: downLayer.width - tierIcon.width,
+            },
+            color: tierColors(rank.tier),
+        })
+        downLayer.addLayer(tierName)
+
+        //winrate
+        const winrate = Math.round((rank.wins / (rank.wins + rank.losses)) * 100)
+        const winRate = new Text({
+            text: winrate.toPrecision(2) + '%',
+            fontSize: 60,
+            position: {
+                x: tierIcon.width,
+                y: textSpacing,
+            },
+            align: 'right',
+            size: {
+                height: 55,
+                width: downLayer.width - tierIcon.width - textSpacing,
+            },
+            color: winrate >= 50 ? colorList.GREEN : colorList.RED,
+        })
+        downLayer.addLayer(winRate)
+
+        //LP
+        const LP = new Text({
+            text: rank.leaguePoints.toString() + ' LP',
+            fontSize: 60,
+            position: {
+                x: tierIcon.width,
+                y: downLayer.height - textSpacing - 60,
+            },
+            align: 'left',
+            size: {
+                height: 60,
+                width: downLayer.width - tierIcon.width,
+            },
+        })
+        downLayer.addLayer(LP)
+
+        //wins
+        const wins = new Text({
+            text: rank.wins.toString() + ' Wins',
+            fontSize: 60,
+            position: {
+                x: tierIcon.width,
+                y: downLayer.height - textSpacing - 60,
+            },
+            align: 'center',
+            size: {
+                height: 60,
+                width: downLayer.width - tierIcon.width - textSpacing * 4,
+            },
+            color: colorList.GREEN,
+        })
+        downLayer.addLayer(wins)
+
+        //losses
+        const losses = new Text({
+            text: rank.losses.toString() + ' Losses',
+            fontSize: 60,
+            position: {
+                x: tierIcon.width,
+                y: downLayer.height - textSpacing - 60,
+            },
+            align: 'right',
+            size: {
+                height: 60,
+                width: downLayer.width - tierIcon.width - textSpacing,
+            },
+            color: colorList.RED,
+        })
+        downLayer.addLayer(losses)
+
+        rankLayer.addLayer(downLayer)
+
+        rankY += drawing.height / 2
+
+        drawing.addLayer(rankLayer)
+    }
 
     //make buffer
     const parent = parentPort

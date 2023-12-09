@@ -55,7 +55,8 @@ export class Rank {
 
         await interaction.deferReply()
 
-        const rankData = rawRankData.data
+        //we don't want to show the cherry (arenas) queue, in this command
+        const rankData = rawRankData.data.filter((queue) => queue.queueType !== 'CHERRY')
 
         const userData: userData = {
             username: accountData.name,

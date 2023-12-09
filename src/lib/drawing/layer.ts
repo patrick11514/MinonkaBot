@@ -147,7 +147,7 @@ export class Layer {
                     r: 0,
                     g: 0,
                     b: 0,
-                    alpha: 50,
+                    alpha: 0,
                 },
             },
         }).png()

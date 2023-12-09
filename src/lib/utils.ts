@@ -1,6 +1,7 @@
 import { language, phrases, translate } from '$/data/translates'
 import { DiscordEvent } from '$/hooks'
 import { db } from '$/types/connection'
+import { tier } from '$/types/riotTypes'
 import { RiotAPILanguages } from '$/types/types'
 import { RepliableInteraction } from 'discord.js'
 import fetch from 'node-fetch'
@@ -291,3 +292,27 @@ const getProfileById = async (
         fnc(interaction, account.puuid, account.region)
     }
 }
+
+export const tierColors = (tier: tier) => {
+    const data: Record<tier, `#${string}`> = {
+        IRON: '#99978b',
+        BRONZE: '#966502',
+        SILVER: '#99978b',
+        GOLD: '#e6c41c',
+        PLATINUM: '#49ebaa',
+        EMERALD: '#1b9627',
+        DIAMOND: '#5149eb',
+        MASTER: '#8117b3',
+        GRANDMASTER: '#9e0606',
+        CHALLENGER: '#e5f051',
+    }
+
+    return data[tier]
+}
+
+export const colorList = {
+    GREEN: '#1fed18',
+    RED: '#ff0000',
+    YELLOW: '#fff000',
+    GRAY: '#7e857f',
+} as const
